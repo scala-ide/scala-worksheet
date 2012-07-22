@@ -1,7 +1,9 @@
 package org.scalaide.worksheet.editors
 
-import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
+import org.scalaide.worksheet.reconciler._
+
 import org.eclipse.jface.text.source.SourceViewerConfiguration
+import org.eclipse.jface.text.reconciler._
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import scala.tools.eclipse.lexical.ScalaPartitions
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer
@@ -17,8 +19,10 @@ import org.eclipse.jface.text.hyperlink.IHyperlinkDetector
 import scala.tools.eclipse.ScalaHover
 import scalariform.ScalaVersions
 import scala.tools.eclipse.ScalaEditor
+import org.eclipse.ui.texteditor.ITextEditor
+import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
 
-class ScriptConfiguration extends SourceViewerConfiguration {
+class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfiguration {
   private val scalaPreferenceStore = ScalaPlugin.plugin.getPreferenceStore
 
   val codeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
@@ -65,6 +69,12 @@ class ScriptConfiguration extends SourceViewerConfiguration {
       IJavaPartitions.JAVA_STRING,
       IJavaPartitions.JAVA_CHARACTER,
       ScalaPartitions.SCALA_MULTI_LINE_STRING)
+  }
+  
+  override def getReconciler(sourceViewer: ISourceViewer): IReconciler = {
+    val reconciler = new MonoReconciler(new ScalaReconcilingStrategy(textEditor), /*isIncremental = */false)
+    reconciler.install(sourceViewer)
+    reconciler
   }
 
   private val scalaCodeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)

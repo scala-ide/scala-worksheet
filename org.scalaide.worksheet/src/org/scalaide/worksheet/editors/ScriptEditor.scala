@@ -20,6 +20,6 @@ class ScriptEditor extends TextEditor {
   
   override def initializeEditor() {
     super.initializeEditor()
-    setSourceViewerConfiguration(new ScriptConfiguration)
+    setSourceViewerConfiguration(new ScriptConfiguration(this))
   }
 }
