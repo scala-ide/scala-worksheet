@@ -34,6 +34,5 @@ class ScriptCompilationUnit(val file: IFile) {
       }
       pc.problemsOf(sourceFile.file)
     }(null)
-
 }
 

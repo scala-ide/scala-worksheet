@@ -81,7 +81,7 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
 
   override def getAnnotationHover(viewer: ISourceViewer): IAnnotationHover = {
     new DefaultAnnotationHover(true) {
-      override def isIncluded(a: Annotation): Boolean = annotationsShownInHover(a.getType)
+      override def isIncluded(a: Annotation): Boolean = ScriptEditor.annotationsShownInHover(a.getType)
     }
    
   }
@@ -102,9 +102,6 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
   private val xmlPCDATAScanner = new SingleTokenScanner(ScalaSyntaxClasses.DEFAULT, javaColorManager, scalaPreferenceStore)
   private val xmlPIScanner = new XmlPIScanner(javaColorManager, scalaPreferenceStore)
   
-  private val annotationsShownInHover = Set(
-      "org.eclipse.jdt.ui.error", "org.eclipse.jdt.ui.warning", "org.eclipse.jdt.ui.info")
-
   //  override def getTextHover(sv: ISourceViewer, contentType: String, stateMask: Int) = {
   //    new ScalaHover(getCodeAssist _)
   //  }
