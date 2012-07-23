@@ -1,9 +1,11 @@
-scala-ide-plugin.g8
+Scala Worksheet plugin
 ===================
 
-Giger8 template for Eclipse plugins based on the Scala IDE.
+A simple worksheet implementation for Scala IDE. It is a glorified editor, with
+the option of evaluating the script and placing the results of each expression in
+a comment on the same line.
 
-This template produces 5 Eclipse plugins:
+There are 5 Eclipse plugins:
 
 * the plugin itself
 * the `plugin.tests` fragment
@@ -16,7 +18,7 @@ based on Tycho, enabling command line builds.
 
 ## Note:
 
-There is no default profile. You need to specify a profile manually, choosing what version
+There are several profiles for choosing what version
 of the Scala IDE and Scala compiler you want to build against:
 
 * `scala-ide-2.0-scala-2.9`
