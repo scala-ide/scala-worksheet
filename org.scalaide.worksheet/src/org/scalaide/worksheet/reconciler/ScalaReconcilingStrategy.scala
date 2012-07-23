@@ -1,53 +1,39 @@
-package org.scalaide.worksheet.reconciler
+package org.scalaide.worksheet
+package reconciler
 
 import org.eclipse.jface.text.reconciler._
 import org.eclipse.jface.text._
+import org.eclipse.jface.text.source._
 import org.eclipse.ui.texteditor._
 import org.eclipse.ui.part.FileEditorInput
 
 import org.eclipse.core.resources.IFile
-
 import org.eclipse.jdt.core.compiler.IProblem
 
 import scala.tools.eclipse.logging.HasLogger
 import scala.tools.eclipse.{ ScalaPlugin, ScalaProject }
-import scala.tools.eclipse.util._
 
-import scala.reflect.internal.util._
+import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
 
 class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStrategy with HasLogger {
   private var document: IDocument = _
+  private lazy val annotationModel = textEditor.getDocumentProvider.getAnnotationModel(textEditor.getEditorInput)
+
+  lazy val scriptUnit = new ScriptCompilationUnit(getFile)
 
   def setDocument(doc: IDocument) {
     document = doc
   }
 
   def reconcile(dirtyRegion: DirtyRegion, subRegion: IRegion) {
-    logger.debug("Reconciling on " + document)
+    logger.debug("Incremental reconciliation not implemented.")
   }
 
   def reconcile(partition: IRegion) {
     logger.info("Reconciling full doc on " + document)
-    val errors = compilationErrors(partition)
-    
+    val errors = scriptUnit.reconcile(document.get)
+
     updateErrorAnnotations(errors)
-  }
-
-  private def compilationErrors(region: IRegion): List[IProblem] =
-    withScalaProject { prj =>
-      prj.withPresentationCompiler { pc =>
-        val sourceFile = scriptSourceFile(region)
-        pc.withResponse[Unit] { response =>
-          pc.askReload(List(sourceFile), response)
-          response.get
-        }
-        pc.problemsOf(sourceFile.file)
-      }(null)
-    } getOrElse Nil
-
-  def scriptSourceFile(region: IRegion): SourceFile = {
-    val contents = document.get(region.getOffset, region.getLength)
-    ScriptSourceFile.apply(EclipseResource(getFile), contents.toCharArray)
   }
 
   private def getFile: IFile =
@@ -56,12 +42,20 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
         fileEditorInput.getFile
     }
 
-  private def withScalaProject[A](op: ScalaProject => A): Option[A] = {
-    ScalaPlugin.plugin.asScalaProject(getFile.getProject) map op
-  }
-  
+  private var previousAnnotations = List[ProblemAnnotation]()
+  private var previousErrors = List[IProblem]()
+
   private def updateErrorAnnotations(errors: List[IProblem]) {
-    // TODO: update the annotation model
+    def position(p: IProblem) = new Position(p.getSourceStart, p.getSourceEnd - p.getSourceStart + 1)
+
+    previousAnnotations.foreach(annotationModel.removeAnnotation)
+
+    for (e <- errors) {
+      //      val annotation = new Annotation("org.scala-ide.sdt.core.problem", false, e.getMessage) // no compilation unit
+      val annotation = new ProblemAnnotation(e, null) // no compilation unit
+      annotationModel.addAnnotation(annotation, position(e))
+      previousAnnotations ::= annotation
+    }
   }
 }
 
