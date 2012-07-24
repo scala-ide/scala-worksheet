@@ -14,50 +14,25 @@ import org.eclipse.swt.widgets.Composite
 import scala.collection.JavaConverters._
 
 object ScriptEditor {
+  
+  /** The annotation types showin when hovering on the left-side ruler (or in the status bar). */
   val annotationsShownInHover = Set(
     "org.eclipse.jdt.ui.error", "org.eclipse.jdt.ui.warning", "org.eclipse.jdt.ui.info")
 }
 
-class ScriptEditor extends TextEditor {
+/** A Scala script editor. 
+ */
+class ScriptEditor extends TextEditor with SelectionTracker {
 
   setPartName("Scala Script Editor")
   setDocumentProvider(new ScriptDocumentProvider)
-
-  def scalaPrefStore = ScalaPlugin.prefStore
-  def javaPrefStore = JavaPlugin.getDefault.getPreferenceStore
 
   override def initializeEditor() {
     super.initializeEditor()
     setSourceViewerConfiguration(new ScriptConfiguration(this))
   }
 
-  lazy val selectionListener = new ISelectionListener() {
-    def selectionChanged(part: IWorkbenchPart, selection: ISelection) {
-      selection match {
-        case textSel: ITextSelection => ScriptEditor.this.selectionChanged(textSel)
-        case _                       =>
-      }
-    }
-  }
-
-  override def dispose() {
-    uninstallSelectionChangeListner()
-    super.dispose()
-  }
-
-  override def createPartControl(parent: Composite) {
-    super.createPartControl(parent)
-    installSelectionChangeListner()
-  }
-
-  def installSelectionChangeListner() {
-    getEditorSite.getPage.addPostSelectionListener(selectionListener)
-  }
-
-  def uninstallSelectionChangeListner() {
-    getEditorSite.getPage.removePostSelectionListener(selectionListener)
-  }
-
+  /** Return the annotation model associated with the current document. */
   private def annotationModel = getDocumentProvider.getAnnotationModel(getEditorInput).asInstanceOf[IAnnotationModel with IAnnotationModelExtension2]
 
   def selectionChanged(selection: ITextSelection) {
