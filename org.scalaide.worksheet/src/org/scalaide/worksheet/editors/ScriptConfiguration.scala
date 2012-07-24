@@ -1,28 +1,35 @@
 package org.scalaide.worksheet.editors
 
-import org.scalaide.worksheet.reconciler._
-
-import org.eclipse.jface.text.source.SourceViewerConfiguration
-import org.eclipse.jface.text.reconciler._
-import org.eclipse.jdt.ui.text.IJavaPartitions
-import scala.tools.eclipse.lexical.ScalaPartitions
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer
-import scala.tools.eclipse.ScalaDamagerRepairer
-import org.eclipse.jface.text.presentation.PresentationReconciler
-import org.eclipse.jface.text.source._
-import scala.tools.eclipse.lexical._
-import org.eclipse.jface.text.{IDocument, ITextHover, DefaultTextHover}
-import org.eclipse.jface.text.rules.ITokenScanner
 import org.eclipse.jdt.internal.ui.JavaPlugin
-import scala.tools.eclipse.ScalaPlugin
-import org.eclipse.jface.text.hyperlink.IHyperlinkDetector
-import scala.tools.eclipse.ScalaHover
-import scalariform.ScalaVersions
-import scala.tools.eclipse.ScalaEditor
+import org.eclipse.jdt.ui.text.IJavaPartitions
+import org.eclipse.jface.text.DefaultTextHover
+import org.eclipse.jface.text.IDocument
+import org.eclipse.jface.text.ITextHover
+import org.eclipse.jface.text.presentation.PresentationReconciler
+import org.eclipse.jface.text.reconciler.IReconciler
+import org.eclipse.jface.text.reconciler.MonoReconciler
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer
+import org.eclipse.jface.text.rules.ITokenScanner
+import org.eclipse.jface.text.source.Annotation
+import org.eclipse.jface.text.source.DefaultAnnotationHover
+import org.eclipse.jface.text.source.IAnnotationHover
+import org.eclipse.jface.text.source.ISourceViewer
+import org.eclipse.jface.text.source.SourceViewerConfiguration
 import org.eclipse.ui.texteditor.ITextEditor
+import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
+
+import scala.tools.eclipse.ScalaDamagerRepairer
+import scala.tools.eclipse.ScalaPlugin
+import scala.tools.eclipse.lexical.ScalaCodeScanner
+import scala.tools.eclipse.lexical.ScalaPartitions
+import scala.tools.eclipse.lexical.SingleTokenScanner
+import scala.tools.eclipse.lexical.XmlCDATAScanner
+import scala.tools.eclipse.lexical.XmlCommentScanner
+import scala.tools.eclipse.lexical.XmlPIScanner
+import scala.tools.eclipse.lexical.XmlTagScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
 
-import org.eclipse.jdt.internal.ui.text.HTMLAnnotationHover
+import scalariform.ScalaVersions
 
 class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfiguration {
   private val scalaPreferenceStore = ScalaPlugin.plugin.getPreferenceStore
@@ -89,6 +96,8 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
   override def getTextHover(viewer: ISourceViewer, contentType: String): ITextHover = {
     return new DefaultTextHover(viewer)
   }
+
+  override def getTabWidth(viewer: ISourceViewer): Int = ScriptEditor.TAB_WIDTH
   
   private val scalaCodeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
   private val singleLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.SINGLE_LINE_COMMENT, javaColorManager, scalaPreferenceStore)
@@ -102,10 +111,6 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
   private val xmlPCDATAScanner = new SingleTokenScanner(ScalaSyntaxClasses.DEFAULT, javaColorManager, scalaPreferenceStore)
   private val xmlPIScanner = new XmlPIScanner(javaColorManager, scalaPreferenceStore)
   
-  //  override def getTextHover(sv: ISourceViewer, contentType: String, stateMask: Int) = {
-  //    new ScalaHover(getCodeAssist _)
-  //  }
-  //
   //  override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
   //    val detector = HyperlinksDetector()
   //    if (editor != null) detector.setContext(editor)

@@ -19,7 +19,7 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
   private var document: IDocument = _
   private lazy val annotationModel = textEditor.getDocumentProvider.getAnnotationModel(textEditor.getEditorInput)
 
-  lazy val scriptUnit = new ScriptCompilationUnit(getFile)
+  lazy val scriptUnit = ScriptCompilationUnit.fromEditorInput(textEditor.getEditorInput).get // we know the editor is a Scala Script editor
 
   def setDocument(doc: IDocument) {
     document = doc
@@ -36,14 +36,7 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
     updateErrorAnnotations(errors)
   }
 
-  private def getFile: IFile =
-    textEditor.getEditorInput match {
-      case fileEditorInput: FileEditorInput =>
-        fileEditorInput.getFile
-    }
-
   private var previousAnnotations = List[ProblemAnnotation]()
-  private var previousErrors = List[IProblem]()
 
   private def updateErrorAnnotations(errors: List[IProblem]) {
     def position(p: IProblem) = new Position(p.getSourceStart, p.getSourceEnd - p.getSourceStart + 1)
