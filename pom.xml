@@ -49,6 +49,7 @@
     <version.tag>local</version.tag>
     <repo.scala-ide>${repo.scala-ide.root}/releases-29/stable/site</repo.scala-ide>
     <junit.version>4.10</junit.version>
+    <mockito.version>1.9.0</mockito.version>
    </properties>
 
   <profiles>
@@ -125,6 +126,12 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-all</artifactId>
+        <version>${mockito.version}</version>
+        <scope>compile</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

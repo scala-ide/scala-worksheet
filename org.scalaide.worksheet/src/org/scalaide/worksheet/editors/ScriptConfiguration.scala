@@ -17,7 +17,6 @@ import org.eclipse.jface.text.source.ISourceViewer
 import org.eclipse.jface.text.source.SourceViewerConfiguration
 import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
-
 import scala.tools.eclipse.ScalaDamagerRepairer
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.lexical.ScalaCodeScanner
@@ -28,8 +27,9 @@ import scala.tools.eclipse.lexical.XmlCommentScanner
 import scala.tools.eclipse.lexical.XmlPIScanner
 import scala.tools.eclipse.lexical.XmlTagScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
-
 import scalariform.ScalaVersions
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector
+import scala.tools.eclipse.hyperlink.text.detector.HyperlinksDetector
 
 class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfiguration {
   private val scalaPreferenceStore = ScalaPlugin.plugin.getPreferenceStore
@@ -110,12 +110,12 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
   private val xmlCDATAScanner = new XmlCDATAScanner(javaColorManager, scalaPreferenceStore)
   private val xmlPCDATAScanner = new SingleTokenScanner(ScalaSyntaxClasses.DEFAULT, javaColorManager, scalaPreferenceStore)
   private val xmlPIScanner = new XmlPIScanner(javaColorManager, scalaPreferenceStore)
-  
-  //  override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
-  //    val detector = HyperlinksDetector()
-  //    if (editor != null) detector.setContext(editor)
-  //    Array(detector)
-  //  }
+
+  override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
+    val detector = HyperlinksDetector()
+    detector.setContext(textEditor)
+    Array(detector)
+  }
 }
 
 

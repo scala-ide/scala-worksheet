@@ -9,5 +9,4 @@
   </parent>
   <artifactId>org.scalaide.worksheet</artifactId>
   <packaging>eclipse-plugin</packaging>
-
 </project>

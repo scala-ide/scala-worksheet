@@ -68,4 +68,14 @@
          </toolbar>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.IEditorInput"
+            class="org.scalaide.worksheet.AdapterFactory">
+         <adapter
+               type="scala.tools.eclipse.InteractiveCompilationUnit">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: ScalaTest Plugin
+Bundle-Name: Scala Worksheet plugin
 Bundle-SymbolicName: org.scalaide.worksheet;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-Vendor: scala-ide.org
@@ -33,3 +33,8 @@ Import-Package:
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter;apply-aspects:=false
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .
+Export-Package: org.scalaide.worksheet,
+ org.scalaide.worksheet.editors,
+ org.scalaide.worksheet.eval,
+ org.scalaide.worksheet.handlers,
+ org.scalaide.worksheet.reconciler
