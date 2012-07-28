@@ -5,8 +5,9 @@ import org.eclipse.jface.text.source.Annotation
 import org.eclipse.jface.text.source.IAnnotationModel
 import org.eclipse.jface.text.source.IAnnotationModelExtension2
 import org.eclipse.ui.editors.text.TextEditor
-
 import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.tools.eclipse.ISourceViewerEditor
+import org.eclipse.jface.text.source.ISourceViewer
 
 object ScriptEditor {
   
@@ -21,7 +22,7 @@ object ScriptEditor {
 
 /** A Scala script editor. 
  */
-class ScriptEditor extends TextEditor with SelectionTracker {
+class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor {
 
   setPartName("Scala Script Editor")
   setDocumentProvider(new ScriptDocumentProvider)
@@ -39,4 +40,6 @@ class ScriptEditor extends TextEditor with SelectionTracker {
     val msg = iterator.asScala.find(a => ScriptEditor.annotationsShownInHover(a.getType)).map(_.getText).getOrElse(null)
     setStatusLineErrorMessage(msg)
   }
+  
+  def getViewer: ISourceViewer = getSourceViewer
 }

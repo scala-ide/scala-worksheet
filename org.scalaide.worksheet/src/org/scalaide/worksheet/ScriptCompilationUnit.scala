@@ -5,7 +5,6 @@ import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.ui.IEditorInput
 import org.eclipse.ui.part.FileEditorInput
 import org.scalaide.worksheet.editors.ScriptEditor
-
 import scala.reflect.internal.util.BatchSourceFile
 import scala.reflect.internal.util.ScriptSourceFile
 import scala.tools.eclipse.InteractiveCompilationUnit
@@ -13,12 +12,15 @@ import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.util.EclipseResource
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.io.AbstractFile
+import org.eclipse.jface.text.IDocument
 
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying
  *  resource.
  */
 case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCompilationUnit {
+  
+  private var document: Option[IDocument] = None
 
   def file: AbstractFile = EclipseResource(workspaceFile)
 
@@ -36,7 +38,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
 
   def exists(): Boolean = true
 
-  def getContents: Array[Char] = file.toCharArray
+  def getContents: Array[Char] = document.map(_.get.toCharArray).getOrElse(file.toCharArray)
 
   /** no-op */
   def scheduleReconcile(): Response[Unit] = {
@@ -45,6 +47,10 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
     r
   }
 
+  def connect(doc: IDocument) {
+    document = Option(doc)
+  }
+  
   def currentProblems: List[IProblem] = {
     scalaProject.withPresentationCompiler { pc =>
       pc.problemsOf(file)

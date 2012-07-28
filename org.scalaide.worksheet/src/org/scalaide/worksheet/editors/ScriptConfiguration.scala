@@ -30,6 +30,10 @@ import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
 import scalariform.ScalaVersions
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector
 import scala.tools.eclipse.hyperlink.text.detector.HyperlinksDetector
+import org.eclipse.jface.text.contentassist.IContentAssistant
+import org.eclipse.jface.text.contentassist.ContentAssistant
+import org.scalaide.worksheet.completion.CompletionProposalComputer
+import scala.tools.eclipse.ScalaEditor
 
 class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfiguration {
   private val scalaPreferenceStore = ScalaPlugin.plugin.getPreferenceStore
@@ -98,6 +102,14 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
   }
 
   override def getTabWidth(viewer: ISourceViewer): Int = ScriptEditor.TAB_WIDTH
+
+  override def getContentAssistant(sourceViewer: ISourceViewer): IContentAssistant = {
+    val assistant = new ContentAssistant
+    assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer))
+    assistant.setContentAssistProcessor(new CompletionProposalComputer(textEditor), IDocument.DEFAULT_CONTENT_TYPE)
+    assistant
+  }
+  
   
   private val scalaCodeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
   private val singleLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.SINGLE_LINE_COMMENT, javaColorManager, scalaPreferenceStore)
