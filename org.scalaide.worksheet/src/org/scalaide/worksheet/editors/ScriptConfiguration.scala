@@ -34,6 +34,8 @@ import org.eclipse.jface.text.contentassist.IContentAssistant
 import org.eclipse.jface.text.contentassist.ContentAssistant
 import org.scalaide.worksheet.completion.CompletionProposalComputer
 import scala.tools.eclipse.ScalaEditor
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter
+import scala.tools.eclipse.formatter.ScalaFormattingStrategy
 
 class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfiguration {
   private val scalaPreferenceStore = ScalaPlugin.plugin.getPreferenceStore
@@ -110,6 +112,11 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
     assistant
   }
   
+  override def getContentFormatter(viewer: ISourceViewer) = {
+    val formatter = new MultiPassContentFormatter(getConfiguredDocumentPartitioning(viewer), IDocument.DEFAULT_CONTENT_TYPE)
+    formatter.setMasterStrategy(new ScalaFormattingStrategy(textEditor))
+    formatter
+  }
   
   private val scalaCodeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
   private val singleLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.SINGLE_LINE_COMMENT, javaColorManager, scalaPreferenceStore)
