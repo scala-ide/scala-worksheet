@@ -13,6 +13,7 @@ import scala.reflect.internal.util.BatchSourceFile
 import scala.tools.eclipse.util.EclipseResource
 import org.scalaide.worksheet.handlers.EvalScript
 import org.junit.Assert
+import org.junit.Ignore
 
 class WorksheetEvalTest {
   import SDTTestUtils._

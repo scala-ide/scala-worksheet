@@ -46,8 +46,8 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                id="org.scalaide.worksheet.menus.sampleMenu"
-               label="Sample Menu"
-               mnemonic="M">
+               label="Worksheet"
+               mnemonic="w">
             <command
                   commandId="org.scalaide.worksheet.commands.evalScript"
                   id="org.scalaide.worksheet.menus.evalScript"
