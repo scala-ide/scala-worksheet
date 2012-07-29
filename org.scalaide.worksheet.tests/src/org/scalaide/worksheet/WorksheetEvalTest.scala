@@ -11,11 +11,14 @@ import java.io.ByteArrayInputStream
 import org.eclipse.core.resources.IResource
 import scala.reflect.internal.util.BatchSourceFile
 import scala.tools.eclipse.util.EclipseResource
+import org.scalaide.worksheet.handlers.EvalScript
+import org.junit.Assert
 
 class WorksheetEvalTest {
   import SDTTestUtils._
   
   @Test
+  @Ignore("Enable when the evaluation engine in the Scala compiler is ready")
   def testEvaluation() {
     val initialContents = """
 object MyMain {
@@ -25,7 +28,15 @@ object MyMain {
 }
       
 """
-    
+      
+   val evaluated = """
+object MyMain {
+  val xs = List(1, 2, 3)  // TO BE UPDATED
+
+  xs.map(_ * 2)
+}
+      
+"""    
     val Seq(prj) = createProjects("eval-test")
     
     val bytes = new ByteArrayInputStream(initialContents.getBytes)
@@ -36,25 +47,11 @@ object MyMain {
     val mockedDoc = mock(classOf[IDocument])
     when(mockedDoc.get).thenReturn(initialContents)
     
-    val eval = new WorksheetEvaluator(prj, mockedDoc)
+    val eval = new EvalScript
     val scriptUnit = ScriptCompilationUnit(iFile)
-    prj.withPresentationCompiler { compiler =>
-//        val source = scriptUnit.sourceFile(mockedDoc.get)
-        val source = new BatchSourceFile(EclipseResource(iFile), mockedDoc.get)
-        compiler.withResponse[Unit] { compiler.askReload(List(source), _) } // just make sure it's loaded
-        compiler.withResponse[(String, Array[Char])] { compiler.askInstrumented(source, -1, _) }.get
-      }() match {
-        case Left((fullName, instrumented)) =>
-          println("Preparing to run instrumented code")
-          println(instrumented.mkString)
-
-          val evaluator = new WorksheetEvaluator(scriptUnit.scalaProject, mockedDoc)
-          val result = evaluator.eval(fullName, instrumented)
-          
-          println(result)
-
-        case Right(ex) =>
-          println("Error during `askInstrumented`", ex)
-      }
+    val res = eval.evalDocument(scriptUnit, mockedDoc)
+    
+    Assert.assertTrue("Should succeed: " + res, res.isRight)
+    Assert.assertEquals("correct output: " + res, res.right.get)
   }
 }

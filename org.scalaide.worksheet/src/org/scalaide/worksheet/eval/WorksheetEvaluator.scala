@@ -22,11 +22,14 @@ import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.VirtualDirectory
 import scala.tools.nsc.reporters.StoreReporter
 
+
 /** An evaluator for worksheet documents.
  *
- *  It evaluates the contents of the given document and returns the sourcecode
- *  augmented with comments containing the result of the evaluation of each expression
- *  in the file.
+ *  It evaluates the contents of the given document and returns the output of the
+ *  instrumented program.
+ *  
+ *  It instantiates the instrumented program in-process, using a different class-loader.
+ *  A more advanced evaluator would spawn a new VM, to allow debugging in the future.
  *
  */
 class WorksheetEvaluator(scalaProject: ScalaProject, doc: IDocument) extends HasLogger {
@@ -37,8 +40,9 @@ class WorksheetEvaluator(scalaProject: ScalaProject, doc: IDocument) extends Has
    *
    *  @param fullName The full name of the main class
    *  @param instrumented The instrumented source code (typically returned from `askInstrumented`)
+   *  @return A right-biased either (right - the success value)
    */
-  def eval(fullName: String, instrumented: Array[Char]): Either[StoreReporter, String] = {
+  def eval(fullName: String, instrumented: Array[Char]): Either[EvaluationError, String] = {
     val iSourceName = writeInstrumented(fullName, instrumented)
 
     // TODO: extract a better API for getting the configuration of the Scala compiler (should be in ScalaProject)
@@ -48,9 +52,9 @@ class WorksheetEvaluator(scalaProject: ScalaProject, doc: IDocument) extends Has
     logger.debug("Compilation arguments: " + args)
     val (vdirOpt, reporter) = compileInstrumented(iSourceName, args)
     if (reporter.hasErrors) {
-      Left(reporter)
+      Left(CompilationError(reporter))
     } else 
-      Right(runInstrumented(vdirOpt, fullName, doc.get.toCharArray))
+      runInstrumented(vdirOpt, fullName, doc.get.toCharArray)
   }
 
   /** Write instrumented source file to disk.
@@ -101,7 +105,7 @@ class WorksheetEvaluator(scalaProject: ScalaProject, doc: IDocument) extends Has
    *  @return The generated file content containing original source in the left column
    *          and outputs in the right column
    */
-  private def runInstrumented(vdirOpt: Option[AbstractFile], iFullName: String, stripped: Array[Char]): String = {
+  private def runInstrumented(vdirOpt: Option[AbstractFile], iFullName: String, stripped: Array[Char]): Either[EvaluationError, String] = {
     val defaultClassLoader = getClass.getClassLoader
     val classLoader = vdirOpt match {
       case Some(vdir) => new AbstractFileClassLoader(vdir, defaultClassLoader)
@@ -127,11 +131,10 @@ class WorksheetEvaluator(scalaProject: ScalaProject, doc: IDocument) extends Has
       }
       outStream.close()
       //    Executor.execute(iFullName, si, classLoader)
-      baos.toString // TODO: encoding
+      Right(baos.toString) // TODO: encoding
     } catch {
       case e: Exception =>
-        eclipseLog.debug("Error evaluating the worksheet", e)
-        stripped.mkString
+        Left(ExecutionError(e))
     }
   }
 }
