@@ -33,7 +33,7 @@ import scala.tools.nsc.reporters.StoreReporter
  *  A more advanced evaluator would spawn a new VM, to allow debugging in the future.
  *
  */
-class WorksheetEvaluator(scalaProject: ScalaProject, doc: IDocument) extends HasLogger {
+class WorksheetEvaluator(scalaProject: ScalaProject) extends HasLogger {
 
   /** Evaluate the instrumented code and return the result of the execution.
    *  It is typically the original source code with comments containing the reulst of

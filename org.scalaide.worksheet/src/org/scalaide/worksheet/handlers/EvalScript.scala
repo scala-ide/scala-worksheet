@@ -45,8 +45,9 @@ class EvalScript extends AbstractHandler with HasLogger {
         case Right(result) =>
           logger.debug(result)
           if (result.length > 0) {
+            val stripped = SourceInserter.stripRight(doc.get.toCharArray)
             val mixer = new Mixer
-            doc.replace(0, doc.getLength, mixer.mix(doc.get.toCharArray, result.toCharArray()).mkString)
+            doc.replace(0, doc.getLength, mixer.mix(stripped, result.toCharArray()).mkString)
           }
       }
     }
@@ -70,7 +71,7 @@ class EvalScript extends AbstractHandler with HasLogger {
         logger.info("Preparing to run instrumented code")
         logger.debug(new String(instrumented))
 
-        val evaluator = new WorksheetEvaluator(scriptUnit.scalaProject, doc)
+        val evaluator = new WorksheetEvaluator(scriptUnit.scalaProject)
         evaluator.eval(fullName, instrumented)
 
       case Right(ex) =>
