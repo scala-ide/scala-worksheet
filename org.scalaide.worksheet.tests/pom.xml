@@ -25,8 +25,7 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<configuration>
 					<testSuite>${project.artifactId}</testSuite>
-					<testClass>org.scalaide.worksheet.SomeInterestingCodeTest
-					</testClass>
+					<testClass>org.scalaide.worksheet.TestSuite</testClass>
 				</configuration>
 			</plugin>
 			<plugin>
