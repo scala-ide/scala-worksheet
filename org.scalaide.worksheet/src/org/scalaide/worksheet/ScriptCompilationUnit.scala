@@ -13,13 +13,14 @@ import scala.tools.eclipse.util.EclipseResource
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.io.AbstractFile
 import org.eclipse.jface.text.IDocument
+import org.eclipse.ui.texteditor.ITextEditor
 
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying
  *  resource.
  */
 case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCompilationUnit {
-  
+
   private var document: Option[IDocument] = None
 
   def file: AbstractFile = EclipseResource(workspaceFile)
@@ -47,10 +48,11 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
     r
   }
 
-  def connect(doc: IDocument) {
+  def connect(doc: IDocument): this.type = {
     document = Option(doc)
+    this
   }
-  
+
   def currentProblems: List[IProblem] = {
     scalaProject.withPresentationCompiler { pc =>
       pc.problemsOf(file)
@@ -62,18 +64,29 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
    */
   def reconcile(newContents: String): List[IProblem] =
     scalaProject.withPresentationCompiler { pc =>
-      val src = batchSourceFile(newContents.toCharArray)
+      askReload(newContents.toCharArray)
+      pc.problemsOf(file)
+    }(Nil)
+
+  def askReload(newContents: Array[Char] = getContents): Unit =
+    scalaProject.withPresentationCompiler { pc =>
+      val src = batchSourceFile(newContents)
       pc.withResponse[Unit] { response =>
         pc.askReload(List(src), response)
         response.get
       }
-      pc.problemsOf(src.file)
-    }(Nil)
+    }()
 }
 
 object ScriptCompilationUnit {
   def fromEditorInput(editorInput: IEditorInput): Option[ScriptCompilationUnit] = {
     getFile(editorInput).map(ScriptCompilationUnit.apply)
+  }
+
+  def fromEditor(textEditor: ITextEditor): Option[ScriptCompilationUnit] = {
+    val input = textEditor.getEditorInput
+    for (unit <- fromEditorInput(input))
+      yield unit.connect(textEditor.getDocumentProvider().getDocument(input))
   }
 
   private def getFile(editorInput: IEditorInput): Option[IFile] =

@@ -19,10 +19,12 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
   private var document: IDocument = _
   private lazy val annotationModel = textEditor.getDocumentProvider.getAnnotationModel(textEditor.getEditorInput)
 
-  lazy val scriptUnit = ScriptCompilationUnit.fromEditorInput(textEditor.getEditorInput).get // we know the editor is a Scala Script editor
+  lazy val scriptUnit = ScriptCompilationUnit.fromEditor(textEditor).get // we know the editor is a Scala Script editor
 
   def setDocument(doc: IDocument) {
     document = doc
+
+    doc.addDocumentListener(reloader)
   }
 
   def reconcile(dirtyRegion: DirtyRegion, subRegion: IRegion) {
@@ -30,7 +32,6 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
   }
 
   def reconcile(partition: IRegion) {
-    logger.info("Reconciling full doc on " + document)
     val errors = scriptUnit.reconcile(document.get)
 
     updateErrorAnnotations(errors)
@@ -49,6 +50,22 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
       annotationModel.addAnnotation(annotation, position(e))
       previousAnnotations ::= annotation
     }
+  }
+
+  /** Ask the underlying unit to reload on each document change event.
+   * 
+   *  This is certainly wasteful, but otherwise the AST trees are not up to date
+   *  in the interval between the last keystroke and reconciliation (which has a delay of
+   *  500ms usually). The user can be quick and ask for completions in this interval, and get
+   *  wrong results.
+   */
+  private object reloader extends IDocumentListener {
+    def documentChanged(event: DocumentEvent) {
+      scriptUnit.askReload()
+    }
+
+    def documentAboutToBeChanged(event: DocumentEvent) {}
+
   }
 }
 
