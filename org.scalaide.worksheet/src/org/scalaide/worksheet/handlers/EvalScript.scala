@@ -19,6 +19,7 @@ import org.scalaide.worksheet.eval.InstrumentedError
 import org.scalaide.worksheet.eval.CompilationError
 import org.scalaide.worksheet.eval.InstrumentedError
 import org.scalaide.worksheet.eval.ExecutionError
+import scala.tools.nsc.scratchpad.Mixer
 
 class EvalScript extends AbstractHandler with HasLogger {
 
@@ -26,7 +27,7 @@ class EvalScript extends AbstractHandler with HasLogger {
     for {
       editor <- Option(HandlerUtil.getActiveEditor(event).asInstanceOf[ITextEditor])
       editorInput <- Option(HandlerUtil.getActiveEditorInput(event))
-      scriptUnit <- ScriptCompilationUnit.fromEditorInput(editorInput)
+      scriptUnit <- ScriptCompilationUnit.fromEditor(editor)
     } {
       val doc = editor.getDocumentProvider.getDocument(editorInput)
       evalDocument(scriptUnit, doc) match {
@@ -43,8 +44,10 @@ class EvalScript extends AbstractHandler with HasLogger {
 
         case Right(result) =>
           logger.debug(result)
-          if (result.length > 0)
-            doc.replace(0, doc.getLength, result)
+          if (result.length > 0) {
+            val mixer = new Mixer
+            doc.replace(0, doc.getLength, mixer.mix(doc.get.toCharArray, result.toCharArray()).mkString)
+          }
       }
     }
 

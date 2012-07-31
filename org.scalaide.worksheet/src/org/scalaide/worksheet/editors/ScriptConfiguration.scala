@@ -131,6 +131,7 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
   private val xmlPIScanner = new XmlPIScanner(javaColorManager, scalaPreferenceStore)
 
   override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
+    // FIXME: only works with external targets
     val detector = HyperlinksDetector()
     detector.setContext(textEditor)
     Array(detector)
