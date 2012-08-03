@@ -52,7 +52,9 @@ class EvalScript extends AbstractHandler with HasLogger {
           if (result.length > 0) {
             val stripped = SourceInserter.stripRight(doc.get.toCharArray)
             val mixer = new Mixer
-            doc.replace(0, doc.getLength, mixer.mix(stripped, result.toCharArray()).mkString)
+            doc.set(mixer.mix(stripped, result.toCharArray()).mkString)
+            // FIXME: May throw CoreException
+            editor.getDocumentProvider.saveDocument(null, editorInput, doc, true)
           }
       }
     }
