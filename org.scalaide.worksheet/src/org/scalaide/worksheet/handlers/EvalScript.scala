@@ -61,7 +61,7 @@ class EvalScript extends AbstractHandler with HasLogger {
     } getOrElse false
 
 
-  def evalDocument(scriptUnit: ScriptCompilationUnit, doc: IDocument): Either[EvaluationError, String] = {
+  private def evalDocument(scriptUnit: ScriptCompilationUnit, doc: IDocument): Either[EvaluationError, String] = {
     scriptUnit.scalaProject.withPresentationCompiler { compiler =>
       val source = scriptUnit.batchSourceFile(SourceInserter.stripRight(doc.get.toCharArray))
       compiler.withResponse[Unit] { compiler.askReload(List(source), _) } // just make sure it's loaded

@@ -23,12 +23,12 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
 
   private var document: Option[IDocument] = None
 
-  def file: AbstractFile = EclipseResource(workspaceFile)
+  override def file: AbstractFile = EclipseResource(workspaceFile)
 
-  def scalaProject = ScalaPlugin.plugin.asScalaProject(workspaceFile.getProject).get
+  override lazy val scalaProject = ScalaPlugin.plugin.asScalaProject(workspaceFile.getProject).get
 
   /** Return the compiler ScriptSourceFile corresponding to this unit. */
-  def sourceFile(contents: Array[Char]): ScriptSourceFile = {
+  override def sourceFile(contents: Array[Char]): ScriptSourceFile = {
     ScriptSourceFile.apply(file, contents)
   }
 
@@ -37,12 +37,12 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
     new BatchSourceFile(file, contents)
   }
 
-  def exists(): Boolean = true
+  override def exists(): Boolean = true
 
-  def getContents: Array[Char] = document.map(_.get.toCharArray).getOrElse(file.toCharArray)
+  override def getContents: Array[Char] = document.map(_.get.toCharArray).getOrElse(file.toCharArray)
 
   /** no-op */
-  def scheduleReconcile(): Response[Unit] = {
+  override def scheduleReconcile(): Response[Unit] = {
     val r = new Response[Unit]
     r.set()
     r
@@ -53,7 +53,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
     this
   }
 
-  def currentProblems: List[IProblem] = {
+  override def currentProblems: List[IProblem] = {
     scalaProject.withPresentationCompiler { pc =>
       pc.problemsOf(file)
     }(Nil)
@@ -62,7 +62,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
   /** Reconcile the unit. Return all compilation errors.
    *  Blocks until the unit is type-checked.
    */
-  def reconcile(newContents: String): List[IProblem] =
+  override def reconcile(newContents: String): List[IProblem] =
     scalaProject.withPresentationCompiler { pc =>
       askReload(newContents.toCharArray)
       pc.problemsOf(file)
