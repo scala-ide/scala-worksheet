@@ -20,6 +20,10 @@ import org.scalaide.worksheet.eval.CompilationError
 import org.scalaide.worksheet.eval.InstrumentedError
 import org.scalaide.worksheet.eval.ExecutionError
 import scala.tools.nsc.scratchpad.Mixer
+import scala.tools.eclipse.util.FileUtils
+import scala.tools.eclipse.buildmanager.BuildProblemMarker
+import org.eclipse.core.resources.IMarker
+import scala.tools.eclipse.resources.MarkerFactory
 
 class EvalScript extends AbstractHandler with HasLogger {
 
@@ -29,12 +33,13 @@ class EvalScript extends AbstractHandler with HasLogger {
       editorInput <- Option(HandlerUtil.getActiveEditorInput(event))
       scriptUnit <- ScriptCompilationUnit.fromEditor(editor)
     } {
+      clearBuildErrors(scriptUnit)
+
       val doc = editor.getDocumentProvider.getDocument(editorInput)
       evalDocument(scriptUnit, doc) match {
-        case Left(CompilationError(reporter)) =>
-          MessageDialog.openError(ScalaPlugin.getShell,
-            "Error during evaluation",
-            "Compilation errors during the evaluation of instrumented code\n(please open a bug report):\n\n" + reporter.infos.map(_.msg).mkString("\n"))
+        case Left(CompilationError(reporter)) => 
+          logger.debug("compilation errors in "+(editorInput.getName()))
+          reportBuildErrors(scriptUnit, reporter)
 
         case Left(InstrumentedError(ex)) =>
           eclipseLog.error("Error during askInstrumented", ex)
@@ -55,6 +60,22 @@ class EvalScript extends AbstractHandler with HasLogger {
     null
   }
 
+  private def clearBuildErrors(scriptUnit: ScriptCompilationUnit): Unit = 
+    FileUtils.clearBuildErrors(scriptUnit.workspaceFile, null)
+  
+  private def reportBuildErrors(scriptUnit: ScriptCompilationUnit, reporter: StoreReporter): Unit = {
+    reporter.infos.map { error => 
+      val pos = error.pos
+      if(pos.isDefined) {
+        val source = pos.source
+        val length = source.identifier(pos).map(_.length).getOrElse(0)
+        val position = MarkerFactory.Position(pos.point, length, pos.line)
+        BuildProblemMarker.create(scriptUnit.workspaceFile, IMarker.SEVERITY_ERROR, error.msg, position)
+      }
+      else BuildProblemMarker.create(scriptUnit.workspaceFile, error.msg)
+    }
+  }
+  
   override def isEnabled: Boolean =
     EditorHelpers.withCurrentEditor { editor =>
       EditorUtils.getEditorScalaInput(editor) map { scu => scu.currentProblems.isEmpty }
