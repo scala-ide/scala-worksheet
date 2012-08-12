@@ -1,4 +1,4 @@
-package org.scalaide.worksheet.editors
+package org.scalaide.worksheet.editor
 
 import org.eclipse.ui.editors.text.TextEditor
 import org.eclipse.jface.text.ITextSelection

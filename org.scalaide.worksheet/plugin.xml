@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.scalaide.worksheet.editors.ScriptEditor"
+            class="org.scalaide.worksheet.editor.ScriptEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             extensions="sc"
             icon="icons/sample.gif"

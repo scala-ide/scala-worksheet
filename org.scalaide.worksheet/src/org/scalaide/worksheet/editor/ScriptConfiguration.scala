@@ -1,4 +1,4 @@
-package org.scalaide.worksheet.editors
+package org.scalaide.worksheet.editor
 
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions

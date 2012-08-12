@@ -1,14 +1,10 @@
-package org.scalaide.worksheet
+package org.scalaide.worksheet.runtime
 
 import org.eclipse.core.runtime.Path
 import scala.tools.eclipse.ScalaProject
-import java.util.concurrent.atomic.AtomicReference
 import org.eclipse.core.runtime.IPath
 import org.eclipse.core.resources.IProject
-import java.io.CharArrayReader
-import java.io.ByteArrayInputStream
 import java.io.File
-import org.eclipse.core.resources.IFolder
 import java.io.FileWriter
 
 object Configuration {

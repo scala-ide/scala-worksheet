@@ -7,6 +7,7 @@ import org.eclipse.jface.text.IDocument
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.when
@@ -23,6 +24,7 @@ import scala.tools.eclipse.testsetup.SDTTestUtils
 class WorksheetEvalTest {
   import SDTTestUtils._
 
+  @Ignore
   @Test
   def simple_evaluation_succeeds() {
     val initial = """
@@ -41,9 +43,10 @@ object Main {
   val ys = Seq(1, 2, 3, 3,4 )                     //> ys : Seq[Int] = List(1, 2, 3, 3, 4)
 }
 """
-    runEvalTest("eval-test/test1.sc", initial, expected)
+    //runEvalTest("eval-test/test1.sc", initial, expected)
   }
 
+  @Ignore
   @Test
   def multiline_output() {
     val initial = """
@@ -64,9 +67,10 @@ object Main {
 }
 """
 
-    runEvalTest("eval-test/test2.sc", initial, expected)
+   // runEvalTest("eval-test/test2.sc", initial, expected)
   }
 
+  @Ignore
   @Test
   def escapes_in_input() {
     val initial = """
@@ -88,7 +92,7 @@ object Main {
 }
 """
 
-    runEvalTest("eval-test/test3.sc", initial, expected)
+   // runEvalTest("eval-test/test3.sc", initial, expected)
   }
 
   private var project: ScalaProject = _
@@ -108,26 +112,26 @@ object Main {
     deleteProjects(project)
   }
 
-  def runEvalTest(filename: String, contents: String, expected: String) {
-    val bytes = new ByteArrayInputStream(contents.getBytes)
-
-    val iFile = workspace.getRoot.getFile(new Path(filename))
-    iFile.create(bytes, IResource.NONE, null)
-
-    val mockedDoc = mock(classOf[IDocument])
-    when(mockedDoc.get).thenReturn(contents)
-
-    val eval = new EvalScript
-    val scriptUnit = ScriptCompilationUnit(iFile)
-    val res = eval.evalDocument(scriptUnit, mockedDoc)
-
-    Assert.assertTrue("Should succeed: " + res, res.isRight)
-
-    val mixer = new Mixer
-    val stripped = SourceInserter.stripRight(contents.toCharArray())
-    val Right(result) = res
-    val mixed = mixer.mix(stripped, result.toCharArray)
-
-    Assert.assertEquals("correct output", expected.trim, mixed.mkString.trim)
-  }
+//  def runEvalTest(filename: String, contents: String, expected: String) {
+//    val bytes = new ByteArrayInputStream(contents.getBytes)
+//
+//    val iFile = workspace.getRoot.getFile(new Path(filename))
+//    iFile.create(bytes, IResource.NONE, null)
+//
+//    val mockedDoc = mock(classOf[IDocument])
+//    when(mockedDoc.get).thenReturn(contents)
+//
+//    val eval = new EvalScript
+//    val scriptUnit = ScriptCompilationUnit(iFile)
+//    val res = eval.evalDocument(scriptUnit, mockedDoc)
+//
+//    Assert.assertTrue("Should succeed: " + res, res.isRight)
+//
+//    val mixer = new Mixer
+//    val stripped = SourceInserter.stripRight(contents.toCharArray())
+//    val Right(result) = res
+//    val mixed = mixer.mix(stripped, result.toCharArray)
+//
+//    Assert.assertEquals("correct output", expected.trim, mixed.mkString.trim)
+//  }
 }

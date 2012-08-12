@@ -19,19 +19,19 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
   private var document: IDocument = _
   private lazy val annotationModel = textEditor.getDocumentProvider.getAnnotationModel(textEditor.getEditorInput)
 
-  lazy val scriptUnit = ScriptCompilationUnit.fromEditor(textEditor).get // we know the editor is a Scala Script editor
+  private lazy val scriptUnit = ScriptCompilationUnit.fromEditor(textEditor).get // we know the editor is a Scala Script editor
 
-  def setDocument(doc: IDocument) {
+  override def setDocument(doc: IDocument) {
     document = doc
 
     doc.addDocumentListener(reloader)
   }
 
-  def reconcile(dirtyRegion: DirtyRegion, subRegion: IRegion) {
+  override def reconcile(dirtyRegion: DirtyRegion, subRegion: IRegion) {
     logger.debug("Incremental reconciliation not implemented.")
   }
 
-  def reconcile(partition: IRegion) {
+  override def reconcile(partition: IRegion) {
     val errors = scriptUnit.reconcile(document.get)
 
     updateErrorAnnotations(errors)
@@ -60,11 +60,11 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
    *  wrong results.
    */
   private object reloader extends IDocumentListener {
-    def documentChanged(event: DocumentEvent) {
+    override def documentChanged(event: DocumentEvent) {
       scriptUnit.askReload()
     }
 
-    def documentAboutToBeChanged(event: DocumentEvent) {}
+    override def documentAboutToBeChanged(event: DocumentEvent) {}
 
   }
 }
