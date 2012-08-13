@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.scalaide.worksheet.feature"
-      label=""
+      label="Scala Worksheet"
       version="0.1.0.qualifier"
       provider-name="org.scalaide"
       plugin="org.scalaide.worksheet">
 
    <description url="http://example.org">
-      Template of a Scala IDE plug-in
+      The Scala Worksheet plugin for Scala IDE.
    </description>
 
    <copyright url="http://example.org/downloads/">
-      Copyright (C) 2012  _______TO_UPDATE_______. 
-All rights reserved.
+      Copyright (C) 2012  Typesafe, Inc. All rights reserved.
    </copyright>
 
    <license url="http://scala-lang.org/downloads/license.html">
       SCALA LICENSE
 
-Copyright (C) 2011-2012 Artima, Inc. All rights reserved.
+Copyright (C) 2011-2012 Typesafe, Inc. All rights reserved.
 
-This software was developed by _______TO_UPDATE_______.
+This software was developed by Typesafe Inc.
 
 Permission to use, copy, modify, and distribute this software in source
 or binary form for any purpose with or without fee is hereby granted,
@@ -52,23 +51,11 @@ SUCH DAMAGE.
    </license>
 
    <url>
-      <update label="Scala IDE plugin template update site" url="http://example.org/update/site"/>
+      <update label="Scala Worksheet update site" url="http://scala-ide.dreamhosters.com/nightly-update-worksheet-scalaide21-210/site/"/>
    </url>
 
    <requires>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="org.eclipse.ui.console"/>
-      <import plugin="org.eclipse.jdt.core"/>
-      <import plugin="org.eclipse.jdt.ui"/>
-      <import plugin="org.eclipse.jdt.launching"/>
-      <import plugin="org.eclipse.debug.ui"/>
-      <import plugin="org.eclipse.jdt.debug.ui"/>
-      <import plugin="org.eclipse.ui.forms"/>
-      <import plugin="org.scala-ide.sdt.core"/>
+      <import feature="org.scala-ide.sdt.feature"/>
    </requires>
 
    <plugin
