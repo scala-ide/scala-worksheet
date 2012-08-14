@@ -1,10 +1,27 @@
 package org.scalaide.worksheet.editor
 
+import scala.tools.eclipse.ScalaDamagerRepairer
+import scala.tools.eclipse.ScalaPlugin
+import scala.tools.eclipse.formatter.ScalaFormattingStrategy
+import scala.tools.eclipse.hyperlink.text.detector.HyperlinksDetector
+import scala.tools.eclipse.lexical.ScalaCodeScanner
+import scala.tools.eclipse.lexical.ScalaPartitions
+import scala.tools.eclipse.lexical.SingleTokenScanner
+import scala.tools.eclipse.lexical.XmlCDATAScanner
+import scala.tools.eclipse.lexical.XmlCommentScanner
+import scala.tools.eclipse.lexical.XmlPIScanner
+import scala.tools.eclipse.lexical.XmlTagScanner
+import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
+
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.text.DefaultTextHover
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextHover
+import org.eclipse.jface.text.contentassist.ContentAssistant
+import org.eclipse.jface.text.contentassist.IContentAssistant
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector
 import org.eclipse.jface.text.presentation.PresentationReconciler
 import org.eclipse.jface.text.reconciler.IReconciler
 import org.eclipse.jface.text.reconciler.MonoReconciler
@@ -16,26 +33,11 @@ import org.eclipse.jface.text.source.IAnnotationHover
 import org.eclipse.jface.text.source.ISourceViewer
 import org.eclipse.jface.text.source.SourceViewerConfiguration
 import org.eclipse.ui.texteditor.ITextEditor
-import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
-import scala.tools.eclipse.ScalaDamagerRepairer
-import scala.tools.eclipse.ScalaPlugin
-import scala.tools.eclipse.lexical.ScalaCodeScanner
-import scala.tools.eclipse.lexical.ScalaPartitions
-import scala.tools.eclipse.lexical.SingleTokenScanner
-import scala.tools.eclipse.lexical.XmlCDATAScanner
-import scala.tools.eclipse.lexical.XmlCommentScanner
-import scala.tools.eclipse.lexical.XmlPIScanner
-import scala.tools.eclipse.lexical.XmlTagScanner
-import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
-import scalariform.ScalaVersions
-import org.eclipse.jface.text.hyperlink.IHyperlinkDetector
-import scala.tools.eclipse.hyperlink.text.detector.HyperlinksDetector
-import org.eclipse.jface.text.contentassist.IContentAssistant
-import org.eclipse.jface.text.contentassist.ContentAssistant
 import org.scalaide.worksheet.completion.CompletionProposalComputer
-import scala.tools.eclipse.ScalaEditor
-import org.eclipse.jface.text.formatter.MultiPassContentFormatter
-import scala.tools.eclipse.formatter.ScalaFormattingStrategy
+import org.scalaide.worksheet.lexical.SingleLineCommentScanner
+import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
+
+import scalariform.ScalaVersions
 
 class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfiguration {
   private val scalaPreferenceStore = ScalaPlugin.plugin.getPreferenceStore
@@ -119,7 +121,7 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
   }
   
   private val scalaCodeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
-  private val singleLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.SINGLE_LINE_COMMENT, javaColorManager, scalaPreferenceStore)
+  private val singleLineCommentScanner = new SingleLineCommentScanner(javaColorManager, scalaPreferenceStore)
   private val multiLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_COMMENT, javaColorManager, scalaPreferenceStore)
   private val scaladocScanner = new SingleTokenScanner(ScalaSyntaxClasses.SCALADOC, javaColorManager, scalaPreferenceStore)
   private val stringScanner = new SingleTokenScanner(ScalaSyntaxClasses.STRING, javaColorManager, scalaPreferenceStore)
