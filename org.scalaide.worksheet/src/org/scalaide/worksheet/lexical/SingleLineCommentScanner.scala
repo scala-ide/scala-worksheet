@@ -2,19 +2,17 @@ package org.scalaide.worksheet.lexical
 
 import scala.tools.eclipse.lexical.AbstractScalaScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
-
 import org.eclipse.jdt.ui.text.IColorManager
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.rules.IToken
 import org.eclipse.jface.text.rules.Token
-
 import WorksheetSyntaxClasses.EVAL_RESULT_FIRST_LINE
 import WorksheetSyntaxClasses.EVAL_RESULT_NEW_LINE
+import org.scalaide.worksheet.properties.WorksheetColourPreferenceInitializer
 
 class SingleLineCommentScanner(val colorManager: IColorManager, val preferenceStore: IPreferenceStore) extends AbstractScalaScanner {
-  ColorInitializer.init(preferenceStore)
-
+//  new WorksheetColourPreferenceInitializer().initializeDefaultPreferences
   abstract sealed class State
 
   case object Init extends State

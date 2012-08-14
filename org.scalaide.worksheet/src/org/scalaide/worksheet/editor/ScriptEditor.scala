@@ -15,6 +15,9 @@ import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.ui.texteditor.IElementStateListener
 import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.tools.eclipse.logging.HasLogger
+import scala.tools.eclipse.ScalaPlugin
+import org.eclipse.jface.util.IPropertyChangeListener
+import org.eclipse.jface.util.PropertyChangeEvent
 
 object ScriptEditor {
 
@@ -29,7 +32,11 @@ object ScriptEditor {
 
 /** A Scala script editor.*/
 class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with HasLogger {
-
+  val prefStore = ScalaPlugin.prefStore
+  this.setPreferenceStore(prefStore)
+  val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
+  setSourceViewerConfiguration(sourceViewConfiguration);
+  new ScriptConfiguration(ScalaPlugin.plugin.getPreferenceStore, this)
   setPartName("Scala Script Editor")
   setDocumentProvider(new ScriptDocumentProvider)
 
@@ -40,7 +47,8 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     }
   }
 
-  /** This class is used by the `IncrementalDocumentMixer` to update the editor's document with
+  /**
+   * This class is used by the `IncrementalDocumentMixer` to update the editor's document with
    *  the evaluation's result.
    */
   private class DefaultEditorProxy extends EditorProxy {
@@ -72,11 +80,11 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     }
 
     override def completedExternalEditorUpdate(): Unit = {
-      stopExternalEditorUpdate() 
+      stopExternalEditorUpdate()
       save()
     }
 
-    private def save(): Unit = SWTUtils.asyncExec  {
+    private def save(): Unit = SWTUtils.asyncExec {
       evaluationOnSave = false
       doSave(null)
       evaluationOnSave = true
@@ -97,10 +105,10 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private val editorProxy = new DefaultEditorProxy
 
-  override def initializeEditor() {
-    super.initializeEditor()
-    setSourceViewerConfiguration(new ScriptConfiguration(this))
-  }
+//  override def initializeEditor() {
+//    super.initializeEditor()
+//    setSourceViewerConfiguration(sourceViewConfiguration)
+//  }
 
   /** Return the annotation model associated with the current document. */
   private def annotationModel: IAnnotationModel with IAnnotationModelExtension2 = getDocumentProvider.getAnnotationModel(getEditorInput).asInstanceOf[IAnnotationModel with IAnnotationModelExtension2]
@@ -121,7 +129,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private[worksheet] def runEvaluation(): Unit = withScriptCompilationUnit {
     editorProxy.prepareExternalEditorUpdate()
-    
+
     import org.scalaide.worksheet.runtime.WorksheetsManager
     import org.scalaide.worksheet.runtime.WorksheetRunner
     WorksheetsManager.Instance ! WorksheetRunner.RunEvaluation(_, editorProxy)
@@ -129,7 +137,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private[worksheet] def stopEvaluation(): Unit = withScriptCompilationUnit {
     editorProxy.stopExternalEditorUpdate()
-    
+
     import org.scalaide.worksheet.runtime.WorksheetsManager
     import org.scalaide.worksheet.runtime.ProgramExecutorService
     WorksheetsManager.Instance ! ProgramExecutorService.StopRun(_)
@@ -138,6 +146,17 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = {
     ScriptCompilationUnit.fromEditor(ScriptEditor.this) foreach f
   }
+
+  import scala.tools.eclipse.util.SWTUtils
+  import scala.tools.eclipse.util.SWTUtils.fnToPropertyChangeListener
+  private val preferenceListener: IPropertyChangeListener = handlePreferenceStoreChanged _
+
+  override def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
+    sourceViewConfiguration.handlePropertyChangeEvent(event)
+    getSourceViewer().invalidateTextPresentation
+  }
+
+  prefStore.addPropertyChangeListener(preferenceListener)
 
   //TODO: `stopEvaluation` if the editor gets hidden
 }

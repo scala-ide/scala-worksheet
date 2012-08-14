@@ -9,4 +9,5 @@ object WorksheetSyntaxClasses {
   val EVAL_RESULT_NEW_LINE = ScalaSyntaxClass("Evaluation result - New line", "syntaxColouring.evalResultNewLine")
   val EVAL_RESULT_MARKER = ScalaSyntaxClass("Evaluation result - Marker", "syntaxColouring.evalResultMarker")
 
+  val ALL_SYNTAX_CLASSES = Array(EVAL_RESULT_FIRST_LINE, EVAL_RESULT_NEW_LINE, EVAL_RESULT_MARKER)
 }

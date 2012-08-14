@@ -12,7 +12,6 @@ import scala.tools.eclipse.lexical.XmlCommentScanner
 import scala.tools.eclipse.lexical.XmlPIScanner
 import scala.tools.eclipse.lexical.XmlTagScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
-
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.text.DefaultTextHover
@@ -36,12 +35,11 @@ import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.lexical.SingleLineCommentScanner
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
-
 import scalariform.ScalaVersions
+import org.eclipse.jface.preference.IPreferenceStore
+import org.eclipse.jface.util.PropertyChangeEvent
 
-class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfiguration {
-  private val scalaPreferenceStore = ScalaPlugin.plugin.getPreferenceStore
-
+class ScriptConfiguration(val scalaPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
   val codeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
 
   val javaColorManager = JavaPlugin.getDefault.getJavaTextTools.getColorManager
@@ -138,6 +136,20 @@ class ScriptConfiguration(textEditor: ITextEditor) extends SourceViewerConfigura
     detector.setContext(textEditor)
     Array(detector)
   }
+  
+  def handlePropertyChangeEvent(event: PropertyChangeEvent) {
+      scalaCodeScanner.adaptToPreferenceChange(event)
+      scaladocScanner.adaptToPreferenceChange(event)
+      stringScanner.adaptToPreferenceChange(event)
+      multiLineStringScanner.adaptToPreferenceChange(event)
+      singleLineCommentScanner.adaptToPreferenceChange(event)
+      multiLineCommentScanner.adaptToPreferenceChange(event)
+      xmlTagScanner.adaptToPreferenceChange(event)
+      xmlCommentScanner.adaptToPreferenceChange(event)
+      xmlCDATAScanner.adaptToPreferenceChange(event)
+      xmlPCDATAScanner.adaptToPreferenceChange(event)
+      xmlPIScanner.adaptToPreferenceChange(event)
+   }
 }
 
 
