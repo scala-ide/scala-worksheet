@@ -121,4 +121,24 @@
             parentId="org.eclipse.ui.textEditorScope">
       </context>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.scalaide.worksheet.properties.WorksheetPreferences"
+            id="org.scalaide.worksheet.preferences"
+            name="Worksheet">
+      </page>
+      <page
+            category="org.scalaide.worksheet.preferences"
+            class="org.scalaide.worksheet.properties.WorksheetSyntaxColouringPreferencePage"
+            id="org.scalaide.worksheet.preferences.syntaxColoring"
+            name="SyntaxColoring">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.scalaide.worksheet.properties.WorksheetColourPreferenceInitializer">
+      </initializer>
+   </extension>
 </plugin>

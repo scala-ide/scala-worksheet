@@ -18,6 +18,9 @@ import scala.tools.eclipse.logging.HasLogger
 import org.eclipse.ui.texteditor.TextOperationAction
 import org.eclipse.jface.action.IMenuManager
 import org.eclipse.ui.texteditor.ITextEditorActionConstants
+import org.eclipse.jface.util.IPropertyChangeListener
+import org.eclipse.jface.util.PropertyChangeEvent
+import org.scalaide.worksheet.WorksheetPlugin
 
 object ScriptEditor {
 
@@ -32,7 +35,10 @@ object ScriptEditor {
 
 /** A Scala script editor.*/
 class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with HasLogger {
-
+  val prefStore = WorksheetPlugin.prefStore
+  this.setPreferenceStore(prefStore)
+  val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
+  setSourceViewerConfiguration(sourceViewConfiguration);
   setPartName("Scala Script Editor")
   setDocumentProvider(new ScriptDocumentProvider)
 
@@ -43,7 +49,8 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     }
   }
 
-  /** This class is used by the `IncrementalDocumentMixer` to update the editor's document with
+  /**
+   * This class is used by the `IncrementalDocumentMixer` to update the editor's document with
    *  the evaluation's result.
    */
   private class DefaultEditorProxy extends EditorProxy {
@@ -62,6 +69,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
         // we need to turn off evaluation on save if we don't want to loop forever 
         // (because of `editorSaved` implementation, i.e., automatic worksheet evaluation on save)
         getSourceViewer().getTextWidget().setCaretOffset(newCaretOffset)
+        getSourceViewer().invalidateTextPresentation()
       }
     }
 
@@ -74,11 +82,11 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     }
 
     override def completedExternalEditorUpdate(): Unit = {
-      stopExternalEditorUpdate() 
+      stopExternalEditorUpdate()
       save()
     }
 
-    private def save(): Unit = SWTUtils.asyncExec  {
+    private def save(): Unit = SWTUtils.asyncExec {
       evaluationOnSave = false
       doSave(null)
       evaluationOnSave = true
@@ -99,10 +107,10 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private val editorProxy = new DefaultEditorProxy
 
-  override def initializeEditor() {
-    super.initializeEditor()
-    setSourceViewerConfiguration(new ScriptConfiguration(this))
-  }
+//  override def initializeEditor() {
+//    super.initializeEditor()
+//    setSourceViewerConfiguration(sourceViewConfiguration)
+//  }
   
   override def initializeKeyBindingScopes() {
     setKeyBindingScopes(Array("org.scalaide.worksheet.editorScope"))
@@ -142,7 +150,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private[worksheet] def runEvaluation(): Unit = withScriptCompilationUnit {
     editorProxy.prepareExternalEditorUpdate()
-    
+
     import org.scalaide.worksheet.runtime.WorksheetsManager
     import org.scalaide.worksheet.runtime.WorksheetRunner
     WorksheetsManager.Instance ! WorksheetRunner.RunEvaluation(_, editorProxy)
@@ -150,7 +158,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private[worksheet] def stopEvaluation(): Unit = withScriptCompilationUnit {
     editorProxy.stopExternalEditorUpdate()
-    
+
     import org.scalaide.worksheet.runtime.WorksheetsManager
     import org.scalaide.worksheet.runtime.ProgramExecutorService
     WorksheetsManager.Instance ! ProgramExecutorService.StopRun(_)
@@ -159,6 +167,17 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = {
     ScriptCompilationUnit.fromEditor(ScriptEditor.this) foreach f
   }
+
+  import scala.tools.eclipse.util.SWTUtils
+  import scala.tools.eclipse.util.SWTUtils.fnToPropertyChangeListener
+  private val preferenceListener: IPropertyChangeListener = handlePreferenceStoreChanged _
+
+  override def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
+    sourceViewConfiguration.handlePropertyChangeEvent(event)
+    getSourceViewer().invalidateTextPresentation
+  }
+
+  prefStore.addPropertyChangeListener(preferenceListener)
 
   //TODO: `stopEvaluation` if the editor gets hidden
 }
