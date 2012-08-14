@@ -2,7 +2,7 @@ package org.scalaide.worksheet.runtime
 
 import java.io.File
 
-import scala.reflect.internal.util.Position
+import scala.tools.nsc.util.Position
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.logging.HasLogger

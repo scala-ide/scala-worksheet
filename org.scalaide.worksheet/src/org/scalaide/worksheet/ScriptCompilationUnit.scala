@@ -1,8 +1,5 @@
 package org.scalaide.worksheet
 
-import scala.reflect.internal.util.BatchSourceFile
-import scala.reflect.internal.util.Position
-import scala.reflect.internal.util.ScriptSourceFile
 import scala.tools.eclipse.InteractiveCompilationUnit
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.buildmanager.BuildProblemMarker
@@ -10,6 +7,9 @@ import scala.tools.eclipse.util.EclipseResource
 import scala.tools.eclipse.util.FileUtils
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.io.AbstractFile
+import scala.tools.nsc.util.BatchSourceFile
+import scala.tools.nsc.util.Position
+import scala.tools.nsc.util.ScriptSourceFile
 
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IMarker
@@ -19,6 +19,7 @@ import org.eclipse.ui.IEditorInput
 import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.editor.ScriptEditor
+
 
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying

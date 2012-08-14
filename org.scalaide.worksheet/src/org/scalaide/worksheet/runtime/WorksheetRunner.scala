@@ -10,7 +10,6 @@ import scala.sys.process.Process
 import scala.sys.process.ProcessIO
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.logging.HasLogger
-import scala.util.{ Failure, Success }
 
 import org.eclipse.debug.core.DebugPlugin
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy
@@ -55,8 +54,8 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
         case RunEvaluation(unit, editor) =>
           unit.clearBuildErrors()
           instrumenter.instrument(unit) match {
-            case Failure(ex) => eclipseLog.error(ex)
-            case Success((decl, source)) =>
+            case Left(ex) => eclipseLog.error(ex)
+            case Right((decl, source)) =>
               compiler.compile(source) match {
                 case CompilationFailed(errors) =>
                   logger.debug("compilation errors in " + (unit.file.name))
