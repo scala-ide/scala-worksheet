@@ -78,4 +78,26 @@
          </adapter>
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="org.scala-ide.sdt.core.wizards"
+            class="org.scalaide.worksheet.wizards.NewWorksheetWizard"
+            finalPerspective="org.scala-ide.sdt.core.perspective"
+            icon="icons/sample.gif"
+            id="org.scalaide.worksheet.wizards.newWorksheet"
+            name="Scala Worksheet"
+            project="false">
+            <description>Create a Scala worksheet</description>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.scala-ide.sdt.core.perspective">
+         <newWizardShortcut
+               id="org.scalaide.worksheet.wizards.newWorksheet">
+         </newWizardShortcut>
+      </perspectiveExtension>
+   </extension>
 </plugin>
