@@ -15,6 +15,9 @@ import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.ui.texteditor.IElementStateListener
 import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.tools.eclipse.logging.HasLogger
+import org.eclipse.ui.texteditor.TextOperationAction
+import org.eclipse.jface.action.IMenuManager
+import org.eclipse.ui.texteditor.ITextEditorActionConstants
 
 object ScriptEditor {
 
@@ -99,6 +102,25 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   override def initializeEditor() {
     super.initializeEditor()
     setSourceViewerConfiguration(new ScriptConfiguration(this))
+  }
+  
+  override def initializeKeyBindingScopes() {
+    setKeyBindingScopes(Array("org.scalaide.worksheet.editorScope"))
+  }
+  
+  override def createActions() {
+    super.createActions()
+    
+    val formatAction= new TextOperationAction(EditorMessages.resourceBundle, "Editor.Format.", this, ISourceViewer.FORMAT)
+    formatAction.setActionDefinitionId("org.scalaide.worksheet.commands.format")
+    setAction("format", formatAction)
+  }
+  
+  override def editorContextMenuAboutToShow(menu: IMenuManager) {
+    super.editorContextMenuAboutToShow(menu)
+    
+    // add the format menu item
+    addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "format")
   }
 
   /** Return the annotation model associated with the current document. */

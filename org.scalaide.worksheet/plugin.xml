@@ -23,6 +23,12 @@
             id="org.scalaide.worksheet.commands.evalScript"
             name="Evaluate Script">
       </command>
+      <command
+            categoryId="org.scalaide.worksheet.commands.category"
+            defaultHandler="org.scalaide.worksheet.handlers.Format"
+            id="org.scalaide.worksheet.commands.format"
+            name="Format">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -35,9 +41,15 @@
          point="org.eclipse.ui.bindings">
       <key
             commandId="org.scalaide.worksheet.commands.evalScript"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="org.scalaide.worksheet.editorScope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+B">
+      </key>
+      <key
+            commandId="org.scalaide.worksheet.commands.format"
+            contextId="org.scalaide.worksheet.editorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+F">
       </key>
    </extension>
    <extension
@@ -99,5 +111,14 @@
                id="org.scalaide.worksheet.wizards.newWorksheet">
          </newWizardShortcut>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            description="Scala worksheet editor"
+            id="org.scalaide.worksheet.editorScope"
+            name="Editing Scala Worksheet"
+            parentId="org.eclipse.ui.textEditorScope">
+      </context>
    </extension>
 </plugin>
