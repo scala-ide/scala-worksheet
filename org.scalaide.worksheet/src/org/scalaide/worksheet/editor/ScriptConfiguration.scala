@@ -1,5 +1,4 @@
 package org.scalaide.worksheet.editor
-
 import scala.tools.eclipse.ScalaDamagerRepairer
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.formatter.ScalaFormattingStrategy
@@ -12,8 +11,10 @@ import scala.tools.eclipse.lexical.XmlCommentScanner
 import scala.tools.eclipse.lexical.XmlPIScanner
 import scala.tools.eclipse.lexical.XmlTagScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
+
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
+import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.text.DefaultTextHover
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextHover
@@ -31,19 +32,19 @@ import org.eclipse.jface.text.source.DefaultAnnotationHover
 import org.eclipse.jface.text.source.IAnnotationHover
 import org.eclipse.jface.text.source.ISourceViewer
 import org.eclipse.jface.text.source.SourceViewerConfiguration
+import org.eclipse.jface.util.PropertyChangeEvent
 import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.lexical.SingleLineCommentScanner
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
+
 import scalariform.ScalaVersions
-import org.eclipse.jface.preference.IPreferenceStore
-import org.eclipse.jface.util.PropertyChangeEvent
 
-class ScriptConfiguration(val worksheetPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
-  val scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
-  val codeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
-
-  val javaColorManager = JavaPlugin.getDefault.getJavaTextTools.getColorManager
+class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
+  @inline private def scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
+  
+  private val javaColorManager = JavaPlugin.getDefault.getJavaTextTools.getColorManager
+  private val codeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
 
   override def getPresentationReconciler(sv: ISourceViewer) = {
     val reconciler = super.getPresentationReconciler(sv).asInstanceOf[PresentationReconciler]
@@ -120,7 +121,7 @@ class ScriptConfiguration(val worksheetPreferenceStore: IPreferenceStore, textEd
   }
 
   private val scalaCodeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
-  private val singleLineCommentScanner = new SingleLineCommentScanner(scalaPreferenceStore, worksheetPreferenceStore)
+  private val singleLineCommentScanner = new SingleLineCommentScanner(scalaPreferenceStore, pluginPreferenceStore)
   private val multiLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_COMMENT, javaColorManager, scalaPreferenceStore)
   private val scaladocScanner = new SingleTokenScanner(ScalaSyntaxClasses.SCALADOC, javaColorManager, scalaPreferenceStore)
   private val stringScanner = new SingleTokenScanner(ScalaSyntaxClasses.STRING, javaColorManager, scalaPreferenceStore)

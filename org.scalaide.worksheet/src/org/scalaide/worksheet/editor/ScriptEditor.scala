@@ -1,31 +1,30 @@
 package org.scalaide.worksheet.editor
 
+import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.tools.eclipse.ISourceViewerEditor
+import scala.tools.eclipse.logging.HasLogger
+
+import org.eclipse.jface.action.IMenuManager
+
 import org.eclipse.jface.text.ITextSelection
 import org.eclipse.jface.text.source.Annotation
 import org.eclipse.jface.text.source.IAnnotationModel
 import org.eclipse.jface.text.source.IAnnotationModelExtension2
-import org.eclipse.swt.widgets.Composite
-import org.eclipse.swt.events.KeyEvent
-import org.eclipse.swt.events.KeyAdapter
-import org.eclipse.ui.editors.text.TextEditor
-import scala.collection.JavaConverters.asScalaIteratorConverter
-import scala.tools.eclipse.ISourceViewerEditor
 import org.eclipse.jface.text.source.ISourceViewer
-import org.eclipse.core.runtime.IProgressMonitor
-import org.eclipse.ui.texteditor.IElementStateListener
-import org.scalaide.worksheet.ScriptCompilationUnit
-import scala.tools.eclipse.logging.HasLogger
-import org.eclipse.ui.texteditor.TextOperationAction
-import org.eclipse.jface.action.IMenuManager
-import org.eclipse.ui.texteditor.ITextEditorActionConstants
 import org.eclipse.jface.util.IPropertyChangeListener
 import org.eclipse.jface.util.PropertyChangeEvent
+import org.eclipse.swt.events.KeyAdapter
+import org.eclipse.swt.events.KeyEvent
+import org.eclipse.ui.editors.text.TextEditor
+import org.eclipse.ui.texteditor.ITextEditorActionConstants
+import org.eclipse.ui.texteditor.TextOperationAction
+import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 
 object ScriptEditor {
 
   /** The annotation types showin when hovering on the left-side ruler (or in the status bar). */
-  val annotationsShownInHover = Set(
+  private[editor] val annotationsShownInHover = Set(
     "org.eclipse.jdt.ui.error", "org.eclipse.jdt.ui.warning", "org.eclipse.jdt.ui.info")
 
   val SCRIPT_EXTENSION = ".sc"
@@ -35,10 +34,11 @@ object ScriptEditor {
 
 /** A Scala script editor.*/
 class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with HasLogger {
-  val prefStore = WorksheetPlugin.prefStore
-  this.setPreferenceStore(prefStore)
-  val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
-  setSourceViewerConfiguration(sourceViewConfiguration);
+  @inline private def prefStore = WorksheetPlugin.prefStore
+  
+  private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
+  setSourceViewerConfiguration(sourceViewConfiguration)
+  setPreferenceStore(prefStore)
   setPartName("Scala Script Editor")
   setDocumentProvider(new ScriptDocumentProvider)
 
@@ -107,10 +107,10 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private val editorProxy = new DefaultEditorProxy
 
-//  override def initializeEditor() {
-//    super.initializeEditor()
-//    setSourceViewerConfiguration(sourceViewConfiguration)
-//  }
+  override def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
+    sourceViewConfiguration.handlePropertyChangeEvent(event)
+    getSourceViewer().invalidateTextPresentation()
+  }
   
   override def initializeKeyBindingScopes() {
     setKeyBindingScopes(Array("org.scalaide.worksheet.editorScope"))
@@ -167,17 +167,6 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = {
     ScriptCompilationUnit.fromEditor(ScriptEditor.this) foreach f
   }
-
-  import scala.tools.eclipse.util.SWTUtils
-  import scala.tools.eclipse.util.SWTUtils.fnToPropertyChangeListener
-  private val preferenceListener: IPropertyChangeListener = handlePreferenceStoreChanged _
-
-  override def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
-    sourceViewConfiguration.handlePropertyChangeEvent(event)
-    getSourceViewer().invalidateTextPresentation
-  }
-
-  prefStore.addPropertyChangeListener(preferenceListener)
 
   //TODO: `stopEvaluation` if the editor gets hidden
 }

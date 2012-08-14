@@ -1,11 +1,12 @@
 package org.scalaide.worksheet.editor
 
-import org.eclipse.ui.editors.text.TextEditor
 import org.eclipse.jface.text.ITextSelection
-import org.eclipse.ui.IWorkbenchPart
 import org.eclipse.jface.viewers.ISelection
-import org.eclipse.ui.ISelectionListener
 import org.eclipse.swt.widgets.Composite
+import org.eclipse.ui.ISelectionListener
+import org.eclipse.ui.IWorkbenchPart
+
+import org.eclipse.ui.editors.text.TextEditor
 
 /** An editor trait that follows selection change events and calls `selectionChanged`.
  *  It encapsulates a selection listener, so clients don't need to take care of

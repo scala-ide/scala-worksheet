@@ -1,7 +1,8 @@
 package org.scalaide.worksheet
 
-import org.eclipse.core.runtime.IAdapterFactory
 import scala.tools.eclipse.InteractiveCompilationUnit
+
+import org.eclipse.core.runtime.IAdapterFactory
 import org.eclipse.ui.part.FileEditorInput
 
 /** Adapt `FileEditorInput` to `InteractiveCompilationUnit`, if possible. It allows

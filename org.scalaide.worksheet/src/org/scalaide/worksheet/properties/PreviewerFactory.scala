@@ -1,6 +1,7 @@
 package org.scalaide.worksheet.properties
 
 import scala.tools.eclipse.lexical.ScalaDocumentPartitioner
+
 import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.resource.JFaceResources
@@ -14,14 +15,10 @@ import org.eclipse.swt.SWT
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.ui.editors.text.EditorsUI
 import org.eclipse.ui.texteditor.ChainedPreferenceStore
-import org.scalaide.worksheet.editor.ScriptConfiguration
-import java.util.HashMap
-import org.eclipse.jface.text.IDocumentPartitioner
-import org.eclipse.jdt.ui.text.IJavaPartitions
-import org.eclipse.jface.text.TextUtilities
 import org.scalaide.worksheet.editor.ScalaPartitioning
+import org.scalaide.worksheet.editor.ScriptConfiguration
 
-object WorksheetPreviewerFactory {
+object PreviewerFactory {
 
   def createPreviewer(parent: Composite, worksheetPreferenceStore: IPreferenceStore, initialText: String): SourceViewer = {
     val preferenceStore = new ChainedPreferenceStore(Array(worksheetPreferenceStore, EditorsUI.getPreferenceStore))
@@ -42,12 +39,8 @@ object WorksheetPreviewerFactory {
     document.setDocumentPartitioner(ScalaPartitioning.SCALA_PARTITIONING, partitioner)
     previewViewer.setDocument(document)
     previewViewer.invalidateTextPresentation()
-    
-//    val partitioners = new HashMap[String, IDocumentPartitioner]
-//    partitioners.put(IJavaPartitions.JAVA_PARTITIONING, new ScalaDocumentPartitioner(conservative = true))
-//    TextUtilities.addDocumentPartitioners(document, partitioners)
-//    previewViewer.setDocument(document)
 
+    // FIXME: Should provide a mechanism for de-registering this on plugin's disposal
     preferenceStore.addPropertyChangeListener(new IPropertyChangeListener {
       def propertyChange(event: PropertyChangeEvent) {
         configuration.handlePropertyChangeEvent(event)

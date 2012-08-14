@@ -5,9 +5,7 @@ import org.osgi.framework.BundleContext
 
 object WorksheetPlugin {
   @volatile var plugin: WorksheetPlugin = _
-  val PLUGIN_ID = "Worksheet Plugin"
-
-  def getDefault = WorksheetPlugin.plugin
+  private val PLUGIN_ID = "Worksheet Plugin"
 
   def prefStore = plugin.getPreferenceStore
 

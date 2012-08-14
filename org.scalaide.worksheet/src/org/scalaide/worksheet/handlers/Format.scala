@@ -2,10 +2,10 @@ package org.scalaide.worksheet.handlers
 
 import org.eclipse.core.commands.AbstractHandler
 import org.eclipse.core.commands.ExecutionEvent
-import org.eclipse.ui.handlers.HandlerUtil
-import org.scalaide.worksheet.editor.ScriptEditor
 import org.eclipse.jface.text.ITextOperationTarget
 import org.eclipse.jface.text.source.ISourceViewer
+import org.eclipse.ui.handlers.HandlerUtil
+import org.scalaide.worksheet.editor.ScriptEditor
 
 /**
  * Invoke the formatter on a Scala worksheet editor

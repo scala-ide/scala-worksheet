@@ -9,6 +9,7 @@ import scala.tools.eclipse.util.SWTUtils.fnToPropertyChangeListener
 import scala.tools.eclipse.util.SWTUtils.fnToSelectionAdapter
 import scala.tools.eclipse.util.SWTUtils.noArgFnToSelectionAdapter
 import scala.tools.eclipse.util.SWTUtils.noArgFnToSelectionChangedListener
+
 import org.eclipse.jdt.internal.ui.preferences.OverlayPreferenceStore
 import org.eclipse.jdt.internal.ui.preferences.OverlayPreferenceStore.BOOLEAN
 import org.eclipse.jdt.internal.ui.preferences.OverlayPreferenceStore.OverlayKey
@@ -23,6 +24,7 @@ import org.eclipse.jface.text.source.SourceViewer
 import org.eclipse.jface.util.PropertyChangeEvent
 import org.eclipse.jface.viewers.DoubleClickEvent
 import org.eclipse.jface.viewers.IStructuredSelection
+import org.eclipse.jface.viewers.StructuredSelection
 import org.eclipse.jface.viewers.TreeViewer
 import org.eclipse.swt.SWT
 import org.eclipse.swt.events.SelectionEvent
@@ -33,20 +35,19 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Label
 import org.eclipse.swt.widgets.Link
+import org.eclipse.swt.widgets.Scrollable
 import org.eclipse.ui.IWorkbench
 import org.eclipse.ui.IWorkbenchPreferencePage
 import org.eclipse.ui.dialogs.PreferencesUtil
-import org.eclipse.swt.widgets.Scrollable
-import org.eclipse.jface.viewers.StructuredSelection
-import org.scalaide.worksheet.lexical.WorksheetSyntaxClasses.ALL_SYNTAX_CLASSES
-import org.scalaide.worksheet.lexical.WorksheetSyntaxClasses.EVAL_RESULT_FIRST_LINE
 import org.scalaide.worksheet.WorksheetPlugin
+import org.scalaide.worksheet.lexical.SyntaxClasses.ALL_SYNTAX_CLASSES
+import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_FIRST_LINE
 
 
 /**
  * @see org.eclipse.jdt.internal.ui.preferences.JavaEditorColoringConfigurationBlock
  */
-class WorksheetSyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPreferencePage {
+class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPreferencePage {
 
   setPreferenceStore(WorksheetPlugin.plugin.getPreferenceStore)
   private val overlayStore = makeOverlayPreferenceStore
@@ -110,6 +111,15 @@ class WorksheetSyntaxColouringPreferencePage extends PreferencePage with IWorkbe
 
   override def dispose() {
     overlayStore.stop()
+    foregroundColorEditorLabel.dispose()
+    backgroundColorEditorLabel.dispose()
+    enabledCheckBox.dispose()
+    backgroundColorEnabledCheckBox.dispose()
+    foregroundColorButton.dispose()
+    backgroundColorButton.dispose()
+    boldCheckBox.dispose()
+    italicCheckBox.dispose()
+    underlineCheckBox.dispose()
     super.dispose()
   }
 
@@ -120,10 +130,10 @@ class WorksheetSyntaxColouringPreferencePage extends PreferencePage with IWorkbe
   }
 
   def createTreeViewer(editorComposite: Composite) {
+    val contentAndLabelProvider = new SyntaxColouringTreeContentAndLabelProvider
     treeViewer = new TreeViewer(editorComposite, SWT.SINGLE | SWT.BORDER)
-
-    treeViewer.setContentProvider(WorksheetSyntaxColouringTreeContentAndLabelProvider)
-    treeViewer.setLabelProvider(WorksheetSyntaxColouringTreeContentAndLabelProvider)
+    treeViewer.setContentProvider(contentAndLabelProvider)
+    treeViewer.setLabelProvider(contentAndLabelProvider)
 
     // scrollbars and tree indentation guess
     val widthHint = ALL_SYNTAX_CLASSES.map { syntaxClass => convertWidthInCharsToPixels(syntaxClass.displayName.length) }.max +
@@ -304,8 +314,10 @@ class WorksheetSyntaxColouringPreferencePage extends PreferencePage with IWorkbe
     }
   }
 
-  private def createPreviewer(parent: Composite): SourceViewer =
-    WorksheetPreviewerFactory.createPreviewer(parent, overlayStore, WorksheetSyntaxColouringPreviewText.previewText)
+  private def createPreviewer(parent: Composite): SourceViewer = {
+    val preview = new SyntaxColouringPreviewText 
+    PreviewerFactory.createPreviewer(parent, overlayStore, preview.previewText)
+  }
 
   private def selectedSyntaxClass: Option[ScalaSyntaxClass] = condOpt(treeViewer.getSelection) {
     case EclipseUtils.SelectedItems(syntaxClass: ScalaSyntaxClass) => syntaxClass

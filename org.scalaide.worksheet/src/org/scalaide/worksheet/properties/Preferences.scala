@@ -3,6 +3,7 @@ package org.scalaide.worksheet.properties
 import scala.tools.eclipse.logging.HasLogger
 import scala.tools.eclipse.properties.EclipseSettings
 import scala.tools.eclipse.properties.ScalaPluginPreferencePage
+
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.GridData
@@ -15,7 +16,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage
 import org.eclipse.ui.dialogs.PropertyPage
 import org.scalaide.worksheet.WorksheetPlugin
 
-class WorksheetPreferences extends PropertyPage with IWorkbenchPreferencePage with EclipseSettings
+class Preferences extends PropertyPage with IWorkbenchPreferencePage with EclipseSettings
   with ScalaPluginPreferencePage with HasLogger {
 
   /** Pulls the preference store associated with this plugin */
@@ -56,15 +57,15 @@ class WorksheetPreferences extends PropertyPage with IWorkbenchPreferencePage wi
     composite
   }
 
-  override def performOk = try {
+  override def performOk(): Boolean = try {
     eclipseBoxes.foreach(_.eSettings.foreach(_.apply()))
     save()
     true
   } catch {
-    case ex: Throwable => eclipseLog.error(ex); false
+    case ex: Exception => eclipseLog.error(ex); false
   }
 
-  def updateApply = updateApplyButton
+  override def updateApply(): Unit = updateApplyButton()
 
   /** Updates the apply button with the appropriate enablement. */
   protected override def updateApplyButton(): Unit = {

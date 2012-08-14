@@ -1,10 +1,10 @@
 package org.scalaide.worksheet.editor
 
-import org.eclipse.ui.editors.text.TextFileDocumentProvider
-import org.eclipse.jface.text.IDocument
-import org.eclipse.ui.editors.text.FileDocumentProvider
-import org.eclipse.jface.text.IDocumentExtension3
 import scala.tools.eclipse.lexical.ScalaDocumentPartitioner
+
+import org.eclipse.jface.text.IDocument
+import org.eclipse.jface.text.IDocumentExtension3
+import org.eclipse.ui.editors.text.FileDocumentProvider
 
 /** A Document provider for Scala scripts. It sets the Scala
  *  partitioner.

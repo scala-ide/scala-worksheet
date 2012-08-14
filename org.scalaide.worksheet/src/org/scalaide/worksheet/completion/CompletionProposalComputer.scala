@@ -1,18 +1,19 @@
 package org.scalaide.worksheet.completion
 
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor
-import org.eclipse.jface.text.contentassist.ICompletionProposal
-import org.eclipse.jface.text.ITextViewer
-import org.eclipse.jface.text.contentassist.IContextInformation
-import scala.tools.eclipse.util.EditorUtils
-import scala.tools.eclipse.InteractiveCompilationUnit
-import org.scalaide.worksheet.ScriptCompilationUnit
-import scala.tools.eclipse.completion.ScalaCompletions
-import org.eclipse.ui.texteditor.ITextEditor
-import scala.tools.eclipse.ScalaWordFinder
 import scala.reflect.internal.util.SourceFile
 import scala.tools.eclipse.ScalaPresentationCompiler
+import scala.tools.eclipse.ScalaWordFinder
+import scala.tools.eclipse.completion.ScalaCompletions
 import scala.tools.eclipse.ui.ScalaCompletionProposal
+import scala.tools.eclipse.util.EditorUtils
+
+import org.eclipse.jface.text.ITextViewer
+import org.eclipse.jface.text.contentassist.ICompletionProposal
+
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor
+import org.eclipse.jface.text.contentassist.IContextInformation
+import org.eclipse.ui.texteditor.ITextEditor
+import org.scalaide.worksheet.ScriptCompilationUnit
 
 class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletions with IContentAssistProcessor {
   def getCompletionProposalAutoActivationCharacters() = Array('.')

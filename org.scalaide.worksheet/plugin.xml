@@ -124,13 +124,13 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.scalaide.worksheet.properties.WorksheetPreferences"
+            class="org.scalaide.worksheet.properties.Preferences"
             id="org.scalaide.worksheet.preferences"
-            name="Worksheet">
+            name="Scala Worksheet">
       </page>
       <page
             category="org.scalaide.worksheet.preferences"
-            class="org.scalaide.worksheet.properties.WorksheetSyntaxColouringPreferencePage"
+            class="org.scalaide.worksheet.properties.SyntaxColouringPreferencePage"
             id="org.scalaide.worksheet.preferences.syntaxColoring"
             name="SyntaxColoring">
       </page>
@@ -138,7 +138,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.scalaide.worksheet.properties.WorksheetColourPreferenceInitializer">
+            class="org.scalaide.worksheet.properties.ColourPreferenceInitializer">
       </initializer>
    </extension>
 </plugin>

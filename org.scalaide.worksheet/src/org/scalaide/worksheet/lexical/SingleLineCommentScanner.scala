@@ -10,9 +10,9 @@ import org.eclipse.jface.text.rules.ITokenScanner
 import org.eclipse.jface.text.rules.Token
 import org.eclipse.jface.util.PropertyChangeEvent
 
-import WorksheetSyntaxClasses.EVAL_RESULT_FIRST_LINE
-import WorksheetSyntaxClasses.EVAL_RESULT_MARKER
-import WorksheetSyntaxClasses.EVAL_RESULT_NEW_LINE
+import SyntaxClasses.EVAL_RESULT_FIRST_LINE
+import SyntaxClasses.EVAL_RESULT_MARKER
+import SyntaxClasses.EVAL_RESULT_NEW_LINE
 
 class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val worksheetPreferenceStore: IPreferenceStore) extends ITokenScanner {
   abstract sealed class State
