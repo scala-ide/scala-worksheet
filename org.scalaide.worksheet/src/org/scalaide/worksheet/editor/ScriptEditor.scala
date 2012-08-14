@@ -59,6 +59,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
         // we need to turn off evaluation on save if we don't want to loop forever 
         // (because of `editorSaved` implementation, i.e., automatic worksheet evaluation on save)
         getSourceViewer().getTextWidget().setCaretOffset(newCaretOffset)
+        getSourceViewer().invalidateTextPresentation()
       }
     }
 
