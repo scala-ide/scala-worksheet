@@ -2,23 +2,25 @@ package org.scalaide.worksheet.text
 
 import java.io.Writer
 
-import reflect.internal.Chars._
+//import reflect.internal.Chars._
 
 object SourceInserter {
+  val LineBreak = System.getProperty("line.separator")
   def stripRight(cs: Array[Char]): Array[Char] = {
     val lines =
       new String(cs) split "\n"
     def leftPart(str: String) =
       (str split """//>|//\|""").head
     def isContinuation(str: String) =
-      ((str contains "//>") || (str contains "//|")) && (leftPart(str) forall isWhitespace)
+      ((str contains "//>") || (str contains "//|")) && (leftPart(str) forall Character.isWhitespace)
     def stripTrailingWS(str: String) =
-      str take (str lastIndexWhere (!isWhitespace(_))) + 1
+      str take (str lastIndexWhere (!Character.isWhitespace(_))) + 1
     val prefixes =
       lines filterNot isContinuation map leftPart map stripTrailingWS
     (prefixes mkString "\n").toArray
   }
 }
+
 class SourceInserter(contents: Array[Char], start: Int = 0, tabInc: Int = 8) extends Writer {
 
   private var buf = contents
@@ -29,7 +31,7 @@ class SourceInserter(contents: Array[Char], start: Int = 0, tabInc: Int = 8) ext
 
   private def currentColumn: Int = {
     var i = offset
-    while (i > 0 && !isLineBreakChar(buf(i - 1))) i -= 1
+    while (i > 0 && (buf(i - 1) != SourceInserter.LineBreak)) i -= 1
     var col = 0
     while (i < offset) {
       col = if (buf(i) == '\t') (col + tabInc) / tabInc * tabInc else col + 1
@@ -51,6 +53,9 @@ class SourceInserter(contents: Array[Char], start: Int = 0, tabInc: Int = 8) ext
       buf = buf1
     }
   }
+
+  final val LF = '\u000A'
+  final val CR = '\u000D'
 
   private def insertChar(ch: Char) = {
 //  Console.err.print("["+ch+"]")

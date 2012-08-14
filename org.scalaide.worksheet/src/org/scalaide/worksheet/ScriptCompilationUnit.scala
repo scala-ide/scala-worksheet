@@ -5,8 +5,8 @@ import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.ui.IEditorInput
 import org.eclipse.ui.part.FileEditorInput
 import org.scalaide.worksheet.editor.ScriptEditor
-import scala.reflect.internal.util.BatchSourceFile
-import scala.reflect.internal.util.ScriptSourceFile
+import scala.tools.nsc.util.BatchSourceFile
+import scala.tools.nsc.util.ScriptSourceFile
 import scala.tools.eclipse.InteractiveCompilationUnit
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.util.EclipseResource
@@ -18,7 +18,7 @@ import scala.tools.eclipse.util.FileUtils
 import scala.tools.eclipse.resources.MarkerFactory
 import scala.tools.eclipse.buildmanager.BuildProblemMarker
 import org.eclipse.core.resources.IMarker
-import scala.reflect.internal.util.Position
+import scala.tools.nsc.util.Position
 
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying

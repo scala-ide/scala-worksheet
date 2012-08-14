@@ -10,7 +10,7 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.tools.eclipse.completion.ScalaCompletions
 import org.eclipse.ui.texteditor.ITextEditor
 import scala.tools.eclipse.ScalaWordFinder
-import scala.reflect.internal.util.SourceFile
+import scala.tools.nsc.util.SourceFile
 import scala.tools.eclipse.ScalaPresentationCompiler
 import scala.tools.eclipse.ui.ScalaCompletionProposal
 
