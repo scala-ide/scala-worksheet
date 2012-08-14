@@ -36,11 +36,11 @@ import org.eclipse.swt.widgets.Link
 import org.eclipse.ui.IWorkbench
 import org.eclipse.ui.IWorkbenchPreferencePage
 import org.eclipse.ui.dialogs.PreferencesUtil
-import scala.tools.eclipse.ScalaPlugin
 import org.eclipse.swt.widgets.Scrollable
 import org.eclipse.jface.viewers.StructuredSelection
 import org.scalaide.worksheet.lexical.WorksheetSyntaxClasses.ALL_SYNTAX_CLASSES
 import org.scalaide.worksheet.lexical.WorksheetSyntaxClasses.EVAL_RESULT_FIRST_LINE
+import org.scalaide.worksheet.WorksheetPlugin
 
 
 /**
@@ -48,7 +48,7 @@ import org.scalaide.worksheet.lexical.WorksheetSyntaxClasses.EVAL_RESULT_FIRST_L
  */
 class WorksheetSyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPreferencePage {
 
-  setPreferenceStore(ScalaPlugin.plugin.getPreferenceStore)
+  setPreferenceStore(WorksheetPlugin.plugin.getPreferenceStore)
   private val overlayStore = makeOverlayPreferenceStore
 
   private var foregroundColorEditorLabel: Label = _
@@ -104,7 +104,7 @@ class WorksheetSyntaxColouringPreferencePage extends PreferencePage with IWorkbe
   override def performOk() = {
     super.performOk()
     overlayStore.propagate()
-    ScalaPlugin.plugin.savePluginPreferences()
+    WorksheetPlugin.plugin.savePluginPreferences()
     true
   }
 

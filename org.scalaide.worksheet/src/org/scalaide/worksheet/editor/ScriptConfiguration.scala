@@ -39,7 +39,8 @@ import scalariform.ScalaVersions
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.util.PropertyChangeEvent
 
-class ScriptConfiguration(val scalaPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
+class ScriptConfiguration(val worksheetPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
+  val scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
   val codeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
 
   val javaColorManager = JavaPlugin.getDefault.getJavaTextTools.getColorManager
@@ -75,7 +76,7 @@ class ScriptConfiguration(val scalaPreferenceStore: IPreferenceStore, textEditor
   override def getConfiguredDocumentPartitioning(sourceViewer: ISourceViewer): String = {
     ScalaPartitioning.SCALA_PARTITIONING
   }
-  
+
   override def getConfiguredContentTypes(sourceViewer: ISourceViewer): Array[String] = {
     Array(IDocument.DEFAULT_CONTENT_TYPE,
       IJavaPartitions.JAVA_DOC,
@@ -85,9 +86,9 @@ class ScriptConfiguration(val scalaPreferenceStore: IPreferenceStore, textEditor
       IJavaPartitions.JAVA_CHARACTER,
       ScalaPartitions.SCALA_MULTI_LINE_STRING)
   }
-  
+
   override def getReconciler(sourceViewer: ISourceViewer): IReconciler = {
-    val reconciler = new MonoReconciler(new ScalaReconcilingStrategy(textEditor), /*isIncremental = */false)
+    val reconciler = new MonoReconciler(new ScalaReconcilingStrategy(textEditor), /*isIncremental = */ false)
     reconciler.install(sourceViewer)
     reconciler
   }
@@ -96,9 +97,9 @@ class ScriptConfiguration(val scalaPreferenceStore: IPreferenceStore, textEditor
     new DefaultAnnotationHover(true) {
       override def isIncluded(a: Annotation): Boolean = ScriptEditor.annotationsShownInHover(a.getType)
     }
-   
+
   }
-  
+
   override def getTextHover(viewer: ISourceViewer, contentType: String): ITextHover = {
     return new DefaultTextHover(viewer)
   }
@@ -111,15 +112,15 @@ class ScriptConfiguration(val scalaPreferenceStore: IPreferenceStore, textEditor
     assistant.setContentAssistProcessor(new CompletionProposalComputer(textEditor), IDocument.DEFAULT_CONTENT_TYPE)
     assistant
   }
-  
+
   override def getContentFormatter(viewer: ISourceViewer) = {
     val formatter = new MultiPassContentFormatter(getConfiguredDocumentPartitioning(viewer), IDocument.DEFAULT_CONTENT_TYPE)
     formatter.setMasterStrategy(new ScalaFormattingStrategy(textEditor))
     formatter
   }
-  
+
   private val scalaCodeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
-  private val singleLineCommentScanner = new SingleLineCommentScanner(javaColorManager, scalaPreferenceStore)
+  private val singleLineCommentScanner = new SingleLineCommentScanner(scalaPreferenceStore, worksheetPreferenceStore)
   private val multiLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_COMMENT, javaColorManager, scalaPreferenceStore)
   private val scaladocScanner = new SingleTokenScanner(ScalaSyntaxClasses.SCALADOC, javaColorManager, scalaPreferenceStore)
   private val stringScanner = new SingleTokenScanner(ScalaSyntaxClasses.STRING, javaColorManager, scalaPreferenceStore)
@@ -136,22 +137,21 @@ class ScriptConfiguration(val scalaPreferenceStore: IPreferenceStore, textEditor
     detector.setContext(textEditor)
     Array(detector)
   }
-  
-  def handlePropertyChangeEvent(event: PropertyChangeEvent) {
-      scalaCodeScanner.adaptToPreferenceChange(event)
-      scaladocScanner.adaptToPreferenceChange(event)
-      stringScanner.adaptToPreferenceChange(event)
-      multiLineStringScanner.adaptToPreferenceChange(event)
-      singleLineCommentScanner.adaptToPreferenceChange(event)
-      multiLineCommentScanner.adaptToPreferenceChange(event)
-      xmlTagScanner.adaptToPreferenceChange(event)
-      xmlCommentScanner.adaptToPreferenceChange(event)
-      xmlCDATAScanner.adaptToPreferenceChange(event)
-      xmlPCDATAScanner.adaptToPreferenceChange(event)
-      xmlPIScanner.adaptToPreferenceChange(event)
-   }
-}
 
+  def handlePropertyChangeEvent(event: PropertyChangeEvent) {
+    scalaCodeScanner.adaptToPreferenceChange(event)
+    scaladocScanner.adaptToPreferenceChange(event)
+    stringScanner.adaptToPreferenceChange(event)
+    multiLineStringScanner.adaptToPreferenceChange(event)
+    singleLineCommentScanner.adaptToPreferenceChange(event)
+    multiLineCommentScanner.adaptToPreferenceChange(event)
+    xmlTagScanner.adaptToPreferenceChange(event)
+    xmlCommentScanner.adaptToPreferenceChange(event)
+    xmlCDATAScanner.adaptToPreferenceChange(event)
+    xmlPCDATAScanner.adaptToPreferenceChange(event)
+    xmlPIScanner.adaptToPreferenceChange(event)
+  }
+}
 
 object ScalaPartitioning {
   final val SCALA_PARTITIONING = "__scala_partitioning"

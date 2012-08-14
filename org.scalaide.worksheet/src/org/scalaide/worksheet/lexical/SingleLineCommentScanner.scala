@@ -1,18 +1,20 @@
 package org.scalaide.worksheet.lexical
 
-import scala.tools.eclipse.lexical.AbstractScalaScanner
+import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClass
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
-import org.eclipse.jdt.ui.text.IColorManager
+
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.rules.IToken
+import org.eclipse.jface.text.rules.ITokenScanner
 import org.eclipse.jface.text.rules.Token
-import WorksheetSyntaxClasses.EVAL_RESULT_FIRST_LINE
-import WorksheetSyntaxClasses.EVAL_RESULT_NEW_LINE
-import org.scalaide.worksheet.properties.WorksheetColourPreferenceInitializer
+import org.eclipse.jface.util.PropertyChangeEvent
 
-class SingleLineCommentScanner(val colorManager: IColorManager, val preferenceStore: IPreferenceStore) extends AbstractScalaScanner {
-//  new WorksheetColourPreferenceInitializer().initializeDefaultPreferences
+import WorksheetSyntaxClasses.EVAL_RESULT_FIRST_LINE
+import WorksheetSyntaxClasses.EVAL_RESULT_MARKER
+import WorksheetSyntaxClasses.EVAL_RESULT_NEW_LINE
+
+class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val worksheetPreferenceStore: IPreferenceStore) extends ITokenScanner {
   abstract sealed class State
 
   case object Init extends State
@@ -38,7 +40,6 @@ class SingleLineCommentScanner(val colorManager: IColorManager, val preferenceSt
     state match {
       case Init => {
         val c = document.getChar(offset + "//".length())
-        import WorksheetSyntaxClasses._
         def commonWork(c: Char) = {
           tokenOffset = offset
           tokenLength = "//>".length()
@@ -81,6 +82,29 @@ class SingleLineCommentScanner(val colorManager: IColorManager, val preferenceSt
         getToken(EVAL_RESULT_NEW_LINE)
       }
     }
+
+  private var tokens: Map[ScalaSyntaxClass, Token] = Map()
+
+  protected def getToken(syntaxClass: ScalaSyntaxClass): Token =
+    tokens.getOrElse(syntaxClass, createToken(syntaxClass))
+
+  private def createToken(syntaxClass: ScalaSyntaxClass) = {
+    val token = new Token(getTextAttribute(syntaxClass))
+    tokens = tokens + (syntaxClass -> token)
+    token
+  }
+
+  def adaptToPreferenceChange(event: PropertyChangeEvent) =
+    for ((syntaxClass, token) <- tokens)
+      token.setData(getTextAttribute(syntaxClass))
+
+  private def getTextAttribute(syntaxClass: ScalaSyntaxClass) = {
+    val prefStore = syntaxClass match {
+      case EVAL_RESULT_FIRST_LINE | EVAL_RESULT_NEW_LINE | EVAL_RESULT_MARKER => worksheetPreferenceStore
+      case _ => scalaPreferenceStore
+    }
+    syntaxClass.getTextAttribute(prefStore)
+  }
 
   def getTokenOffset = tokenOffset
 

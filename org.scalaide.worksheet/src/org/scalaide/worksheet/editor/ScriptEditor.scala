@@ -15,9 +15,9 @@ import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.ui.texteditor.IElementStateListener
 import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.tools.eclipse.logging.HasLogger
-import scala.tools.eclipse.ScalaPlugin
 import org.eclipse.jface.util.IPropertyChangeListener
 import org.eclipse.jface.util.PropertyChangeEvent
+import org.scalaide.worksheet.WorksheetPlugin
 
 object ScriptEditor {
 
@@ -32,11 +32,10 @@ object ScriptEditor {
 
 /** A Scala script editor.*/
 class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with HasLogger {
-  val prefStore = ScalaPlugin.prefStore
+  val prefStore = WorksheetPlugin.prefStore
   this.setPreferenceStore(prefStore)
   val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
   setSourceViewerConfiguration(sourceViewConfiguration);
-  new ScriptConfiguration(ScalaPlugin.plugin.getPreferenceStore, this)
   setPartName("Scala Script Editor")
   setDocumentProvider(new ScriptDocumentProvider)
 

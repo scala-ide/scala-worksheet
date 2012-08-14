@@ -23,8 +23,8 @@ import org.scalaide.worksheet.editor.ScalaPartitioning
 
 object WorksheetPreviewerFactory {
 
-  def createPreviewer(parent: Composite, scalaPreferenceStore: IPreferenceStore, initialText: String): SourceViewer = {
-    val preferenceStore = new ChainedPreferenceStore(Array(scalaPreferenceStore, EditorsUI.getPreferenceStore))
+  def createPreviewer(parent: Composite, worksheetPreferenceStore: IPreferenceStore, initialText: String): SourceViewer = {
+    val preferenceStore = new ChainedPreferenceStore(Array(worksheetPreferenceStore, EditorsUI.getPreferenceStore))
     val previewViewer = new ProjectionViewer(parent, null, null, false, SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER)
     val font = JFaceResources.getFont(PreferenceConstants.EDITOR_TEXT_FONT)
     previewViewer.getTextWidget.setFont(font)

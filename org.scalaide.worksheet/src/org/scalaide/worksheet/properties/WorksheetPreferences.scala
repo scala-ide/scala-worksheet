@@ -13,14 +13,14 @@ import org.eclipse.swt.widgets.Group
 import org.eclipse.ui.IWorkbench
 import org.eclipse.ui.IWorkbenchPreferencePage
 import org.eclipse.ui.dialogs.PropertyPage
-import scala.tools.eclipse.ScalaPlugin
+import org.scalaide.worksheet.WorksheetPlugin
 
 class WorksheetPreferences extends PropertyPage with IWorkbenchPreferencePage with EclipseSettings
   with ScalaPluginPreferencePage with HasLogger {
 
   /** Pulls the preference store associated with this plugin */
   override def doGetPreferenceStore(): IPreferenceStore = {
-    ScalaPlugin.plugin.getPreferenceStore
+    WorksheetPlugin.plugin.getPreferenceStore
   }
 
   override def init(wb: IWorkbench) {}

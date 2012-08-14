@@ -35,6 +35,7 @@ Import-Package:
  scala.tools.eclipse;apply-aspects:=false,
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter;apply-aspects:=false
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Activator: org.scalaide.worksheet.WorksheetPlugin
 Bundle-ClassPath: .
 Export-Package: org.scalaide.worksheet,
  org.scalaide.worksheet.editor,
