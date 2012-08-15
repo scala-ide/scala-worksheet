@@ -12,7 +12,6 @@ import scala.tools.eclipse.lexical.XmlCommentScanner
 import scala.tools.eclipse.lexical.XmlPIScanner
 import scala.tools.eclipse.lexical.XmlTagScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
-
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.preference.IPreferenceStore
@@ -38,8 +37,9 @@ import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.lexical.SingleLineCommentScanner
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
-
 import scalariform.ScalaVersions
+import scala.tools.eclipse.ui.AutoCloseBracketStrategy
+import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
   @inline private def scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
@@ -152,6 +152,23 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
     xmlPCDATAScanner.adaptToPreferenceChange(event)
     xmlPIScanner.adaptToPreferenceChange(event)
   }
+
+  override def getAutoEditStrategies(sourceViewer: ISourceViewer, contentType: String): Array[org.eclipse.jface.text.IAutoEditStrategy] = {
+    val partitioning = getConfiguredDocumentPartitioning(sourceViewer)
+    contentType match {
+      // TODO: see why no jdt provided strategy is working
+//      case IJavaPartitions.JAVA_DOC | IJavaPartitions.JAVA_MULTI_LINE_COMMENT =>
+//        Array(new JavaDocAutoIndentStrategy(partitioning))
+//      case IJavaPartitions.JAVA_STRING =>
+//        Array(new SmartSemicolonAutoEditStrategy(partitioning), new JavaStringAutoIndentStrategy(partitioning))
+//      case IJavaPartitions.JAVA_CHARACTER | IDocument.DEFAULT_CONTENT_TYPE =>
+//        Array(new AutoCloseBracketStrategy(), new DefaultIndentLineAutoEditStrategy())
+      case _ =>
+        Array(new AutoCloseBracketStrategy(), new DefaultIndentLineAutoEditStrategy(), new EvaluationResultsAutoEditStrategy())
+//        Array(new org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy())
+    }
+  }
+
 }
 
 object ScalaPartitioning {
