@@ -1,8 +1,9 @@
 package org.scalaide.worksheet.editor
+
 import scala.tools.eclipse.ScalaDamagerRepairer
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.formatter.ScalaFormattingStrategy
-import scala.tools.eclipse.hyperlink.text.detector.HyperlinksDetector
+import scala.tools.eclipse.hyperlink.text.detector.DeclarationHyperlinkDetector
 import scala.tools.eclipse.lexical.ScalaCodeScanner
 import scala.tools.eclipse.lexical.ScalaPartitions
 import scala.tools.eclipse.lexical.SingleTokenScanner
@@ -133,8 +134,7 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
   private val xmlPIScanner = new XmlPIScanner(javaColorManager, scalaPreferenceStore)
 
   override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
-    // FIXME: only works with external targets
-    val detector = HyperlinksDetector()
+    val detector = DeclarationHyperlinkDetector()
     detector.setContext(textEditor)
     Array(detector)
   }

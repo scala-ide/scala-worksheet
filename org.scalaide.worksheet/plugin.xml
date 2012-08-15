@@ -12,6 +12,12 @@
             name="Scala Script editor">
       </editor>
    </extension>
+   <extension point="org.scala-ide.sdt.core.sourcefileprovider">
+    <provider
+      class="org.scalaide.worksheet.SourceFileProvider"
+      file_extension="sc">
+    </provider>
+  </extension>
    <extension
          point="org.eclipse.ui.commands">
       <category
