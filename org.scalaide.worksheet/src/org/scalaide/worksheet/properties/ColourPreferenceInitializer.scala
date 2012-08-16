@@ -10,6 +10,7 @@ import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_FIRST_LINE
 import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_MARKER
 import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_NEW_LINE
+import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_DELIMITER
 
 class ColourPreferenceInitializer extends AbstractPreferenceInitializer {
 
@@ -47,5 +48,6 @@ class ColourPreferenceInitializer extends AbstractPreferenceInitializer {
     setDefaultsForSyntaxClass(EVAL_RESULT_FIRST_LINE,  new RGB(63, 127, 95), backgroundRGBOpt = Some(bgColor))(worksheetPrefStore)
     setDefaultsForSyntaxClass(EVAL_RESULT_NEW_LINE, new RGB(0, 192, 127), backgroundRGBOpt = Some(bgColor))(worksheetPrefStore)
     setDefaultsForSyntaxClass(EVAL_RESULT_MARKER, new RGB(0, 192, 127))(worksheetPrefStore)
+    setDefaultsForSyntaxClass(EVAL_RESULT_DELIMITER, new RGB(100, 192, 127))(worksheetPrefStore)
   }
 }

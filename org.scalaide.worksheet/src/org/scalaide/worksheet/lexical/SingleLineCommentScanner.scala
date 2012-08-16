@@ -13,11 +13,14 @@ import org.eclipse.jface.util.PropertyChangeEvent
 import SyntaxClasses.EVAL_RESULT_FIRST_LINE
 import SyntaxClasses.EVAL_RESULT_MARKER
 import SyntaxClasses.EVAL_RESULT_NEW_LINE
+import SyntaxClasses.EVAL_RESULT_DELIMITER
 
 class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val worksheetPreferenceStore: IPreferenceStore) extends ITokenScanner {
+  import SingleLineCommentScanner._
   abstract sealed class State
 
   case object Init extends State
+  case object Delimiter extends State
   case object MiddleFirst extends State
   case object MiddleNew extends State
   case object End extends State
@@ -36,24 +39,24 @@ class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val w
     this.state = Init
   }
 
-  def nextToken(): IToken =
+  def nextToken(): IToken = {
+    def commonWorkMiddle(markerDelimiterString: String) = {
+      tokenOffset = offset
+      tokenLength = length - markerDelimiterString.length()
+      offset += tokenLength;
+      this.state = End
+    }
+
     state match {
       case Init => {
-        val c = document.getChar(offset + "//".length())
-        def commonWork(c: Char) = {
-          tokenOffset = offset
-          tokenLength = "//>".length()
-          offset += tokenLength;
-          getToken(EVAL_RESULT_MARKER)
-        }
+        val c = document.getChar(offset + MARKER_STRING.length())
         c match {
-          case '>' => {
-            state = MiddleFirst
-            commonWork(c)
-          }
-          case '|' => {
-            state = MiddleNew
-            commonWork(c)
+          case FIRST_LINE_CHAR | NEW_LINE_CHAR => {
+            tokenOffset = offset
+            tokenLength = MARKER_STRING.length()
+            offset += tokenLength;
+            state = Delimiter
+            getToken(EVAL_RESULT_MARKER)
           }
           case _ => {
             tokenOffset = offset
@@ -64,24 +67,30 @@ class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val w
           }
         }
       }
-      case End => {
-        Token.EOF
+      case Delimiter => {
+        val c = document.getChar(offset)
+        state = c match {
+          case FIRST_LINE_CHAR => MiddleFirst
+          case NEW_LINE_CHAR => MiddleNew
+        }
+        tokenOffset = offset
+        tokenLength = 1 // Delimiter length is 1
+        offset += tokenLength;
+        getToken(EVAL_RESULT_DELIMITER)
       }
       case MiddleFirst => {
-        tokenOffset = offset
-        tokenLength = length - "//>".length()
-        offset += tokenLength;
-        state = End
+        commonWorkMiddle(FIRST_LINE_STRING)
         getToken(EVAL_RESULT_FIRST_LINE)
       }
       case MiddleNew => {
-        tokenOffset = offset
-        tokenLength = length - "//>".length()
-        offset += tokenLength;
-        state = End
+        commonWorkMiddle(NEW_LINE_STRING)
         getToken(EVAL_RESULT_NEW_LINE)
       }
+      case End => {
+        Token.EOF
+      }
     }
+  }
 
   private var tokens: Map[ScalaSyntaxClass, Token] = Map()
 
@@ -100,8 +109,8 @@ class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val w
 
   private def getTextAttribute(syntaxClass: ScalaSyntaxClass) = {
     val prefStore = syntaxClass match {
-      case EVAL_RESULT_FIRST_LINE | EVAL_RESULT_NEW_LINE | EVAL_RESULT_MARKER => worksheetPreferenceStore
-      case _ => scalaPreferenceStore
+      case ScalaSyntaxClasses.SINGLE_LINE_COMMENT => scalaPreferenceStore
+      case _ => worksheetPreferenceStore
     }
     syntaxClass.getTextAttribute(prefStore)
   }
@@ -109,4 +118,12 @@ class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val w
   def getTokenOffset = tokenOffset
 
   def getTokenLength = tokenLength
+}
+
+object SingleLineCommentScanner {
+  private val FIRST_LINE_CHAR = '>'
+  private val NEW_LINE_CHAR = '|'
+  private val MARKER_STRING = "//"
+  private val FIRST_LINE_STRING = MARKER_STRING + FIRST_LINE_CHAR
+  private val NEW_LINE_STRING = MARKER_STRING + NEW_LINE_CHAR
 }
