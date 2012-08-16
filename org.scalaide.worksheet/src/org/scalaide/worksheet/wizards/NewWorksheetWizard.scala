@@ -10,25 +10,29 @@ import org.eclipse.ui.IWorkbenchPage
 import org.eclipse.ui.PlatformUI
 import org.eclipse.ui.ide.IDE
 import org.eclipse.ui.PartInitException
+import scala.tools.eclipse.logging.HasLogger
+import scala.tools.eclipse.util.Utils.any2optionable
+import org.scalaide.worksheet.editor.ScriptEditor
 
 /**
  * A wizard to create a new Scala worksheet file.
  */
-class NewWorksheetWizard extends Wizard with INewWizard {
+class NewWorksheetWizard extends Wizard with INewWizard with HasLogger {
 
   // from org.eclipse.jface.wizard.Wizard
 
   override def performFinish(): Boolean = {
-    val file = newFileWizardPage.createNewFile();
+    val file = newFileWizardPage.createNewFile()
     
     if (file != null) {
       // if it worked, open the file
       SWTUtils.asyncExec {
-        val page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        val page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
         try {
-          IDE.openEditor(page, file, true);
+          val editor = IDE.openEditor(page, file, true)
+          editor.asInstanceOfOpt[ScriptEditor] foreach (_.runEvaluation)
         } catch {
-          case e: PartInitException =>
+          case e: PartInitException => eclipseLog.error("Failed to initialize editor for file "+ file.getName())
         }
       }
       true
