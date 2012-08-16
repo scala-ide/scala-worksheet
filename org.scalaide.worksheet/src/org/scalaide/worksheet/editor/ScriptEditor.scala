@@ -43,6 +43,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private class StopEvaluationOnKeyPressed(editorProxy: DefaultEditorProxy) extends KeyAdapter {
     override def keyPressed(e: KeyEvent) {
+      // Don't stop evaluation if no real character is entered in the editor (e.g., KEY UP/DOWN)
       if (Character.isLetterOrDigit(e.character) || Character.isSpace(e.character))
         stopEvaluation()
     }

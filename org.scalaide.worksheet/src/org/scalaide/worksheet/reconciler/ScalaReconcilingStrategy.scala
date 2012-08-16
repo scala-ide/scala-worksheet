@@ -40,13 +40,15 @@ class ScalaReconcilingStrategy(textEditor: ITextEditor) extends IReconcilingStra
 
     previousAnnotations.foreach(annotationModel.removeAnnotation)
 
-    for (e <- errors) {
-      //      val annotation = new Annotation("org.scala-ide.sdt.core.problem", false, e.getMessage) // no compilation unit
+    for (e <- errors if !isPureExpressionWarning(e)) {
       val annotation = new ProblemAnnotation(e, null) // no compilation unit
       annotationModel.addAnnotation(annotation, position(e))
       previousAnnotations ::= annotation
     }
   }
+  
+  private def isPureExpressionWarning(e: IProblem): Boolean =
+    e.getMessage == "a pure expression does nothing in statement position; you may be omitting necessary parentheses"
 
   /** Ask the underlying unit to reload on each document change event.
    * 
