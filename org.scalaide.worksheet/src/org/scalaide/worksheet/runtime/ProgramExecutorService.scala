@@ -1,22 +1,26 @@
 package org.scalaide.worksheet.runtime
 
-
 import java.util.concurrent.atomic.AtomicReference
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.PrintStream
-
 import scala.actors.{ Actor, DaemonActor }
-import scala.sys.process.BasicIO
-import scala.sys.process.Process
-import scala.sys.process.ProcessIO
-import scala.sys.process.ProcessBuilder
 import scala.tools.eclipse.logging.HasLogger
-
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.EditorProxy
-
 import org.scalaide.worksheet.util.using
+import org.eclipse.jdt.launching.JavaRuntime
+import org.eclipse.jdt.launching.VMRunnerConfiguration
+import org.eclipse.core.runtime.NullProgressMonitor
+import org.eclipse.debug.core.ILaunch
+import org.eclipse.debug.core.model.IProcess
+import org.eclipse.debug.core.Launch
+import org.eclipse.debug.core.model.IStreamMonitor
+import org.eclipse.debug.core.model.IFlushableStreamMonitor
+import org.eclipse.debug.core.IStreamListener
+import java.io.Writer
+import java.io.StringWriter
+import org.eclipse.debug.core.DebugPlugin
+import org.eclipse.debug.core.IDebugEventSetListener
+import org.eclipse.debug.core.DebugEvent
+import org.eclipse.debug.core.ILaunchManager
 
 object ProgramExecutorService {
   def apply(): Actor = {
@@ -25,91 +29,113 @@ object ProgramExecutorService {
     executor
   }
 
-  private object ScalaRunner {
-    def apply(processRef: AtomicReference[Process]): Actor = {
-      val executor = new ScalaRunner(processRef)
-      executor.start()
-      executor
-    }
-
-    case class RunScalaApp(mainClass: String)
-  }
-
-  private class ScalaRunner private (processRef: AtomicReference[Process]) extends Actor with HasLogger {
-    import ScalaRunner.RunScalaApp
-    override def act() = react {
-      case RunScalaApp(mainClass) =>
-        val process = processRef.get
-        if (process != null) {
-          val exitCode = process.exitValue()
-          logger.debug("Evaluation completed with exit code: %d".format(exitCode))
-        }
-        reply(FinishedRun)
-
-      case any => exit(this.toString + ": Unsupported message " + any)
-    }
-  }
-
-  object RunProgram {
-    def apply(unit: ScriptCompilationUnit, mainClass: String, classPath: Seq[File], editor: EditorProxy): RunProgram =
-      RunProgram(getUnitId(unit), mainClass, classPath, editor)
-  }
-  case class RunProgram private (unitId: String, mainClass: String, classPath: Seq[File], editor: EditorProxy)
+  case class RunProgram(unit: ScriptCompilationUnit, mainClass: String, classPath: Seq[String], editor: EditorProxy)
   case object FinishedRun
   case class StopRun(unit: ScriptCompilationUnit) {
     def getId: String = getUnitId(unit)
   }
 
   private def getUnitId(unit: ScriptCompilationUnit): String = unit.file.file.getAbsolutePath()
+
+  /**
+   * Return the process for this launch, if available
+   */
+  private def getFirstProcess(launch: ILaunch): Option[IProcess] = launch.getProcesses().headOption
+
+  /**
+   * Transfer data for the stream (out and error) of an IProcess to the mixer buffer
+   */
+  private class StreamListener(writer: Writer) extends IStreamListener {
+    def streamAppended(text: String, monitor: IStreamMonitor) {
+      writer.write(text)
+    }
+  }
+
+  /**
+   * Extractor of debug events
+   */
+  private object EclipseDebugEvent {
+    def unapply(event: DebugEvent): Option[(Int, Object)] = {
+      event.getSource match {
+        case element: Object =>
+          Some(event.getKind, element)
+        case _ =>
+          None
+      }
+    }
+  }
+
+  /**
+   * Listen to Process terminate event, and require clean up of the evaluation executor.
+   */
+  private class DebugEventListener(service: ProgramExecutorService, launchRef: AtomicReference[ILaunch]) extends IDebugEventSetListener {
+    // from org.eclipse.debug.core.IDebugEventSetListener
+    override def handleDebugEvents(debugEvents: Array[DebugEvent]) {
+      debugEvents foreach {
+        _ match {
+          case EclipseDebugEvent(DebugEvent.TERMINATE, element) =>
+            if (Option(element) == getFirstProcess(launchRef.get))
+              service ! FinishedRun
+          case _ =>
+        }
+      }
+    }
+  }
 }
 
 private class ProgramExecutorService private () extends DaemonActor with HasLogger {
-  import ProgramExecutorService.{ RunProgram, FinishedRun, StopRun }
+  import ProgramExecutorService._
   import scala.actors.{ AbstractActor, Exit }
 
   private var id: String = _
-  private val processRef: AtomicReference[Process] = new AtomicReference
+  private val launchRef: AtomicReference[ILaunch] = new AtomicReference
 
   private var editorUpdater: Actor = _
-  private var runner: Actor = _
+  private var debugEventListener: IDebugEventSetListener = _
 
   override def act(): Unit = {
     loop {
       react {
-        case RunProgram(unitId, mainClass, cp, doc) =>
+        case RunProgram(unit, mainClass, cp, doc) =>
           trapExit = true // get notified if a slave actor fails
 
-          /** Launch `mainClass` in a different JVM and return everything on stdout and stderr.
-           *
-           *  This implementation uses `scala.sys.process` to launch `java`, which needs to be
-           *  on the classpath. It adds the project classpath and its output folders on the VM
-           *  classpath.
-           */
-          id = unitId
-          val baos = new ByteArrayOutputStream
-          editorUpdater = IncrementalDocumentMixer(doc, baos)
+          id = getUnitId(unit)
+
+          // Get the vm configured to the project, and a runner to launch an process
+          val vmInstall = JavaRuntime.getVMInstall(unit.scalaProject.javaProject)
+          val vmRunner = vmInstall.getVMRunner(ILaunchManager.RUN_MODE)
+
+          // simple configuration, main class and classpath
+          val vmRunnerConfig = new VMRunnerConfiguration(mainClass, cp.toArray)
+
+          // a launch is need to get the created process
+          val launch: ILaunch = new Launch(null, null, null)
+          launchRef.set(launch)
+
+          // listener to know whan the process terminates
+          debugEventListener = new DebugEventListener(this, launchRef)
+          DebugPlugin.getDefault().addDebugEventListener(debugEventListener)
+
+          // launch the vm
+          vmRunner.run(vmRunnerConfig, launch, new NullProgressMonitor)
+
+          // We have a process at this point
+          val process = getFirstProcess(launch).get
+
+          // connect the out and error streams to the buffer used by the mixer
+          val writer = new StringWriter()
+          connectListener(process.getStreamsProxy().getErrorStreamMonitor(), writer)
+          connectListener(process.getStreamsProxy().getOutputStreamMonitor(), writer)
+
+          // start the mixer
+          editorUpdater = IncrementalDocumentMixer(doc, writer)
           link(editorUpdater)
 
-          lazy val outStream = new PrintStream(baos)
-          val pio = new ProcessIO(in => (),
-            os => using(outStream)(BasicIO.transferFully(os, _)),
-            es => using(outStream)(BasicIO.transferFully(es, _)),
-            true)
-
-          val rawCp = cp.map(_.getAbsolutePath()).mkString("", File.pathSeparator, "")
-          val javaCmd = List("java", "-cp") :+ rawCp :+ mainClass
-
-          logger.debug("Running " + javaCmd.mkString("", " ", ""))
-          val builder = Process(javaCmd.toArray)
-          processRef.set(builder.run(pio))
-          runner = ProgramExecutorService.ScalaRunner(processRef)
-          link(runner)
-
-          runner ! ProgramExecutorService.ScalaRunner.RunScalaApp(mainClass)
+          // switch behavior. Waits for the end or the interuption of the evaluation
           running()
-
+          
         case msg @ StopRun(unitId) => ignoreStopRun(msg)
-        case msg: Exit             => resetStateOnSlaveFailure(msg)
+        case msg: Exit => resetStateOnSlaveFailure(msg)
         case any => logger.debug(this.toString + ": swallow message " + any)
       }
     }
@@ -136,20 +162,20 @@ private class ProgramExecutorService private () extends DaemonActor with HasLogg
     // to termination events (which could be triggered by the below actions)  
     trapExit = false
 
-    if (runner != null) {
-      unlink(runner)
-      runner = null
-    }
-
     if (editorUpdater != null) {
       unlink(editorUpdater)
       editorUpdater ! 'stop
       editorUpdater = null
     }
 
-    if (processRef.get != null) {
-      processRef.get.destroy()
-      processRef.set(null)
+    if (launchRef.get != null) {
+      getFirstProcess(launchRef.get) foreach { _.terminate() }
+      launchRef.set(null)
+    }
+
+    if (debugEventListener != null) {
+      DebugPlugin.getDefault().removeDebugEventListener(debugEventListener)
+      debugEventListener = null
     }
 
     id = null
@@ -163,24 +189,27 @@ private class ProgramExecutorService private () extends DaemonActor with HasLogg
 
   override def toString: String = "ProgramExecutorService <actor>"
 
-  //  val manager = DebugPlugin.getDefault().getLaunchManager()
-  //
-  //  private def getLaunchConfig(): ILaunchConfigurationWorkingCopy = {
-  //
-  //    val confType = manager.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION)
-  //    for {
-  //      conf <- manager.getLaunchConfigurations(confType)
-  //      if conf.getName() == WORKSHEET_LAUNCH_CONFIGURATION
-  //    } conf.delete()
-  //
-  //    confType.newInstance(null, WORKSHEET_LAUNCH_CONFIGURATION)
-  //  }
-  //
-  //  private def getVMInstall() {
-  //
-  //    val jre = JavaRuntime.getDefaultVMInstall()
-  //
-  //  }
-  //
-  //  final val WORKSHEET_LAUNCH_CONFIGURATION = "Start Worksheet"
+  /**
+   * Connect an IProcess stream to the writer.
+   */
+  private def connectListener(stream: IStreamMonitor, writer: Writer) {
+    val listener = new StreamListener(writer)
+
+    // there is some possible race condition between getting the already current content
+    // add getting update through the listener. IFlushableStreamMonitor has a solution for it.
+    stream match {
+      case flushableStream: IFlushableStreamMonitor =>
+        flushableStream.synchronized {
+          flushableStream.addListener(listener)
+          listener.streamAppended(flushableStream.getContents(), flushableStream)
+          flushableStream.flushContents()
+          flushableStream.setBuffered(false)
+        }
+      case otherStream =>
+        // it is unlikely to not have an IFlushableStreamMonitor
+        otherStream.addListener(listener)
+        listener.streamAppended(otherStream.getContents(), otherStream)
+    }
+  }
+
 }

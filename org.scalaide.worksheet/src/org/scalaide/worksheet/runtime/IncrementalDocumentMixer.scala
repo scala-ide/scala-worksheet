@@ -1,17 +1,13 @@
 package org.scalaide.worksheet.runtime
 
-import java.io.ByteArrayOutputStream
-
 import scala.tools.eclipse.logging.HasLogger
-import scala.tools.eclipse.util.SWTUtils
 import org.scalaide.worksheet.text.{Mixer, SourceInserter}
-
 import org.scalaide.worksheet.editor.EditorProxy
-
 import scala.actors.{ Actor, DaemonActor, TIMEOUT }
+import java.io.Writer
 
 object IncrementalDocumentMixer {
-  def apply(editor: EditorProxy, source: ByteArrayOutputStream): Actor = {
+  def apply(editor: EditorProxy, source: Writer): Actor = {
     val stealer = new IncrementalDocumentMixer(editor, source)
     stealer.start()
     stealer
@@ -20,7 +16,7 @@ object IncrementalDocumentMixer {
   private val RefreshDocumentTimeout = 200
 }
 
-private class IncrementalDocumentMixer private (editor: EditorProxy, source: ByteArrayOutputStream) extends DaemonActor with HasLogger {
+private class IncrementalDocumentMixer private (editor: EditorProxy, source: Writer) extends DaemonActor with HasLogger {
   import IncrementalDocumentMixer.RefreshDocumentTimeout
 
   private val originalCursorPosition = editor.caretOffset

@@ -1,20 +1,9 @@
 package org.scalaide.worksheet.runtime
 
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.PrintStream
-
 import scala.actors.{ Actor, DaemonActor }
-import scala.sys.process.BasicIO
-import scala.sys.process.Process
-import scala.sys.process.ProcessIO
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.logging.HasLogger
 
-import org.eclipse.debug.core.DebugPlugin
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy
-import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants
-import org.eclipse.jdt.launching.JavaRuntime
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.EditorProxy
 
@@ -75,8 +64,11 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
     }
   }
 
-  private def classpath: Seq[File] = {
-    (scalaProject.scalaClasspath.fullClasspath ++ scalaProject.outputFolderLocations.map(_.toFile) :+ config.binFolder)
+  /**
+   * The classpath, as a list of local filesystem path
+   */
+  private def classpath: Seq[String] = {
+    (scalaProject.scalaClasspath.fullClasspath.map(_.getAbsolutePath()) ++ scalaProject.outputFolderLocations.map(_.toOSString()) :+ config.binFolder.getAbsolutePath())
   }
 
   private def reportBuildErrors(unit: ScriptCompilationUnit, errors: Iterable[CompilationError]): Unit = {
