@@ -26,28 +26,27 @@ class ColourPreferenceInitializer extends AbstractPreferenceInitializer {
     syntaxClass: ScalaSyntaxClass, 
     foregroundRGB: RGB, 
     enabled: Boolean = true, 
-    backgroundRGBOpt: Option[RGB] = None, 
+    backgroundRGB: RGB, 
     bold: Boolean = false, 
     italic: Boolean = false, 
     strikethrough: Boolean = false, 
     underline: Boolean = false)(implicit worksheetPrefStore: IPreferenceStore) =
     {
-      lazy val WHITE = new RGB(255, 255, 255)
       worksheetPrefStore.setDefault(syntaxClass.enabledKey, enabled)
       worksheetPrefStore.setDefault(syntaxClass.foregroundColourKey, StringConverter.asString(foregroundRGB))
-      val defaultBackgroundColour = StringConverter.asString(backgroundRGBOpt getOrElse WHITE)
+      val defaultBackgroundColour = StringConverter.asString(backgroundRGB)
       worksheetPrefStore.setDefault(syntaxClass.backgroundColourKey, defaultBackgroundColour)
-      worksheetPrefStore.setDefault(syntaxClass.backgroundColourEnabledKey, backgroundRGBOpt.isDefined)
+      worksheetPrefStore.setDefault(syntaxClass.backgroundColourEnabledKey, true)
       worksheetPrefStore.setDefault(syntaxClass.boldKey, bold)
       worksheetPrefStore.setDefault(syntaxClass.italicKey, italic)
       worksheetPrefStore.setDefault(syntaxClass.underlineKey, underline)
     }
 
   private def setDefaultsForSyntaxClasses(implicit worksheetPrefStore: IPreferenceStore) {
-    val bgColor = new RGB(60, 60, 60)
-    setDefaultsForSyntaxClass(EVAL_RESULT_FIRST_LINE,  new RGB(63, 127, 95), backgroundRGBOpt = Some(bgColor))(worksheetPrefStore)
-    setDefaultsForSyntaxClass(EVAL_RESULT_NEW_LINE, new RGB(0, 192, 127), backgroundRGBOpt = Some(bgColor))(worksheetPrefStore)
-    setDefaultsForSyntaxClass(EVAL_RESULT_MARKER, new RGB(0, 192, 127))(worksheetPrefStore)
-    setDefaultsForSyntaxClass(EVAL_RESULT_DELIMITER, new RGB(100, 192, 127))(worksheetPrefStore)
+    val editorBackground = Colors.White // currently the editor's background cannot be changed, so we can assume is white.
+    setDefaultsForSyntaxClass(EVAL_RESULT_FIRST_LINE,  Colors.DarkGrey, backgroundRGB = editorBackground, italic = true)(worksheetPrefStore)
+    setDefaultsForSyntaxClass(EVAL_RESULT_NEW_LINE, Colors.DarkGrey, backgroundRGB = editorBackground, italic = true)(worksheetPrefStore)
+    setDefaultsForSyntaxClass(EVAL_RESULT_MARKER, editorBackground, backgroundRGB = editorBackground)(worksheetPrefStore)
+    setDefaultsForSyntaxClass(EVAL_RESULT_DELIMITER, Colors.LightGreen, backgroundRGB = editorBackground)(worksheetPrefStore)
   }
 }
