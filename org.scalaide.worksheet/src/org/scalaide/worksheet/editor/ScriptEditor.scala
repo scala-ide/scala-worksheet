@@ -3,9 +3,7 @@ package org.scalaide.worksheet.editor
 import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.tools.eclipse.ISourceViewerEditor
 import scala.tools.eclipse.logging.HasLogger
-
 import org.eclipse.jface.action.IMenuManager
-
 import org.eclipse.jface.text.ITextSelection
 import org.eclipse.jface.text.source.Annotation
 import org.eclipse.jface.text.source.IAnnotationModel
@@ -20,6 +18,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants
 import org.eclipse.ui.texteditor.TextOperationAction
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
+import org.scalaide.worksheet.editor.action.RunEvaluationAction
 
 object ScriptEditor {
 
@@ -119,15 +118,22 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   override def createActions() {
     super.createActions()
     
+    // Adding source formatting action in the editor popup dialog 
     val formatAction= new TextOperationAction(EditorMessages.resourceBundle, "Editor.Format.", this, ISourceViewer.FORMAT)
     formatAction.setActionDefinitionId("org.scalaide.worksheet.commands.format")
     setAction("format", formatAction)
+    
+    // Adding run evaluation action in the editor popup dialog
+    val evalScriptAction= new RunEvaluationAction(this)
+    evalScriptAction.setActionDefinitionId("org.scalaide.worksheet.commands.evalScript")
+    setAction("evalScript", evalScriptAction)
   }
   
   override def editorContextMenuAboutToShow(menu: IMenuManager) {
     super.editorContextMenuAboutToShow(menu)
     
-    // add the format menu item
+    // add the format menu itemevalScript    
+    addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "evalScript")
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "format")
   }
 
