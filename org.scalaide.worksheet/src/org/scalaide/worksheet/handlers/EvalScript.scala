@@ -10,7 +10,6 @@ import org.eclipse.ui.handlers.HandlerUtil
 import org.scalaide.worksheet.editor.ScriptEditor
 
 class EvalScript extends AbstractHandler with HasLogger {
-
   override def execute(event: ExecutionEvent): AnyRef = {
     HandlerUtil.getActiveEditor(event) match {
       case editor: ScriptEditor => editor.runEvaluation()
@@ -18,9 +17,4 @@ class EvalScript extends AbstractHandler with HasLogger {
     }
     null
   }
-
-  override def isEnabled: Boolean =
-    EditorHelpers.withCurrentEditor { editor =>
-      EditorUtils.getEditorScalaInput(editor) map { scu => scu.currentProblems.isEmpty }
-    } getOrElse false
 }

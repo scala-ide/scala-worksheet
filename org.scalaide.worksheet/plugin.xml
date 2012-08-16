@@ -59,34 +59,6 @@
       </key>
    </extension>
    <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               id="org.scalaide.worksheet.menus.sampleMenu"
-               label="Worksheet"
-               mnemonic="w">
-            <command
-                  commandId="org.scalaide.worksheet.commands.evalScript"
-                  id="org.scalaide.worksheet.menus.evalScript"
-                  mnemonic="S">
-            </command>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="org.scalaide.worksheet.toolbars.sampleToolbar">
-            <command
-                  commandId="org.scalaide.worksheet.commands.evalScript"
-                  icon="icons/run_worksheet.gif"
-                  id="org.scalaide.worksheet.toolbars.evalScript"
-                  tooltip="Evaluate the curent worksheet">
-            </command>
-         </toolbar>
-      </menuContribution>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.ui.IEditorInput"
