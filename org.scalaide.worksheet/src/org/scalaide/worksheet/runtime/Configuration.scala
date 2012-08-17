@@ -1,13 +1,16 @@
 package org.scalaide.worksheet.runtime
 
-import org.eclipse.core.runtime.Path
-import scala.tools.eclipse.ScalaProject
-import org.eclipse.core.runtime.IPath
-import org.eclipse.core.resources.IProject
 import java.io.File
 import java.io.FileWriter
 
-object Configuration {
+import scala.tools.eclipse.ScalaProject
+
+import org.eclipse.core.resources.IProject
+import org.eclipse.core.runtime.IPath
+
+import org.eclipse.core.runtime.Path
+
+private[runtime] object Configuration {
   private val RootFolder = new Path(".worksheet")
   private val SrcFolder = RootFolder.append("src")
   private val BinFolder = RootFolder.append("bin")
@@ -16,7 +19,7 @@ object Configuration {
     new Configuration(project.underlying)
 }
 
-final class Configuration private (project: IProject) {
+final private[runtime] class Configuration private (project: IProject) {
   import Configuration._
 
   @inline private def location = project.getLocation

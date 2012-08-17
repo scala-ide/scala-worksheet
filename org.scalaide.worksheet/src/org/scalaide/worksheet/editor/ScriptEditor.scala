@@ -1,15 +1,15 @@
 package org.scalaide.worksheet.editor
 
-import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.tools.eclipse.ISourceViewerEditor
 import scala.tools.eclipse.logging.HasLogger
+
 import org.eclipse.jface.action.IMenuManager
+import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextSelection
 import org.eclipse.jface.text.source.Annotation
 import org.eclipse.jface.text.source.IAnnotationModel
 import org.eclipse.jface.text.source.IAnnotationModelExtension2
 import org.eclipse.jface.text.source.ISourceViewer
-import org.eclipse.jface.util.IPropertyChangeListener
 import org.eclipse.jface.util.PropertyChangeEvent
 import org.eclipse.swt.events.KeyAdapter
 import org.eclipse.swt.events.KeyEvent
@@ -19,7 +19,6 @@ import org.eclipse.ui.texteditor.TextOperationAction
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
-import org.eclipse.jface.text.IDocument
 
 object ScriptEditor {
 
@@ -163,6 +162,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private def annotationModel: IAnnotationModel with IAnnotationModelExtension2 = getDocumentProvider.getAnnotationModel(getEditorInput).asInstanceOf[IAnnotationModel with IAnnotationModelExtension2]
 
   def selectionChanged(selection: ITextSelection) {
+    import scala.collection.JavaConverters.asScalaIteratorConverter
     val iterator = annotationModel.getAnnotationIterator(selection.getOffset, selection.getLength, true, true).asInstanceOf[java.util.Iterator[Annotation]]
     val msg = iterator.asScala.find(a => ScriptEditor.annotationsShownInHover(a.getType)).map(_.getText).getOrElse(null)
     setStatusLineErrorMessage(msg)

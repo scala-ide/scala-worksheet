@@ -1,8 +1,9 @@
 package org.scalaide.worksheet.runtime
 
-import scala.actors.{ Actor, DaemonActor }
+import scala.actors.{Actor, DaemonActor}
 import scala.collection.mutable
 import scala.tools.eclipse.ScalaProject
+
 import org.scalaide.worksheet.ScriptCompilationUnit
 
 object WorksheetsManager {

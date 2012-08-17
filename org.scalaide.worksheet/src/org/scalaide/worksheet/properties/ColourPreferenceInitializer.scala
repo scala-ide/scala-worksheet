@@ -7,10 +7,7 @@ import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.resource.StringConverter
 import org.eclipse.swt.graphics.RGB
 import org.scalaide.worksheet.WorksheetPlugin
-import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_FIRST_LINE
-import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_MARKER
-import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_NEW_LINE
-import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_DELIMITER
+import org.scalaide.worksheet.lexical.SyntaxClasses.EvalResult
 
 class ColourPreferenceInitializer extends AbstractPreferenceInitializer {
 
@@ -44,9 +41,9 @@ class ColourPreferenceInitializer extends AbstractPreferenceInitializer {
 
   private def setDefaultsForSyntaxClasses(implicit worksheetPrefStore: IPreferenceStore) {
     val editorBackground = Colors.White // currently the editor's background cannot be changed, so we can assume is white.
-    setDefaultsForSyntaxClass(EVAL_RESULT_FIRST_LINE,  Colors.DarkGrey, backgroundRGB = editorBackground, italic = true)(worksheetPrefStore)
-    setDefaultsForSyntaxClass(EVAL_RESULT_NEW_LINE, Colors.DarkGrey, backgroundRGB = editorBackground, italic = true)(worksheetPrefStore)
-    setDefaultsForSyntaxClass(EVAL_RESULT_MARKER, editorBackground, backgroundRGB = editorBackground)(worksheetPrefStore)
-    setDefaultsForSyntaxClass(EVAL_RESULT_DELIMITER, Colors.LightGreen, backgroundRGB = editorBackground)(worksheetPrefStore)
+    setDefaultsForSyntaxClass(EvalResult.FirstLine,  Colors.DarkGrey, backgroundRGB = editorBackground, italic = true)(worksheetPrefStore)
+    setDefaultsForSyntaxClass(EvalResult.NewLine, Colors.DarkGrey, backgroundRGB = editorBackground, italic = true)(worksheetPrefStore)
+    setDefaultsForSyntaxClass(EvalResult.Marker, editorBackground, backgroundRGB = editorBackground)(worksheetPrefStore)
+    setDefaultsForSyntaxClass(EvalResult.Delimiter, Colors.LightGreen, backgroundRGB = editorBackground)(worksheetPrefStore)
   }
 }

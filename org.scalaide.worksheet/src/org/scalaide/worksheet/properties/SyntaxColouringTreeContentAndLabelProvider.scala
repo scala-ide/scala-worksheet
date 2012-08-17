@@ -1,4 +1,5 @@
 package org.scalaide.worksheet.properties
+
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClass
 
 import org.eclipse.jface.viewers.ITreeContentProvider
@@ -8,7 +9,7 @@ import org.scalaide.worksheet.lexical.SyntaxClasses
 
 class SyntaxColouringTreeContentAndLabelProvider extends LabelProvider with ITreeContentProvider {
 
-  def getElements(inputElement: AnyRef) = SyntaxClasses.ALL_SYNTAX_CLASSES.toArray
+  override def getElements(inputElement: AnyRef): Array[AnyRef] = SyntaxClasses.AllSyntaxClasses.toArray
 
   override def getChildren(parentElement: AnyRef) = Array()
 

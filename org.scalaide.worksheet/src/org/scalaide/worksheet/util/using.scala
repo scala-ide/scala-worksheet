@@ -1,6 +1,7 @@
 package org.scalaide.worksheet.util
 
 import java.io.Closeable
+
 import scala.util.control.Exception
 import scala.util.control.Exception.Catch
 import scala.util.control.Exception.ignoring

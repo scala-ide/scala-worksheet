@@ -11,7 +11,6 @@ import org.scalaide.worksheet.editor.ScriptEditor
  * Invoke the formatter on a Scala worksheet editor
  */
 class Format extends AbstractHandler {
-
   override def execute(event: ExecutionEvent): AnyRef = {
     HandlerUtil.getActiveEditor(event) match {
       case editor: ScriptEditor =>
@@ -20,5 +19,4 @@ class Format extends AbstractHandler {
     }
     null
   }
-
 }

@@ -9,7 +9,6 @@ import scala.tools.nsc.util.SourceFile
 
 import org.eclipse.jface.text.ITextViewer
 import org.eclipse.jface.text.contentassist.ICompletionProposal
-
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor
 import org.eclipse.jface.text.contentassist.IContextInformation
 import org.eclipse.ui.texteditor.ITextEditor

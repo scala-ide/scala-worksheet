@@ -1,10 +1,12 @@
 package org.scalaide.worksheet.runtime
 
-import scala.tools.eclipse.logging.HasLogger
-import org.scalaide.worksheet.text.{Mixer, SourceInserter}
-import org.scalaide.worksheet.editor.EditorProxy
-import scala.actors.{ Actor, DaemonActor, TIMEOUT }
 import java.io.Writer
+
+import scala.actors.{Actor, DaemonActor, TIMEOUT}
+import scala.tools.eclipse.logging.HasLogger
+
+import org.scalaide.worksheet.editor.EditorProxy
+import org.scalaide.worksheet.text.{Mixer, SourceInserter}
 
 object IncrementalDocumentMixer {
   def apply(editor: EditorProxy, source: Writer): Actor = {

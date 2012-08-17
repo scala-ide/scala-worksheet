@@ -1,6 +1,5 @@
 package org.scalaide.worksheet.runtime
-
-import scala.actors.{ Actor, DaemonActor }
+import scala.actors.{Actor, DaemonActor}
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.logging.HasLogger
 
@@ -26,7 +25,6 @@ object WorksheetRunner {
  *
  *  It instantiates the instrumented program in-process, using a different class-loader.
  *  A more advanced evaluator would spawn a new VM, to allow debugging in the future.
- *
  */
 private class WorksheetRunner private (scalaProject: ScalaProject) extends DaemonActor with HasLogger {
   import WorksheetRunner._

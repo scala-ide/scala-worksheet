@@ -3,8 +3,9 @@ package org.scalaide.worksheet.runtime
 import java.io.File
 
 import scala.tools.eclipse.logging.HasLogger
-import org.scalaide.worksheet.text.SourceInserter
+
 import org.scalaide.worksheet.ScriptCompilationUnit
+import org.scalaide.worksheet.text.SourceInserter
 
 case class TopLevelObjectDecl(fullName: String)
 

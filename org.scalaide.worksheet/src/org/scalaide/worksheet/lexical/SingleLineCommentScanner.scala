@@ -9,11 +9,7 @@ import org.eclipse.jface.text.rules.IToken
 import org.eclipse.jface.text.rules.ITokenScanner
 import org.eclipse.jface.text.rules.Token
 import org.eclipse.jface.util.PropertyChangeEvent
-
-import SyntaxClasses.EVAL_RESULT_FIRST_LINE
-import SyntaxClasses.EVAL_RESULT_MARKER
-import SyntaxClasses.EVAL_RESULT_NEW_LINE
-import SyntaxClasses.EVAL_RESULT_DELIMITER
+import org.scalaide.worksheet.lexical.SyntaxClasses.EvalResult
 
 class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val worksheetPreferenceStore: IPreferenceStore) extends ITokenScanner {
   import SingleLineCommentScanner._
@@ -56,7 +52,7 @@ class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val w
             tokenLength = MARKER_STRING.length()
             offset += tokenLength;
             state = Delimiter
-            getToken(EVAL_RESULT_MARKER)
+            getToken(EvalResult.Marker)
           }
           case _ => {
             tokenOffset = offset
@@ -76,15 +72,15 @@ class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val w
         tokenOffset = offset
         tokenLength = 1 // Delimiter length is 1
         offset += tokenLength;
-        getToken(EVAL_RESULT_DELIMITER)
+        getToken(EvalResult.Delimiter)
       }
       case MiddleFirst => {
         commonWorkMiddle(FIRST_LINE_STRING)
-        getToken(EVAL_RESULT_FIRST_LINE)
+        getToken(EvalResult.FirstLine)
       }
       case MiddleNew => {
         commonWorkMiddle(NEW_LINE_STRING)
-        getToken(EVAL_RESULT_NEW_LINE)
+        getToken(EvalResult.NewLine)
       }
       case End => {
         Token.EOF

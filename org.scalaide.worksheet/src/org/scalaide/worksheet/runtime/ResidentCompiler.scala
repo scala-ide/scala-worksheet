@@ -2,13 +2,13 @@ package org.scalaide.worksheet.runtime
 
 import java.io.File
 
-import scala.tools.nsc.util.Position
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.logging.HasLogger
 import scala.tools.nsc.CompilerCommand
 import scala.tools.nsc.Settings
 import scala.tools.nsc.reporters.StoreReporter
+import scala.tools.nsc.util.Position
 
 object ResidentCompiler extends HasLogger {
   def apply(scalaProject: ScalaProject, worksheetConfig: Configuration): ResidentCompiler = {
@@ -27,7 +27,6 @@ object ResidentCompiler extends HasLogger {
     logger.debug("Compilation arguments: " + args)
     new ResidentCompiler(args)
   }
-  
 
   sealed abstract class CompilationResult
   case object CompilationSuccess extends CompilationResult

@@ -40,8 +40,7 @@ import org.eclipse.ui.IWorkbench
 import org.eclipse.ui.IWorkbenchPreferencePage
 import org.eclipse.ui.dialogs.PreferencesUtil
 import org.scalaide.worksheet.WorksheetPlugin
-import org.scalaide.worksheet.lexical.SyntaxClasses.ALL_SYNTAX_CLASSES
-import org.scalaide.worksheet.lexical.SyntaxClasses.EVAL_RESULT_FIRST_LINE
+import org.scalaide.worksheet.lexical.SyntaxClasses
 
 
 /**
@@ -98,7 +97,7 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
 
   def makeOverlayPreferenceStore = {
     val keys =
-      ALL_SYNTAX_CLASSES.flatMap(makeOverlayKeys)
+      SyntaxClasses.AllSyntaxClasses.flatMap(makeOverlayKeys)
     new OverlayPreferenceStore(getPreferenceStore, keys.toArray)
   }
 
@@ -136,7 +135,7 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
     treeViewer.setLabelProvider(contentAndLabelProvider)
 
     // scrollbars and tree indentation guess
-    val widthHint = ALL_SYNTAX_CLASSES.map { syntaxClass => convertWidthInCharsToPixels(syntaxClass.displayName.length) }.max +
+    val widthHint = SyntaxClasses.AllSyntaxClasses.map { syntaxClass => convertWidthInCharsToPixels(syntaxClass.displayName.length) }.max +
       Option(treeViewer.getControl.asInstanceOf[Scrollable].getVerticalBar).map { _.getSize.x * 3 }.getOrElse(0)
 
     treeViewer.getControl.setLayoutData(gridData(
@@ -272,7 +271,7 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
 
     setUpSelectionListeners()
 
-    treeViewer.setSelection(new StructuredSelection(EVAL_RESULT_FIRST_LINE))
+    treeViewer.setSelection(new StructuredSelection(SyntaxClasses.EvalResult.FirstLine))
 
     outerComposite.layout(false)
     outerComposite

@@ -12,9 +12,12 @@ import scala.tools.eclipse.lexical.XmlCommentScanner
 import scala.tools.eclipse.lexical.XmlPIScanner
 import scala.tools.eclipse.lexical.XmlTagScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
+import scala.tools.eclipse.ui.AutoCloseBracketStrategy
+
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.preference.IPreferenceStore
+import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy
 import org.eclipse.jface.text.DefaultTextHover
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextHover
@@ -37,9 +40,8 @@ import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.lexical.SingleLineCommentScanner
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
+
 import scalariform.ScalaVersions
-import scala.tools.eclipse.ui.AutoCloseBracketStrategy
-import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
   @inline private def scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore

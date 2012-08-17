@@ -1,19 +1,13 @@
 package org.scalaide.worksheet.wizards
 
-import org.eclipse.jface.wizard.WizardPage
-import org.eclipse.swt.widgets.Composite
-import org.eclipse.swt.SWT
-import org.eclipse.swt.layout.GridLayout
-import org.eclipse.swt.widgets.Label
-import org.eclipse.swt.widgets.Text
-import org.eclipse.swt.layout.GridData
-import org.eclipse.swt.widgets.Button
-import org.eclipse.ui.dialogs.WizardNewFileCreationPage
-import org.eclipse.jface.viewers.IStructuredSelection
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+
 import org.eclipse.core.runtime.IStatus
 import org.eclipse.core.runtime.Status
-import java.io.InputStream
-import java.io.ByteArrayInputStream
+import org.eclipse.jface.viewers.IStructuredSelection
+import org.eclipse.swt.widgets.Composite
+import org.eclipse.ui.dialogs.WizardNewFileCreationPage
 
 /**
  * Wizard page based of the new file creation page from the framework.

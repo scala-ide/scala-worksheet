@@ -1,17 +1,17 @@
 package org.scalaide.worksheet.wizards
 
+import scala.tools.eclipse.logging.HasLogger
+import scala.tools.eclipse.util.SWTUtils
+import scala.tools.eclipse.util.Utils.any2optionable
+
+import org.eclipse.jface.viewers.IStructuredSelection
+
 import org.eclipse.jface.wizard.Wizard
 import org.eclipse.ui.INewWizard
-import org.eclipse.jface.viewers.IStructuredSelection
 import org.eclipse.ui.IWorkbench
-import org.eclipse.jface.wizard.IWizardPage
-import scala.tools.eclipse.util.SWTUtils
-import org.eclipse.ui.IWorkbenchPage
+import org.eclipse.ui.PartInitException
 import org.eclipse.ui.PlatformUI
 import org.eclipse.ui.ide.IDE
-import org.eclipse.ui.PartInitException
-import scala.tools.eclipse.logging.HasLogger
-import scala.tools.eclipse.util.Utils.any2optionable
 import org.scalaide.worksheet.editor.ScriptEditor
 
 /**

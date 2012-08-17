@@ -1,26 +1,28 @@
 package org.scalaide.worksheet.runtime
 
-import java.util.concurrent.atomic.AtomicReference
-import scala.actors.{ Actor, DaemonActor }
-import scala.tools.eclipse.logging.HasLogger
-import org.scalaide.worksheet.ScriptCompilationUnit
-import org.scalaide.worksheet.editor.EditorProxy
-import org.scalaide.worksheet.util.using
-import org.eclipse.jdt.launching.JavaRuntime
-import org.eclipse.jdt.launching.VMRunnerConfiguration
-import org.eclipse.core.runtime.NullProgressMonitor
-import org.eclipse.debug.core.ILaunch
-import org.eclipse.debug.core.model.IProcess
-import org.eclipse.debug.core.Launch
-import org.eclipse.debug.core.model.IStreamMonitor
-import org.eclipse.debug.core.model.IFlushableStreamMonitor
-import org.eclipse.debug.core.IStreamListener
-import java.io.Writer
 import java.io.StringWriter
+import java.io.Writer
+
+import java.util.concurrent.atomic.AtomicReference
+
+import scala.actors.{Actor, DaemonActor}
+import scala.tools.eclipse.logging.HasLogger
+
+import org.eclipse.core.runtime.NullProgressMonitor
+import org.eclipse.debug.core.DebugEvent
 import org.eclipse.debug.core.DebugPlugin
 import org.eclipse.debug.core.IDebugEventSetListener
-import org.eclipse.debug.core.DebugEvent
+import org.eclipse.debug.core.ILaunch
 import org.eclipse.debug.core.ILaunchManager
+import org.eclipse.debug.core.IStreamListener
+import org.eclipse.debug.core.Launch
+import org.eclipse.debug.core.model.IFlushableStreamMonitor
+import org.eclipse.debug.core.model.IProcess
+import org.eclipse.debug.core.model.IStreamMonitor
+import org.eclipse.jdt.launching.JavaRuntime
+import org.eclipse.jdt.launching.VMRunnerConfiguration
+import org.scalaide.worksheet.ScriptCompilationUnit
+import org.scalaide.worksheet.editor.EditorProxy
 
 object ProgramExecutor {
   def apply(): Actor = {
@@ -37,23 +39,17 @@ object ProgramExecutor {
 
   private def getUnitId(unit: ScriptCompilationUnit): String = unit.file.file.getAbsolutePath()
 
-  /**
-   * Return the process for this launch, if available
-   */
+  /** Return the process for this launch, if available. */
   private def getFirstProcess(launch: ILaunch): Option[IProcess] = launch.getProcesses().headOption
 
-  /**
-   * Transfer data for the stream (out and error) of an IProcess to the mixer buffer
-   */
+  /** Transfer data for the stream (out and error) of an IProcess to the mixer buffer. */
   private class StreamListener(writer: Writer) extends IStreamListener {
     def streamAppended(text: String, monitor: IStreamMonitor) {
       writer.write(text)
     }
   }
 
-  /**
-   * Extractor of debug events
-   */
+  /** Extractor of debug events. */
   private object EclipseDebugEvent {
     def unapply(event: DebugEvent): Option[(Int, Object)] = {
       event.getSource match {
@@ -189,9 +185,7 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
 
   override def toString: String = "ProgramExecutorService <actor>"
 
-  /**
-   * Connect an IProcess stream to the writer.
-   */
+  /** Connect an IProcess stream to the writer.*/
   private def connectListener(stream: IStreamMonitor, writer: Writer) {
     val listener = new StreamListener(writer)
 
@@ -211,5 +205,4 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
         listener.streamAppended(otherStream.getContents(), otherStream)
     }
   }
-
 }

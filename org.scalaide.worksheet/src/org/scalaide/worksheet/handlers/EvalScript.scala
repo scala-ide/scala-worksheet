@@ -1,8 +1,6 @@
 package org.scalaide.worksheet.handlers
 
 import scala.tools.eclipse.logging.HasLogger
-import scala.tools.eclipse.refactoring.EditorHelpers
-import scala.tools.eclipse.util.EditorUtils
 
 import org.eclipse.core.commands.AbstractHandler
 import org.eclipse.core.commands.ExecutionEvent

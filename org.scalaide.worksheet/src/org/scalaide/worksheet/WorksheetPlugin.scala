@@ -24,5 +24,4 @@ class WorksheetPlugin extends AbstractUIPlugin {
     WorksheetPlugin.plugin = null
     super.stop(context)
   }
-
 }

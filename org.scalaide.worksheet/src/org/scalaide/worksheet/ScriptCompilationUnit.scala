@@ -20,7 +20,6 @@ import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.editor.ScriptEditor
 
-
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying
  *  resource.
