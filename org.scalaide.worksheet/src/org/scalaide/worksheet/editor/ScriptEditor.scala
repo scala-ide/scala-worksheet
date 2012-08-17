@@ -19,6 +19,7 @@ import org.eclipse.ui.texteditor.TextOperationAction
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
+import org.eclipse.jface.text.IDocument
 
 object ScriptEditor {
 
@@ -34,7 +35,7 @@ object ScriptEditor {
 /** A Scala script editor.*/
 class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with HasLogger {
   @inline private def prefStore = WorksheetPlugin.prefStore
-  
+
   private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
   setSourceViewerConfiguration(sourceViewConfiguration)
   setPreferenceStore(prefStore)
@@ -49,8 +50,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     }
   }
 
-  /**
-   * This class is used by the `IncrementalDocumentMixer` to update the editor's document with
+  /** This class is used by the `IncrementalDocumentMixer` to update the editor's document with
    *  the evaluation's result.
    */
   private class DefaultEditorProxy extends EditorProxy {
@@ -59,12 +59,12 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     @volatile private[ScriptEditor] var ignoreDocumentUpdate = false
     private val stopEvaluationListener = new StopEvaluationOnKeyPressed(this)
 
-    @inline private def doc = getDocumentProvider.getDocument(getEditorInput)
+    @inline private def doc: IDocument = getDocumentProvider.getDocument(getEditorInput)
 
     override def getContent: String = doc.get
 
     override def replaceWith(content: String, newCaretOffset: Int): Unit = {
-      if (!ignoreDocumentUpdate) SWTUtils.asyncExec {
+      if (!ignoreDocumentUpdate) runInUi {
         doc.set(content)
         // we need to turn off evaluation on save if we don't want to loop forever 
         // (because of `editorSaved` implementation, i.e., automatic worksheet evaluation on save)
@@ -75,7 +75,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
     override def caretOffset: Int = {
       var offset = -1
-      SWTUtils.syncExec { //FIXME: Can I make this non-blocking!?
+      runInUi { //FIXME: Can I make this non-blocking!?
         offset = getSourceViewer().getTextWidget().getCaretOffset()
       }
       offset
@@ -86,7 +86,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
       save()
     }
 
-    private def save(): Unit = SWTUtils.asyncExec {
+    private def save(): Unit = runInUi {
       evaluationOnSave = false
       doSave(null)
       evaluationOnSave = true
@@ -94,16 +94,37 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
     private[ScriptEditor] def prepareExternalEditorUpdate(): Unit = {
       ignoreDocumentUpdate = false
-      SWTUtils.asyncExec { getSourceViewer().getTextWidget().addKeyListener(stopEvaluationListener) }
+      runInUi {
+        getSourceViewer().getTextWidget().addKeyListener(stopEvaluationListener)
+      }
     }
 
     private[ScriptEditor] def stopExternalEditorUpdate(): Unit = {
       ignoreDocumentUpdate = true
-      SWTUtils.asyncExec { getSourceViewer().getTextWidget().removeKeyListener(stopEvaluationListener) }
+      runInUi {
+        getSourceViewer().getTextWidget().removeKeyListener(stopEvaluationListener)
+      }
+    }
+
+    private def runInUi(f: => Unit): Unit = SWTUtils.asyncExec {
+      /* We need to make sure that the editor was not `disposed` before executing `f` 
+       * in the UI thread. The reason is that it is possible that after calling 
+       * `SWTUtils.asyncExec`, but before the passed closure is executed, the editor 
+       * may be disposed. If the editor is disposed, executing `f` will likely end up 
+       * throwing a NPE.
+       * 
+       * FIXME: 
+       * Having said all the above, there is still a possible race condition, i.e., what 
+       * if `disposed` becomes true while `f` is being executed (since the two actions can 
+       * happen in parallel on two different threads). Well, this is indeed an issue, which 
+       * I fear need some thinking to be effectively fixed.
+       */
+      if (!disposed) f
     }
   }
 
   @volatile private var evaluationOnSave = true
+  @volatile private var disposed = false
 
   private val editorProxy = new DefaultEditorProxy
 
@@ -111,28 +132,28 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     sourceViewConfiguration.handlePropertyChangeEvent(event)
     getSourceViewer().invalidateTextPresentation()
   }
-  
+
   override def initializeKeyBindingScopes() {
     setKeyBindingScopes(Array("org.scalaide.worksheet.editorScope"))
   }
-  
+
   override def createActions() {
     super.createActions()
-    
+
     // Adding source formatting action in the editor popup dialog 
-    val formatAction= new TextOperationAction(EditorMessages.resourceBundle, "Editor.Format.", this, ISourceViewer.FORMAT)
+    val formatAction = new TextOperationAction(EditorMessages.resourceBundle, "Editor.Format.", this, ISourceViewer.FORMAT)
     formatAction.setActionDefinitionId("org.scalaide.worksheet.commands.format")
     setAction("format", formatAction)
-    
+
     // Adding run evaluation action in the editor popup dialog
-    val evalScriptAction= new RunEvaluationAction(this)
+    val evalScriptAction = new RunEvaluationAction(this)
     evalScriptAction.setActionDefinitionId("org.scalaide.worksheet.commands.evalScript")
     setAction("evalScript", evalScriptAction)
   }
-  
+
   override def editorContextMenuAboutToShow(menu: IMenuManager) {
     super.editorContextMenuAboutToShow(menu)
-    
+
     // add the format menu itemevalScript    
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "evalScript")
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "format")
@@ -151,8 +172,14 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   override protected def editorSaved(): Unit = {
     super.editorSaved()
-    if (evaluationOnSave)
-      runEvaluation() //FIXME: Should be configurable
+    //FIXME: Should be configurable
+    if (evaluationOnSave) runEvaluation()
+  }
+
+  override def dispose(): Unit = {
+    disposed = true
+    stopEvaluation()
+    super.dispose()
   }
 
   private[worksheet] def runEvaluation(): Unit = withScriptCompilationUnit {
@@ -174,6 +201,4 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = {
     ScriptCompilationUnit.fromEditor(ScriptEditor.this) foreach f
   }
-
-  //TODO: `stopEvaluation` if the editor gets hidden
 }
