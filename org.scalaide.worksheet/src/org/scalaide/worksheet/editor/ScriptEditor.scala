@@ -194,8 +194,8 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     editorProxy.stopExternalEditorUpdate()
 
     import org.scalaide.worksheet.runtime.WorksheetsManager
-    import org.scalaide.worksheet.runtime.ProgramExecutorService
-    WorksheetsManager.Instance ! ProgramExecutorService.StopRun(_)
+    import org.scalaide.worksheet.runtime.ProgramExecutor
+    WorksheetsManager.Instance ! ProgramExecutor.StopRun(_)
   }
 
   private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = {

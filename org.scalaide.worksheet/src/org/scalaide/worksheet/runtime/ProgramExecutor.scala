@@ -22,9 +22,9 @@ import org.eclipse.debug.core.IDebugEventSetListener
 import org.eclipse.debug.core.DebugEvent
 import org.eclipse.debug.core.ILaunchManager
 
-object ProgramExecutorService {
+object ProgramExecutor {
   def apply(): Actor = {
-    val executor = new ProgramExecutorService
+    val executor = new ProgramExecutor
     executor.start()
     executor
   }
@@ -68,7 +68,7 @@ object ProgramExecutorService {
   /**
    * Listen to Process terminate event, and require clean up of the evaluation executor.
    */
-  private class DebugEventListener(service: ProgramExecutorService, launchRef: AtomicReference[ILaunch]) extends IDebugEventSetListener {
+  private class DebugEventListener(service: ProgramExecutor, launchRef: AtomicReference[ILaunch]) extends IDebugEventSetListener {
     // from org.eclipse.debug.core.IDebugEventSetListener
     override def handleDebugEvents(debugEvents: Array[DebugEvent]) {
       debugEvents foreach {
@@ -83,8 +83,8 @@ object ProgramExecutorService {
   }
 }
 
-private class ProgramExecutorService private () extends DaemonActor with HasLogger {
-  import ProgramExecutorService._
+private class ProgramExecutor private () extends DaemonActor with HasLogger {
+  import ProgramExecutor._
   import scala.actors.{ AbstractActor, Exit }
 
   private var id: String = _
@@ -94,8 +94,8 @@ private class ProgramExecutorService private () extends DaemonActor with HasLogg
   private var debugEventListener: IDebugEventSetListener = _
 
   override def act(): Unit = {
-    loop {
-      react {
+    loop {(
+      react ({
         case RunProgram(unit, mainClass, cp, doc) =>
           trapExit = true // get notified if a slave actor fails
 
@@ -113,7 +113,7 @@ private class ProgramExecutorService private () extends DaemonActor with HasLogg
           launchRef.set(launch)
 
           // listener to know whan the process terminates
-          debugEventListener = new DebugEventListener(this, launchRef)
+          debugEventListener = new DebugEventListener(ProgramExecutor.this, launchRef)
           DebugPlugin.getDefault().addDebugEventListener(debugEventListener)
 
           // launch the vm
@@ -136,8 +136,8 @@ private class ProgramExecutorService private () extends DaemonActor with HasLogg
           
         case msg @ StopRun(unitId) => ignoreStopRun(msg)
         case msg: Exit => resetStateOnSlaveFailure(msg)
-        case any => logger.debug(this.toString + ": swallow message " + any)
-      }
+        case any => logger.debug(ProgramExecutor.this.toString + ": swallow message " + any)
+      }))
     }
   }
 
@@ -148,8 +148,8 @@ private class ProgramExecutorService private () extends DaemonActor with HasLogg
   }
 
   private def resetStateOnSlaveFailure(exit: Exit): Unit = {
-    logger.debug(exit.from.toString + " unexpectedly terminated, reason: " + exit.reason + ". " + "Resetting state of " + this
-      + " and getting ready to process new requests.")
+    logger.debug(exit.from.toString + " unexpectedly terminated, reason: " + exit.reason + ". " + "Resetting state of " + ProgramExecutor.this
+    + " and getting ready to process new requests.")
     reset()
   }
 
@@ -183,7 +183,7 @@ private class ProgramExecutorService private () extends DaemonActor with HasLogg
 
   override def exceptionHandler: PartialFunction[Exception, Unit] = {
     case e: Exception =>
-      eclipseLog.warn(this.toString + " self-healing...", e)
+      eclipseLog.warn(ProgramExecutor.this.toString + " self-healing...", e)
       reset()
   }
 

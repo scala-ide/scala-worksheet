@@ -15,7 +15,7 @@ object WorksheetsManager {
 
 private class WorksheetsManager private extends DaemonActor {
   import WorksheetRunner.RunEvaluation
-  import ProgramExecutorService.StopRun
+  import ProgramExecutor.StopRun
 
   //FIXME: Need a way to dispose worksheet evaluator and remove it from the map when the project is disposed (listener!?)
   private val scalaProject2worksheetEvaluator: mutable.Map[ScalaProject, Actor] = new mutable.HashMap

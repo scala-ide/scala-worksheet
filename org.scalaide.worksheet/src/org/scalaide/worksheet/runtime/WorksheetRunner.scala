@@ -35,7 +35,7 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
   private val config = Configuration(scalaProject)
   private val instrumenter = new SourceInstrumenter(config)
   private val compiler = ResidentCompiler(scalaProject, config)
-  private val runner = ProgramExecutorService()
+  private val runner = ProgramExecutor()
 
   override def act() = {
     loop {
@@ -51,11 +51,11 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
                   reportBuildErrors(unit, errors)
 
                 case CompilationSuccess =>
-                  runner ! ProgramExecutorService.RunProgram(unit, decl.fullName, classpath, editor)
+                  runner ! ProgramExecutor.RunProgram(unit, decl.fullName, classpath, editor)
               }
           }
 
-        case msg: ProgramExecutorService.StopRun =>
+        case msg: ProgramExecutor.StopRun =>
           logger.info("forwarding " + msg + " to " + runner)
           runner forward msg
 
