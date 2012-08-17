@@ -7,12 +7,12 @@ import scala.util.control.Exception.ignoring
 
 /** Automatic resource management, a.k.a. Loan pattern (the name is inspired by C#)*/
 object using {
-  def apply[T <: Closeable, R](resource: T)(body: T => R): R = apply(swallowAllExceptions)(resource)(body)
+  def apply[T <: Closeable, R](resource: T)(body: T => R): R = apply(swallowException)(resource)(body)
 
   def apply[T <: Closeable, R](handlers: Catch[R])(resource: T)(body: T => R): R = (
     handlers
     andFinally (ignoring(classOf[Any]) { resource.close() })
     apply body(resource))
   
-  private def swallowAllExceptions = Exception.catching(classOf[Exception])
+  private def swallowException = Exception.catchingPromiscuously(classOf[Exception])
 }
