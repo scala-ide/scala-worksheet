@@ -1,7 +1,7 @@
 package org.scalaide.worksheet.completion
 
 import scala.tools.eclipse.testsetup.TestProjectSetup
-import scala.reflect.internal.util.OffsetPosition
+import scala.tools.nsc.util.OffsetPosition
 import scala.tools.eclipse.completion.CompletionProposal
 import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.tools.eclipse.testsetup.SDTTestUtils
