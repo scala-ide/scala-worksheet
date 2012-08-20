@@ -12,11 +12,14 @@ object SourceInserter {
     def leftPart(str: String) =
       (str split """//>|//\|""").head
     def isContinuation(str: String) =
-      ((str contains "//>") || (str contains "//|")) && (leftPart(str) forall Character.isWhitespace)
-    def stripTrailingWS(str: String) =
-      str take (str lastIndexWhere (!Character.isWhitespace(_))) + 1
+      ((str contains "//>") || (str contains "//|")) && isEmpty(leftPart(str))
+    def isEmpty(str: String) = str forall Character.isWhitespace
+    def stripTrailingWS(str: String) = str take (str lastIndexWhere (!Character.isWhitespace(_))) + 1
+    def stripTrailingWSIfNonEmpty(str: String) = 
+      if(isEmpty(str)) str 
+      else stripTrailingWS(str)
     val prefixes =
-      lines filterNot isContinuation map leftPart map stripTrailingWS
+      lines filterNot isContinuation map leftPart map stripTrailingWSIfNonEmpty
     (prefixes mkString "\n").toArray
   }
 }

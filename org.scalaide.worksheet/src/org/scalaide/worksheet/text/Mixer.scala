@@ -82,7 +82,7 @@ class Mixer {
       align()
       insert(sep: _*)
       insert(cs: _*)
-      if (written < caret) newcaret = caret + inserted
+      if (written < caret) newcaret = scala.math.min(caret + inserted, caret)
     }
     mixed ++= source.view(written, source.length)
     (mixed.toArray, newcaret)
