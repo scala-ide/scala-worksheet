@@ -74,8 +74,9 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
     override def caretOffset: Int = {
       var offset = -1
-      runInUi { //FIXME: Can I make this non-blocking!?
-        offset = getSourceViewer().getTextWidget().getCaretOffset()
+      SWTUtils.syncExec {
+        // Read the comment in `runInUi` 
+        if(!disposed) offset = getSourceViewer().getTextWidget().getCaretOffset()
       }
       offset
     }
