@@ -2,7 +2,6 @@ package org.scalaide.worksheet.editor
 
 import scala.tools.eclipse.ISourceViewerEditor
 import scala.tools.eclipse.logging.HasLogger
-
 import org.eclipse.jface.action.IMenuManager
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextSelection
@@ -19,6 +18,7 @@ import org.eclipse.ui.texteditor.TextOperationAction
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
+import org.eclipse.swt.SWT
 
 object ScriptEditor {
 
@@ -44,7 +44,10 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private class StopEvaluationOnKeyPressed(editorProxy: DefaultEditorProxy) extends KeyAdapter {
     override def keyPressed(e: KeyEvent) {
       // Don't stop evaluation if no real character is entered in the editor (e.g., KEY UP/DOWN)
-      if (Character.isLetterOrDigit(e.character) || Character.isSpace(e.character))
+      if (Character.isLetterOrDigit(e.character) 
+          || Character.isSpace(e.character) 
+          || e.keyCode == SWT.DEL
+          || e.keyCode == SWT.BS)
         stopEvaluation()
     }
   }
