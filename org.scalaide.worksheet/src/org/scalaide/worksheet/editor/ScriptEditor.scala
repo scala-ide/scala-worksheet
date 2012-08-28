@@ -37,7 +37,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
   setSourceViewerConfiguration(sourceViewConfiguration)
-  setPreferenceStore(prefStore)
+//  setPreferenceStore(prefStore)
   setPartName("Scala Script Editor")
   setDocumentProvider(new ScriptDocumentProvider)
 
