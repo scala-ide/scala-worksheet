@@ -33,7 +33,7 @@ object ScriptEditor {
 
 /** A Scala script editor.*/
 class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with HasLogger {
-  @inline private def prefStore = WorksheetPlugin.prefStore
+  private def prefStore = WorksheetPlugin.prefStore
 
   private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
   setSourceViewerConfiguration(sourceViewConfiguration)
@@ -58,7 +58,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     @volatile private[ScriptEditor] var ignoreDocumentUpdate = false
     private val stopEvaluationListener = new StopEvaluationOnKeyPressed(this)
 
-    @inline private def doc: IDocument = getDocumentProvider.getDocument(getEditorInput)
+    private def doc: IDocument = getDocumentProvider.getDocument(getEditorInput)
 
     override def getContent: String = doc.get
 
