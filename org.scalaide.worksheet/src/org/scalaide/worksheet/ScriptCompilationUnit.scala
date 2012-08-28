@@ -10,7 +10,6 @@ import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.util.BatchSourceFile
 import scala.tools.nsc.util.Position
 import scala.tools.nsc.util.ScriptSourceFile
-
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IMarker
 import org.eclipse.jdt.core.compiler.IProblem
@@ -19,6 +18,7 @@ import org.eclipse.ui.IEditorInput
 import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.editor.ScriptEditor
+import scala.tools.eclipse.resources.MarkerFactory
 
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying
@@ -81,13 +81,34 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
         response.get
       }
     }()
-    
+
   def clearBuildErrors(): Unit = {
     FileUtils.clearBuildErrors(workspaceFile, null)
   }
-  
+
+  /** Build errors need to be mapped back to the original source. Right now
+   *  we don't have the necessary information. The build compiler reports
+   *  positions relative to the instrumented source, but offsets are skewed.
+   *
+   *  We rely on the fact that the instrumenter never inserts newlines, so we
+   *  report the error only against the line number, with a length of one.
+   */
   def reportBuildError(errorMsg: String, position: Position): Unit = {
-    BuildProblemMarker.create(workspaceFile, IMarker.SEVERITY_ERROR, errorMsg, position)
+    val marker = workspaceFile.createMarker(ScalaPlugin.plugin.problemMarkerId)
+    BuildProblemMarker.create(workspaceFile, IMarker.SEVERITY_ERROR, errorMsg, worksheetPosition(position))
+  }
+
+  /** A simple heuristic to map back positions to worksheet position.
+   *
+   *  The assumption is that the line numbers match. We can't use column information
+   *  because instrumented code may appear on the same line before the error point.
+   */
+  private def worksheetPosition(pos: Position): MarkerFactory.RegionPosition = {
+    val sourceFile = batchSourceFile(getContents)
+    val line = pos.line - 1
+    val length = sourceFile.lineToString(line).length
+    val offset = sourceFile.lineToOffset(line)
+    MarkerFactory.RegionPosition(offset, length, line)
   }
 }
 
