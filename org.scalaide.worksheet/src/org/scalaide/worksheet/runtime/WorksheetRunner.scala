@@ -1,10 +1,10 @@
 package org.scalaide.worksheet.runtime
-import scala.actors.{Actor, DaemonActor}
+import scala.actors.{ Actor, DaemonActor }
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.logging.HasLogger
-
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.EditorProxy
+import org.scalaide.worksheet.text.SourceInserter
 
 object WorksheetRunner {
 
@@ -40,6 +40,10 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
       react {
         case RunEvaluation(unit, editor) =>
           unit.clearBuildErrors()
+
+          val stripped = SourceInserter.stripRight(editor.getContent.toCharArray())
+          editor.replaceWith(stripped.mkString)
+
           instrumenter.instrument(unit) match {
             case Left(ex) => eclipseLog.error(ex)
             case Right((decl, source)) =>
@@ -62,8 +66,7 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
     }
   }
 
-  /**
-   * The classpath, as a list of local filesystem path
+  /** The classpath, as a list of local filesystem path
    */
   private def classpath: Seq[String] = {
     (scalaProject.scalaClasspath.fullClasspath.map(_.getAbsolutePath()) ++ scalaProject.outputFolderLocations.map(_.toOSString()) :+ config.binFolder.getAbsolutePath())
