@@ -1,10 +1,12 @@
 package org.scalaide.worksheet.runtime
 
-import scala.actors.{Actor, DaemonActor}
-import scala.collection.mutable
+import scala.actors.{ Actor, DaemonActor }
+import scala.collection.immutable
 import scala.tools.eclipse.ScalaProject
-
 import org.scalaide.worksheet.ScriptCompilationUnit
+import scala.actors.Exit
+import scala.tools.eclipse.logging.HasLogger
+import scala.actors.AbstractActor
 
 object WorksheetsManager {
   lazy val Instance: Actor = {
@@ -14,12 +16,12 @@ object WorksheetsManager {
   }
 }
 
-private class WorksheetsManager private extends DaemonActor {
+private class WorksheetsManager private extends DaemonActor with HasLogger {
   import WorksheetRunner.RunEvaluation
   import ProgramExecutor.StopRun
 
   //FIXME: Need a way to dispose worksheet evaluator and remove it from the map when the project is disposed (listener!?)
-  private val scalaProject2worksheetEvaluator: mutable.Map[ScalaProject, Actor] = new mutable.HashMap
+  private var worksheetEvaluator: immutable.Map[ScalaProject, Actor] = new immutable.HashMap
 
   override def act() = loop {
     react {
@@ -29,23 +31,34 @@ private class WorksheetsManager private extends DaemonActor {
       case msg: StopRun =>
         forwardIfEvaluatorExists(msg)
 
+      case Exit(actor, reason) =>
+        eclipseLog.error("Evaluator actor crashed " + reason)
+        evictEvaluator(actor)
+
       case any => exit("Unsupported message " + any)
     }
   }
 
+  private def evictEvaluator(actor: AbstractActor) {
+    worksheetEvaluator = worksheetEvaluator filterNot { case (_, a) => a == actor }
+  }
+
   private def forwardIfEvaluatorExists(msg: StopRun): Unit = {
     val scalaProject = msg.unit.scalaProject
-    for (evaluator <- scalaProject2worksheetEvaluator.get(scalaProject))
+    for (evaluator <- worksheetEvaluator.get(scalaProject))
       evaluator forward msg
   }
 
   private def obtainEvaluator(unit: ScriptCompilationUnit): Actor = {
     val scalaProject = unit.scalaProject
-    scalaProject2worksheetEvaluator.get(scalaProject) match {
+    worksheetEvaluator.get(scalaProject) match {
       case Some(evaluator) => evaluator
       case None =>
         val evaluator = WorksheetRunner(scalaProject)
-        scalaProject2worksheetEvaluator += (scalaProject -> evaluator)
+        trapExit = true
+        link(evaluator)
+
+        worksheetEvaluator = worksheetEvaluator + (scalaProject -> evaluator)
         evaluator
     }
   }
