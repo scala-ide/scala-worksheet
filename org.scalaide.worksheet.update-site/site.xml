@@ -6,6 +6,6 @@
    <feature url="features/org.scalaide.worksheet.source.feature_0.0.0.jar" id="org.scalaide.worksheet.source.feature" version="0.0.0">
       <category name="template-source"/>
    </feature>
-   <category-def name="template" label="Scala IDE plugin template"/>
-   <category-def name="template-source" label="Scala IDE plugin template Source"/> -->
+   <category-def name="template" label="Scala Worksheet"/>
+   <category-def name="template-source" label="Scala worksheet Source"/> -->
 </site>
