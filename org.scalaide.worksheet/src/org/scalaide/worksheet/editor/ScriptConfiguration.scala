@@ -1,6 +1,5 @@
 package org.scalaide.worksheet.editor
 
-import scala.tools.eclipse.ScalaDamagerRepairer
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.formatter.ScalaFormattingStrategy
 import scala.tools.eclipse.hyperlink.text.detector.DeclarationHyperlinkDetector
@@ -51,10 +50,6 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
 
   override def getPresentationReconciler(sv: ISourceViewer) = {
     val reconciler = super.getPresentationReconciler(sv).asInstanceOf[PresentationReconciler]
-    val dr = new ScalaDamagerRepairer(codeScanner)
-
-    reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE)
-    reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE)
 
     def handlePartition(partitionType: String, tokenScanner: ITokenScanner) {
       val dr = new DefaultDamagerRepairer(tokenScanner)
