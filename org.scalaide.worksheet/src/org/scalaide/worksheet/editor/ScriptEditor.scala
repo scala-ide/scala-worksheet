@@ -37,17 +37,17 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
   setSourceViewerConfiguration(sourceViewConfiguration)
-//  setPreferenceStore(prefStore)
+  //  setPreferenceStore(prefStore)
   setPartName("Scala Script Editor")
   setDocumentProvider(new ScriptDocumentProvider)
 
   private class StopEvaluationOnKeyPressed(editorProxy: DefaultEditorProxy) extends KeyAdapter {
+    val exitKeys = Set(SWT.DEL, SWT.BS, SWT.ESC)
     override def keyPressed(e: KeyEvent) {
       // Don't stop evaluation if no real character is entered in the editor (e.g., KEY UP/DOWN)
-      if (Character.isLetterOrDigit(e.character) 
-          || Character.isSpace(e.character) 
-          || e.keyCode == SWT.DEL
-          || e.keyCode == SWT.BS)
+      if (Character.isLetterOrDigit(e.character)
+        || Character.isWhitespace(e.character)
+        || exitKeys(e.keyCode.toChar))
         stopEvaluation()
     }
   }
@@ -65,21 +65,34 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
     override def getContent: String = doc.get
 
-    override def replaceWith(content: String, newCaretOffset: Int): Unit = {
+    override def replaceWith(content: String, lastInsertion: Int): Unit = {
+      // we need to turn off evaluation on save if we don't want to loop forever 
+      // (because of `editorSaved` implementation, i.e., automatic worksheet evaluation on save)
       if (!ignoreDocumentUpdate) runInUi {
+        val (line, col) = lineColumn(caretOffset)
+
         doc.set(content)
-        // we need to turn off evaluation on save if we don't want to loop forever 
-        // (because of `editorSaved` implementation, i.e., automatic worksheet evaluation on save)
-        getSourceViewer().getTextWidget().setCaretOffset(newCaretOffset)
+        getSourceViewer().getTextWidget().setCaretOffset(offsetOf(line, col))
+        getSourceViewer().revealRange(lastInsertion, 0)
         getSourceViewer().invalidateTextPresentation()
       }
+    }
+
+    def lineColumn(offset: Int): (Int, Int) = {
+      val region = doc.getLineInformationOfOffset(offset)
+      (doc.getLineOfOffset(offset), offset - region.getOffset)
+    }
+
+    def offsetOf(line: Int, col: Int): Int = {
+      val region1 = doc.getLineInformation(doc.getNumberOfLines() min line)
+      region1.getOffset + (region1.getLength() min col)
     }
 
     override def caretOffset: Int = {
       var offset = -1
       SWTUtils.syncExec {
         // Read the comment in `runInUi` 
-        if(!disposed) offset = getSourceViewer().getTextWidget().getCaretOffset()
+        if (!disposed) offset = getSourceViewer().getTextWidget().getCaretOffset()
       }
       offset
     }
@@ -109,6 +122,9 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
       }
     }
 
+    /** Run `f' in the UI thread and make sure we were not disposed before.
+     *  Disable redraws during the execution of this block to reduce flickering.
+     */
     private def runInUi(f: => Unit): Unit = SWTUtils.asyncExec {
       /* We need to make sure that the editor was not `disposed` before executing `f` 
        * in the UI thread. The reason is that it is possible that after calling 
@@ -122,7 +138,11 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
        * happen in parallel on two different threads). Well, this is indeed an issue, which 
        * I fear need some thinking to be effectively fixed.
        */
-      if (!disposed) f
+      if (!disposed) {
+        getSourceViewer().getTextWidget().setRedraw(false)
+        f
+        getSourceViewer().getTextWidget().setRedraw(true)
+      }
     }
   }
 

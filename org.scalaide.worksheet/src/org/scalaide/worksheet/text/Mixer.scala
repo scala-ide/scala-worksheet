@@ -39,7 +39,7 @@ class Mixer {
    *         at end of source
    *  @return A pair consisting of
    *            - The combination of source and comments
-   *            - The new position of the caret in the combined source
+   *            - The position of the last inserted comment
    */
   def mix(source: Array[Char], comments: Array[Char], oldcaret: Int = -1): (Array[Char], Int) = {
     val mixed = new ArrayBuffer[Char]
@@ -84,8 +84,9 @@ class Mixer {
       insert(cs: _*)
       if (written < caret) newcaret = scala.math.min(caret + inserted, caret)
     }
+    val lastInsertionPoint = mixed.size
     mixed ++= source.view(written, source.length)
-    (mixed.toArray, newcaret)
+    (mixed.toArray, lastInsertionPoint)
   }
 
 }

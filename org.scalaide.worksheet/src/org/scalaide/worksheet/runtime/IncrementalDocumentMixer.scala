@@ -41,8 +41,8 @@ private class IncrementalDocumentMixer private (editor: EditorProxy, source: Wri
 
   private def updateDocument(newText: String): Unit = {
     if (newText.length > 0) {
-      val (mixed, newCursorPos) = mixer.mix(stripped, newText.toCharArray(), originalCursorPosition)
-      editor.replaceWith(mixed.mkString, newCursorPos)
+      val (mixed, lastInsertion) = mixer.mix(stripped, newText.toCharArray(), originalCursorPosition)
+      editor.replaceWith(mixed.mkString, lastInsertion)
     }
   }
 
