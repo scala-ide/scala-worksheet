@@ -5,6 +5,7 @@ import scala.tools.eclipse.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.EditorProxy
 import org.scalaide.worksheet.text.SourceInserter
+import scala.tools.eclipse.BuildSuccessListener
 
 object WorksheetRunner {
 
@@ -14,8 +15,8 @@ object WorksheetRunner {
     worksheet
   }
 
-  trait Msg
-  case class RunEvaluation(unit: ScriptCompilationUnit, editor: EditorProxy) extends Msg
+  case class RunEvaluation(unit: ScriptCompilationUnit, editor: EditorProxy)
+  case object RefreshResidentCompiler
 }
 
 /** An evaluator for worksheet documents.
@@ -32,8 +33,16 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
 
   private val config = Configuration(scalaProject)
   private val instrumenter = new SourceInstrumenter(config)
-  private val compiler = ResidentCompiler(scalaProject, config)
-  private val runner = ProgramExecutor()
+  private var compiler = ResidentCompiler(scalaProject, config)
+  private val executor = ProgramExecutor()
+
+  private object buildListener extends BuildSuccessListener {
+    def buildSuccessful() {
+      WorksheetRunner.this ! RefreshResidentCompiler
+    }
+  }
+
+  scalaProject.addBuildSuccessListener(buildListener)
 
   override def act() = {
     loop {
@@ -53,15 +62,21 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
                   reportBuildErrors(unit, errors)
 
                 case CompilationSuccess =>
-                  runner ! ProgramExecutor.RunProgram(unit, decl.fullName, classpath, editor)
+                  executor ! ProgramExecutor.RunProgram(unit, decl.fullName, classpath, editor)
               }
           }
 
         case msg: ProgramExecutor.StopRun =>
-          logger.info("forwarding " + msg + " to " + runner)
-          runner forward msg
+          logger.info("forwarding " + msg + " to " + executor)
+          executor forward msg
 
-        case any => exit("Unsupported message " + any)
+        case RefreshResidentCompiler =>
+          logger.info("Refreshing worksheet resident compiler for " + scalaProject)
+          compiler = ResidentCompiler(scalaProject, config)
+
+        case any =>
+          scalaProject.removeBuildSuccessListener(buildListener)
+          exit("Unsupported message " + any)
       }
     }
   }
