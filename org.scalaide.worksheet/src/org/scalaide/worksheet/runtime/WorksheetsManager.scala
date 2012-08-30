@@ -7,6 +7,7 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.actors.Exit
 import scala.tools.eclipse.logging.HasLogger
 import scala.actors.AbstractActor
+import org.eclipse.core.runtime.IPath
 
 object WorksheetsManager {
   lazy val Instance: Actor = {
@@ -21,7 +22,7 @@ private class WorksheetsManager private extends DaemonActor with HasLogger {
   import ProgramExecutor.StopRun
 
   //FIXME: Need a way to dispose worksheet evaluator and remove it from the map when the project is disposed (listener!?)
-  private var worksheetEvaluator: immutable.Map[ScalaProject, Actor] = new immutable.HashMap
+  private var worksheetEvaluator: immutable.Map[IPath, Actor] = new immutable.HashMap
 
   override def act() = loop {
     react {
@@ -45,20 +46,20 @@ private class WorksheetsManager private extends DaemonActor with HasLogger {
 
   private def forwardIfEvaluatorExists(msg: StopRun): Unit = {
     val scalaProject = msg.unit.scalaProject
-    for (evaluator <- worksheetEvaluator.get(scalaProject))
+    for (evaluator <- worksheetEvaluator.get(scalaProject.underlying.getFullPath))
       evaluator forward msg
   }
 
   private def obtainEvaluator(unit: ScriptCompilationUnit): Actor = {
     val scalaProject = unit.scalaProject
-    worksheetEvaluator.get(scalaProject) match {
+    worksheetEvaluator.get(scalaProject.underlying.getFullPath) match {
       case Some(evaluator) => evaluator
       case None =>
         val evaluator = WorksheetRunner(scalaProject)
         trapExit = true
         link(evaluator)
 
-        worksheetEvaluator = worksheetEvaluator + (scalaProject -> evaluator)
+        worksheetEvaluator = worksheetEvaluator + (scalaProject.underlying.getFullPath -> evaluator)
         evaluator
     }
   }
