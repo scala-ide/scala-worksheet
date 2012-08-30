@@ -30,7 +30,7 @@ object ResidentCompiler extends HasLogger {
 
   sealed abstract class CompilationResult
   case object CompilationSuccess extends CompilationResult
-  sealed case class CompilationFailed(errors: Iterable[CompilationError]) extends CompilationResult
+  case class CompilationFailed(errors: Iterable[CompilationError]) extends CompilationResult
 
   case class CompilationError(msg: String, pos: Position)
 }
