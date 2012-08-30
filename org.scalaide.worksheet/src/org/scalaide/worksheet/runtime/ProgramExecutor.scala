@@ -2,12 +2,9 @@ package org.scalaide.worksheet.runtime
 
 import java.io.StringWriter
 import java.io.Writer
-
 import java.util.concurrent.atomic.AtomicReference
-
 import scala.actors.{Actor, DaemonActor}
 import scala.tools.eclipse.logging.HasLogger
-
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.debug.core.DebugEvent
 import org.eclipse.debug.core.DebugPlugin
@@ -23,6 +20,8 @@ import org.eclipse.jdt.launching.JavaRuntime
 import org.eclipse.jdt.launching.VMRunnerConfiguration
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.EditorProxy
+import org.scalaide.worksheet.WorksheetPlugin
+import org.scalaide.worksheet.properties.WorksheetPreferences
 
 object ProgramExecutor {
   def apply(): Actor = {
@@ -123,8 +122,9 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
           connectListener(process.getStreamsProxy().getErrorStreamMonitor(), writer)
           connectListener(process.getStreamsProxy().getOutputStreamMonitor(), writer)
 
+          val maxOutput = WorksheetPlugin.plugin.getPreferenceStore().getInt(WorksheetPreferences.P_CUTOFF_VALUE)
           // start the mixer
-          editorUpdater = IncrementalDocumentMixer(doc, writer)
+          editorUpdater = IncrementalDocumentMixer(doc, writer, maxOutput)
           link(editorUpdater)
 
           // switch behavior. Waits for the end or the interuption of the evaluation

@@ -118,5 +118,8 @@
       <initializer
             class="org.scalaide.worksheet.properties.ColourPreferenceInitializer">
       </initializer>
+      <initializer
+            class="org.scalaide.worksheet.properties.WorksheetPreferenceInitializer">
+      </initializer>
    </extension>
 </plugin>
