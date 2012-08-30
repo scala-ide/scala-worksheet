@@ -140,8 +140,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
        */
       if (!disposed) {
         getSourceViewer().getTextWidget().setRedraw(false)
-        f
-        getSourceViewer().getTextWidget().setRedraw(true)
+        try f finally getSourceViewer().getTextWidget().setRedraw(true)
       }
     }
   }
