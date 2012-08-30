@@ -34,7 +34,7 @@ class SourceInstrumenter(config: Configuration) extends HasLogger {
         else Right(InstrumentationResult(TopLevelObjectDecl(fullName), program))
 
       case Right(ex) =>
-        Left(new ProgramInstrumentationFailed(unit, ex))
+        Left(ProgramInstrumentationFailed(unit, ex))
     }
   }
 

@@ -45,7 +45,7 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
           editor.replaceWith(stripped.mkString)
 
           instrumenter.instrument(unit) match {
-            case Left(ex) => eclipseLog.error(ex)
+            case Left(ex) => eclipseLog.error("Error during instrumentation of " + unit, ex)
             case Right((decl, source)) =>
               compiler.compile(source) match {
                 case CompilationFailed(errors) =>
