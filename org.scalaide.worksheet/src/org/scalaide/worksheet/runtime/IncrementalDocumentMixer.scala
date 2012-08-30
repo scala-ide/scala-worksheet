@@ -17,10 +17,13 @@ object IncrementalDocumentMixer {
 
   final val RefreshDocumentTimeout = 200
   final val MaximumOutputChars = 100
+
+  /** How many ticks should pass with output not changing before adding a spinner? */
+  final val InfiniteLoopTicks = 1000 / RefreshDocumentTimeout // 1 sec
 }
 
-private class IncrementalDocumentMixer private (editor: EditorProxy, source: Writer, val maximumOutputSize: Int = IncrementalDocumentMixer.MaximumOutputChars) extends DaemonActor with HasLogger {
-  import IncrementalDocumentMixer.RefreshDocumentTimeout
+private class IncrementalDocumentMixer private (editor: EditorProxy, source: Writer, val maximumOutputSize: Int) extends DaemonActor with HasLogger {
+  import IncrementalDocumentMixer.{ RefreshDocumentTimeout, InfiniteLoopTicks }
 
   private def originalCursorPosition = editor.caretOffset
   private val originalContent = editor.getContent
@@ -31,7 +34,8 @@ private class IncrementalDocumentMixer private (editor: EditorProxy, source: Wri
 
   override def act(): Unit = loop {
     reactWithin(RefreshDocumentTimeout) {
-      case TIMEOUT => updateDocument(currentContent)
+      case TIMEOUT =>
+        updateDocument(currentContent)
       case 'stop =>
         updateDocument(currentContent)
         editor.completedExternalEditorUpdate()
@@ -42,21 +46,33 @@ private class IncrementalDocumentMixer private (editor: EditorProxy, source: Wri
 
   private def updateDocument(newText: String): Unit = {
     if (newText.length > 0) {
-      lastText = showLongRunning(pruneOutput(newText))
-      val (mixed, lastInsertion) = mixer.mix(stripped, lastText.toCharArray(), originalCursorPosition)
+      val (mixed, lastInsertion) = mixer.mix(stripped, showLongRunning(pruneOutput(newText)).toCharArray(), originalCursorPosition)
       editor.replaceWith(mixed.mkString, lastInsertion)
     }
   }
 
   private var lastText = ""
-  private var ticks = 0
+  private var ticks = -InfiniteLoopTicks
   private val spinner = """|/-\"""
 
-  def showLongRunning(newText: String): String = if (lastText == newText) {
-    ticks += 1
-    if (ticks % 4 == 0) ticks = 0
-    if (newText.last == '\n') newText.init + spinner(ticks) + '\n' else newText + spinner(ticks)
-  } else newText
+  def showLongRunning(newText: String): String = {
+    val prevText = lastText
+    lastText = newText
+
+    if (prevText == newText) {
+      def addSpinner: String = {
+        ticks %= 4
+        if (newText.last == '\n') newText.init + spinner(ticks) + '\n' else newText + spinner(ticks)
+      }
+
+      ticks += 1
+      if (ticks >= 0) addSpinner else newText
+    } else {
+      // reset the counter and wait another second before adding a spinner
+      ticks = -InfiniteLoopTicks
+      newText
+    }
+  }
 
   def pruneOutput(newText: String): String = {
     if (newText.length() > maximumOutputSize) {
