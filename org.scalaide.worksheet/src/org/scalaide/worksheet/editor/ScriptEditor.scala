@@ -55,7 +55,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   /** This class is used by the `IncrementalDocumentMixer` to update the editor's document with
    *  the evaluation's result.
    */
-  private class DefaultEditorProxy extends EditorProxy {
+  private class DefaultEditorProxy extends DocumentHolder {
     import scala.tools.eclipse.util.SWTUtils
 
     @volatile private[ScriptEditor] var ignoreDocumentUpdate = false
@@ -63,9 +63,9 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
     private def doc: IDocument = getDocumentProvider.getDocument(getEditorInput)
 
-    override def getContent: String = doc.get
+    override def getContents: String = doc.get
 
-    override def replaceWith(content: String, lastInsertion: Int): Unit = {
+    override def replaceWith(content: String, revealPos: Int): Unit = {
       // we need to turn off evaluation on save if we don't want to loop forever 
       // (because of `editorSaved` implementation, i.e., automatic worksheet evaluation on save)
       if (!ignoreDocumentUpdate) runInUi {
@@ -73,7 +73,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
         doc.set(content)
         getSourceViewer().getTextWidget().setCaretOffset(offsetOf(line, col))
-        getSourceViewer().revealRange(lastInsertion, 0)
+        if (revealPos > 0) getSourceViewer().revealRange(revealPos, 0)
         getSourceViewer().invalidateTextPresentation()
       }
     }
@@ -88,7 +88,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
       region1.getOffset + (region1.getLength() min col)
     }
 
-    override def caretOffset: Int = {
+    private def caretOffset: Int = {
       var offset = -1
       SWTUtils.syncExec {
         // Read the comment in `runInUi` 
@@ -97,7 +97,14 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
       offset
     }
 
-    override def completedExternalEditorUpdate(): Unit = {
+    override def beginUpdate(): Unit = {
+      ignoreDocumentUpdate = false
+      runInUi {
+        getSourceViewer().getTextWidget().addKeyListener(stopEvaluationListener)
+      }
+    }
+
+    override def endUpdate(): Unit = {
       stopExternalEditorUpdate()
       save()
     }
@@ -106,13 +113,6 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
       evaluationOnSave = false
       doSave(null)
       evaluationOnSave = true
-    }
-
-    private[ScriptEditor] def prepareExternalEditorUpdate(): Unit = {
-      ignoreDocumentUpdate = false
-      runInUi {
-        getSourceViewer().getTextWidget().addKeyListener(stopEvaluationListener)
-      }
     }
 
     private[ScriptEditor] def stopExternalEditorUpdate(): Unit = {
@@ -206,7 +206,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   }
 
   private[worksheet] def runEvaluation(): Unit = withScriptCompilationUnit {
-    editorProxy.prepareExternalEditorUpdate()
+    editorProxy.beginUpdate()
 
     import org.scalaide.worksheet.runtime.WorksheetsManager
     import org.scalaide.worksheet.runtime.WorksheetRunner

@@ -5,11 +5,11 @@ import java.io.Writer
 import scala.actors.{ Actor, DaemonActor, TIMEOUT }
 import scala.tools.eclipse.logging.HasLogger
 
-import org.scalaide.worksheet.editor.EditorProxy
+import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.text.{ Mixer, SourceInserter }
 
 object IncrementalDocumentMixer {
-  def apply(editor: EditorProxy, source: Writer, maxOutput: Int = MaximumOutputChars): Actor = {
+  def apply(editor: DocumentHolder, source: Writer, maxOutput: Int = MaximumOutputChars): Actor = {
     val incrementalMixer = new IncrementalDocumentMixer(editor, source, maxOutput)
     incrementalMixer.start()
     incrementalMixer
@@ -22,12 +22,11 @@ object IncrementalDocumentMixer {
   final val InfiniteLoopTicks = 1000 / RefreshDocumentTimeout // 1 sec
 }
 
-private class IncrementalDocumentMixer private (editor: EditorProxy, source: Writer, val maximumOutputSize: Int) extends DaemonActor with HasLogger {
+private class IncrementalDocumentMixer private (editor: DocumentHolder, source: Writer, val maximumOutputSize: Int) extends DaemonActor with HasLogger {
   import IncrementalDocumentMixer.{ RefreshDocumentTimeout, InfiniteLoopTicks }
 
-  private def originalCursorPosition = editor.caretOffset
-  private val originalContent = editor.getContent
-  private val stripped = SourceInserter.stripRight(editor.getContent.toCharArray)
+  private val originalContent = editor.getContents
+  private val stripped = SourceInserter.stripRight(editor.getContents.toCharArray)
   private val mixer = new Mixer
 
   private def currentContent: String = source.toString()
@@ -38,7 +37,7 @@ private class IncrementalDocumentMixer private (editor: EditorProxy, source: Wri
         updateDocument(currentContent)
       case 'stop =>
         updateDocument(currentContent)
-        editor.completedExternalEditorUpdate()
+        editor.endUpdate()
         exit()
       case any => exit(this.toString + ": Unsupported message " + any)
     }
@@ -46,7 +45,7 @@ private class IncrementalDocumentMixer private (editor: EditorProxy, source: Wri
 
   private def updateDocument(newText: String): Unit = {
     if (newText.length > 0) {
-      val (mixed, lastInsertion) = mixer.mix(stripped, showLongRunning(pruneOutput(newText)).toCharArray(), originalCursorPosition)
+      val (mixed, lastInsertion) = mixer.mix(stripped, showLongRunning(pruneOutput(newText)).toCharArray())
       editor.replaceWith(mixed.mkString, lastInsertion)
     }
   }
