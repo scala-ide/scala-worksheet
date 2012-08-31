@@ -3,7 +3,7 @@ package org.scalaide.worksheet.runtime
 import java.io.StringWriter
 import java.io.Writer
 import java.util.concurrent.atomic.AtomicReference
-import scala.actors.{Actor, DaemonActor}
+import scala.actors.{ Actor, DaemonActor }
 import scala.tools.eclipse.logging.HasLogger
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.debug.core.DebugEvent
@@ -19,7 +19,7 @@ import org.eclipse.debug.core.model.IStreamMonitor
 import org.eclipse.jdt.launching.JavaRuntime
 import org.eclipse.jdt.launching.VMRunnerConfiguration
 import org.scalaide.worksheet.ScriptCompilationUnit
-import org.scalaide.worksheet.editor.EditorProxy
+import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.properties.WorksheetPreferences
 
@@ -30,7 +30,7 @@ object ProgramExecutor {
     executor
   }
 
-  case class RunProgram(unit: ScriptCompilationUnit, mainClass: String, classPath: Seq[String], editor: EditorProxy)
+  case class RunProgram(unit: ScriptCompilationUnit, mainClass: String, classPath: Seq[String], editor: DocumentHolder)
   case object FinishedRun
   case class StopRun(unit: ScriptCompilationUnit) {
     def getId: String = getUnitId(unit)
@@ -60,8 +60,7 @@ object ProgramExecutor {
     }
   }
 
-  /**
-   * Listen to Process terminate event, and require clean up of the evaluation executor.
+  /** Listen to Process terminate event, and require clean up of the evaluation executor.
    */
   private class DebugEventListener(service: ProgramExecutor, launchRef: AtomicReference[ILaunch]) extends IDebugEventSetListener {
     // from org.eclipse.debug.core.IDebugEventSetListener
@@ -88,9 +87,11 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
   private var editorUpdater: Actor = _
   private var debugEventListener: IDebugEventSetListener = _
 
+  override def toString(): String = "ProgramExecutor actor <" + id + ">"
+
   override def act(): Unit = {
-    loop {(
-      react ({
+    loop {
+      react {
         case RunProgram(unit, mainClass, cp, doc) =>
           trapExit = true // get notified if a slave actor fails
 
@@ -129,15 +130,15 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
 
           // switch behavior. Waits for the end or the interuption of the evaluation
           running()
-          
+
         case msg @ StopRun(unitId) => ignoreStopRun(msg)
-        case msg: Exit => resetStateOnSlaveFailure(msg)
-        case any => logger.debug(ProgramExecutor.this.toString + ": swallow message " + any)
-      }))
+        case msg: Exit             => resetStateOnSlaveFailure(msg)
+        case any                   => logger.debug(ProgramExecutor.this.toString() + ": swallow message " + any)
+      }
     }
   }
 
-  private def running() = react {
+  private def running(): Unit = react {
     case msg: StopRun => if (msg.getId == id) reset() else ignoreStopRun(msg)
     case FinishedRun  => reset()
     case msg: Exit    => resetStateOnSlaveFailure(msg)
@@ -145,12 +146,12 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
 
   private def resetStateOnSlaveFailure(exit: Exit): Unit = {
     logger.debug(exit.from.toString + " unexpectedly terminated, reason: " + exit.reason + ". " + "Resetting state of " + ProgramExecutor.this
-    + " and getting ready to process new requests.")
+      + " and getting ready to process new requests.")
     reset()
   }
 
   private def ignoreStopRun(msg: StopRun): Unit = {
-    logger.info("Ignoring " + msg + ": no program is currently being executed.")
+    logger.info("Ignoring " + msg + ": we're executing: " + id)
   }
 
   private def reset(): Unit = {
@@ -182,8 +183,6 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
       eclipseLog.warn(ProgramExecutor.this.toString + " self-healing...", e)
       reset()
   }
-
-  override def toString: String = "ProgramExecutorService <actor>"
 
   /** Connect an IProcess stream to the writer.*/
   private def connectListener(stream: IStreamMonitor, writer: Writer) {
