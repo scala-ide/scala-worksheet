@@ -12,7 +12,6 @@ import scala.tools.eclipse.lexical.XmlPIScanner
 import scala.tools.eclipse.lexical.XmlTagScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
 import scala.tools.eclipse.ui.AutoCloseBracketStrategy
-
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.preference.IPreferenceStore
@@ -39,8 +38,9 @@ import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.lexical.SingleLineCommentScanner
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
-
 import scalariform.ScalaVersions
+import scala.tools.eclipse.ScalaHover
+import org.scalaide.worksheet.ScriptCompilationUnit
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
   @inline private def scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
@@ -100,7 +100,7 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
   }
 
   override def getTextHover(viewer: ISourceViewer, contentType: String): ITextHover = {
-    return new DefaultTextHover(viewer)
+    new ScalaHover(ScriptCompilationUnit.fromEditor(textEditor).get)
   }
 
   override def getTabWidth(viewer: ISourceViewer): Int = ScriptEditor.TAB_WIDTH
