@@ -8,7 +8,7 @@ import scala.tools.eclipse.util.FileUtils
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.util.BatchSourceFile
-import scala.tools.nsc.util.Position
+import scala.tools.nsc.util.{Position, NoPosition}
 import scala.tools.nsc.util.ScriptSourceFile
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IMarker
@@ -105,7 +105,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
    */
   private def worksheetPosition(pos: Position): MarkerFactory.RegionPosition = {
     val sourceFile = batchSourceFile(getContents)
-    val line = pos.line - 1
+    val line = if (pos == NoPosition) 1 else pos.line - 1
     val length = sourceFile.lineToString(line).length
     val offset = sourceFile.lineToOffset(line)
     MarkerFactory.RegionPosition(offset, length, line)
