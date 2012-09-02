@@ -1,30 +1,43 @@
 package org.scalaide.worksheet
 
-import org.eclipse.core.resources.IFolder
-import org.eclipse.core.resources.IResource
-import org.eclipse.core.runtime.Path
-import org.eclipse.jface.text.IDocument
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.when
-import org.scalaide.worksheet.handlers.EvalScript
-import java.io.ByteArrayInputStream
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.testsetup.SDTTestUtils.createProjects
 import scala.tools.eclipse.testsetup.SDTTestUtils.deleteProjects
-import scala.tools.eclipse.testsetup.SDTTestUtils.workspace
-import scala.tools.nsc.scratchpad.Mixer
-import scala.tools.nsc.scratchpad.SourceInserter
+import org.eclipse.core.resources.IFolder
+import org.junit.After
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Test
 import scala.tools.eclipse.testsetup.SDTTestUtils
+import org.junit.Assert
+import org.scalaide.worksheet.testutil.EvalTester
+import org.junit.BeforeClass
+import org.junit.AfterClass
+import org.scalaide.worksheet.properties.WorksheetPreferences
+
+object WorksheetEvalTest {
+  @BeforeClass
+  def createProject() {
+    val Seq(prj) = createProjects("eval-test")
+    project = prj
+
+    project.sourceOutputFolders.map {
+      case (_, outp: IFolder) => outp.create(true, true, null)
+    }
+  }
+
+  private var project: ScalaProject = _
+
+  @AfterClass
+  def deleteProject() {
+    deleteProjects(project)
+  }
+
+}
 
 class WorksheetEvalTest {
   import SDTTestUtils._
 
-  @Ignore
   @Test
   def simple_evaluation_succeeds() {
     val initial = """
@@ -43,10 +56,9 @@ object Main {
   val ys = Seq(1, 2, 3, 3,4 )                     //> ys : Seq[Int] = List(1, 2, 3, 3, 4)
 }
 """
-    //runEvalTest("eval-test/test1.sc", initial, expected)
+    runTest("eval-test/test1.sc", initial, expected)
   }
 
-  @Ignore
   @Test
   def multiline_output() {
     val initial = """
@@ -67,10 +79,9 @@ object Main {
 }
 """
 
-   // runEvalTest("eval-test/test2.sc", initial, expected)
+    runTest("eval-test/test2.sc", initial, expected)
   }
 
-  @Ignore
   @Test
   def escapes_in_input() {
     val initial = """
@@ -92,46 +103,103 @@ object Main {
 }
 """
 
-   // runEvalTest("eval-test/test3.sc", initial, expected)
+    runTest("eval-test/test3.sc", initial, expected)
   }
 
-  private var project: ScalaProject = _
+  @Test
+  def longOutput_is_cut() {
+    val initial = """
+object testeval {
+  var x = 0
 
-  @Before
-  def createProject() {
-    val Seq(prj) = createProjects("eval-test")
-    project = prj
+  while (x < 100) {
+    x += 1
+    println(x)
+  }
+}
+"""
 
-    project.sourceOutputFolders.map {
-      case (_, outp: IFolder) => outp.create(true, true, null)
+    val expected = """
+object testeval {
+  var x = 0                                       //> x : Int = 0
+
+  while (x < 100) {
+    x += 1
+    println(x)
+  }                                               //> 1
+                                                  //| 2
+                                                  //| 3
+                                                  //| 4
+                                                  //| 5
+                                                  //| 6
+                                                  //| 7
+                                                  //| 8
+                                                  //| Output exceeds cutoff limit. 
+}"""
+
+    withCutOffValue(50) { runTest("eval-test/test4.sc", initial, expected) }
+  }
+
+  @Test
+  def inifiteLoop_is_cut() {
+    val initial = """
+object testeval {
+  var x = 0
+
+  while (true) {
+    x += 1
+    println(x)
+  }
+}
+"""
+
+    val expected = """
+object testeval {
+  var x = 0                                       //> x : Int = 0
+
+  while (true) {
+    x += 1
+    println(x)
+  }                                               //> 1
+                                                  //| 2
+                                                  //| 3
+                                                  //| 4
+                                                  //| 5
+                                                  //| 6
+                                                  //| 7
+                                                  //| 8
+                                                  //| Output exceeds cutoff limit. 
+}"""
+    import EvalTester._
+    withCutOffValue(50) {
+      val res = runEvalSync("eval-test/test5.sc", initial, 5000)
+      val lastChar = res.init.trim.last // last character is }, we go one before that
+      Assert.assertTrue("Last character is spinner: " + lastChar, Set('/', '|', '-', '\\').contains(lastChar))
+      Assert.assertEquals("correct output", expected.init.trim, res.init.trim.init.trim) // we cut the last character
     }
   }
 
-  @After
-  def deleteProject() {
-    deleteProjects(project)
+  /** Temporarily set the cut off value to `v`. */
+  private def withCutOffValue(v: Int)(block: => Unit) {
+    val prefs = WorksheetPlugin.plugin.getPreferenceStore()
+    val oldCutoff = prefs.getInt(WorksheetPreferences.P_CUTOFF_VALUE)
+    prefs.setValue(WorksheetPreferences.P_CUTOFF_VALUE, v)
+    try {
+      block
+    } finally prefs.setValue(WorksheetPreferences.P_CUTOFF_VALUE, oldCutoff)
   }
 
-//  def runEvalTest(filename: String, contents: String, expected: String) {
-//    val bytes = new ByteArrayInputStream(contents.getBytes)
-//
-//    val iFile = workspace.getRoot.getFile(new Path(filename))
-//    iFile.create(bytes, IResource.NONE, null)
-//
-//    val mockedDoc = mock(classOf[IDocument])
-//    when(mockedDoc.get).thenReturn(contents)
-//
-//    val eval = new EvalScript
-//    val scriptUnit = ScriptCompilationUnit(iFile)
-//    val res = eval.evalDocument(scriptUnit, mockedDoc)
-//
-//    Assert.assertTrue("Should succeed: " + res, res.isRight)
-//
-//    val mixer = new Mixer
-//    val stripped = SourceInserter.stripRight(contents.toCharArray())
-//    val Right(result) = res
-//    val mixed = mixer.mix(stripped, result.toCharArray)
-//
-//    Assert.assertEquals("correct output", expected.trim, mixed.mkString.trim)
-//  }
+  /** Run the eval test using the initial contents and check against the given expected output.
+   * 
+   *  The `filename` must not exist, and it must be an absolute path, starting at the workspace root.
+   *  The test blocks for at most `timeout` millis, but will finish as soon as the evaluator signals
+   *  termination by calling 'endUpdate' on the `DocumentHolder` interface.
+   */
+  def runTest(filename: String, contents: String, expected: String, timeout: Int = 30000) {
+    import EvalTester._
+
+    val res = runEvalSync(filename, contents, timeout)
+
+    Assert.assertEquals("correct output", expected.trim, res.trim)
+  }
 }
