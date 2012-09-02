@@ -32,7 +32,7 @@ class NewWorksheetWizard extends Wizard with INewWizard with HasLogger {
           val editor = IDE.openEditor(page, file, true)
           editor.asInstanceOfOpt[ScriptEditor] foreach (_.runEvaluation)
         } catch {
-          case e: PartInitException => eclipseLog.error("Failed to initialize editor for file "+ file.getName())
+          case e: PartInitException => eclipseLog.error("Failed to initialize editor for file "+ file.getName(), e)
         }
       }
       true

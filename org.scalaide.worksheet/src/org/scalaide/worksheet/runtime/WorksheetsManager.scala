@@ -8,6 +8,7 @@ import scala.actors.Exit
 import scala.tools.eclipse.logging.HasLogger
 import scala.actors.AbstractActor
 import org.eclipse.core.runtime.IPath
+import scala.actors.UncaughtException
 
 object WorksheetsManager {
   lazy val Instance: Actor = {
@@ -31,6 +32,10 @@ private class WorksheetsManager private extends DaemonActor with HasLogger {
 
       case msg: StopRun =>
         forwardIfEvaluatorExists(msg)
+
+      case Exit(actor, UncaughtException(internalActor, msg, sender, thread, reason)) =>
+        eclipseLog.error("Evaluator actor crashed ", reason)
+        evictEvaluator(actor)
 
       case Exit(actor, reason) =>
         eclipseLog.error("Evaluator actor crashed " + reason)
