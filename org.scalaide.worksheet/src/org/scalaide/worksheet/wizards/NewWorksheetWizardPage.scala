@@ -25,6 +25,9 @@ class NewWorksheetWizardPage(selection: IStructuredSelection) extends WizardNewF
     // do nothing, we don't have this section
   }
 
+  override def getNewFileLabel(): String =
+    "Worksheet name"
+
   override def getInitialContents(): InputStream = {
     new ByteArrayInputStream(
       """object %s {
