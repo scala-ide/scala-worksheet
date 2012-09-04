@@ -94,7 +94,6 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
    *  report the error only against the line number, with a length of one.
    */
   def reportBuildError(errorMsg: String, position: Position): Unit = {
-    val marker = workspaceFile.createMarker(ScalaPlugin.plugin.problemMarkerId)
     BuildProblemMarker.create(workspaceFile, IMarker.SEVERITY_ERROR, errorMsg, worksheetPosition(position))
   }
 
