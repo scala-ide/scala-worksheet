@@ -1,7 +1,6 @@
 package org.scalaide.worksheet.properties
 
 import scala.tools.eclipse.lexical.ScalaDocumentPartitioner
-
 import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.resource.JFaceResources
@@ -17,6 +16,7 @@ import org.eclipse.ui.editors.text.EditorsUI
 import org.eclipse.ui.texteditor.ChainedPreferenceStore
 import org.scalaide.worksheet.editor.ScalaPartitioning
 import org.scalaide.worksheet.editor.ScriptConfiguration
+import org.eclipse.jface.text.ITextHover
 
 object PreviewerFactory {
 
@@ -29,6 +29,7 @@ object PreviewerFactory {
 
     val configuration = new ScriptConfiguration(preferenceStore, null) {
       override def getHyperlinkDetectors(sv: ISourceViewer) = Array()
+      override def getTextHover(viewer: ISourceViewer, contentType: String): ITextHover = null
     } // anonymous class added to solve problem with getHyperlinkDetectors
     previewViewer.configure(configuration)
 
