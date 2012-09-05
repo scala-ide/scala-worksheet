@@ -24,7 +24,7 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
   def getContextInformationValidator = null
 
   def computeCompletionProposals(viewer: ITextViewer, offset: Int): Array[ICompletionProposal] = {
-    EditorUtils.getEditorScalaInput(textEditor) match {
+    EditorUtils.getEditorCompilationUnit(textEditor) match {
       case Some(scu: ScriptCompilationUnit) =>
         // TODO: Not sure if this is the best way. Maybe compilation units should always be connected to something..
         scu.connect(viewer.getDocument)

@@ -19,6 +19,8 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
 import org.eclipse.swt.SWT
+import scala.tools.eclipse.InteractiveCompilationUnit
+import scala.tools.eclipse.ui.InteractiveCompilationUnitEditor
 
 object ScriptEditor {
 
@@ -32,7 +34,7 @@ object ScriptEditor {
 }
 
 /** A Scala script editor.*/
-class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with HasLogger {
+class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with InteractiveCompilationUnitEditor with HasLogger {
   private def prefStore = WorksheetPlugin.prefStore
 
   private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
@@ -225,4 +227,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = {
     ScriptCompilationUnit.fromEditor(ScriptEditor.this) foreach f
   }
+  
+  override def getInteractiveCompilationUnit(): Option[InteractiveCompilationUnit] = ScriptCompilationUnit.fromEditor(this)
+    
 }
