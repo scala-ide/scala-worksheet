@@ -51,9 +51,9 @@ object Main {
 
     val expected = """
 object Main {
-  val xs = List(1, 2, 3)                          //> xs : List[Int] = List(1, 2, 3)
+  val xs = List(1, 2, 3)                          //> xs  : List[Int] = List(1, 2, 3)
   xs.max                                          //> res0: Int = 3
-  val ys = Seq(1, 2, 3, 3,4 )                     //> ys : Seq[Int] = List(1, 2, 3, 3, 4)
+  val ys = Seq(1, 2, 3, 3,4 )                     //> ys  : Seq[Int] = List(1, 2, 3, 3, 4)
 }
 """
     runTest("eval-test/test1.sc", initial, expected)
@@ -71,7 +71,7 @@ object Main {
 
     val expected = """
 object Main {
-  val xs = List(1, 2, 3)                          //> xs : List[Int] = List(1, 2, 3)
+  val xs = List(1, 2, 3)                          //> xs  : List[Int] = List(1, 2, 3)
 
   xs foreach println                              //> 1
                                                   //| 2
@@ -94,7 +94,7 @@ object Main {
 
     val expected = """
 object Main {
-  val xs = List(1, 2, 3)                          //> xs : List[Int] = List(1, 2, 3)
+  val xs = List(1, 2, 3)                          //> xs  : List[Int] = List(1, 2, 3)
 
   println("\none\ntwo\nthree")                    //> 
                                                   //| one
@@ -121,7 +121,7 @@ object testeval {
 
     val expected = """
 object testeval {
-  var x = 0                                       //> x : Int = 0
+  var x = 0                                       //> x  : Int = 0
 
   while (x < 100) {
     x += 1
@@ -133,7 +133,6 @@ object testeval {
                                                   //| 5
                                                   //| 6
                                                   //| 7
-                                                  //| 8
                                                   //| Output exceeds cutoff limit. 
 }"""
 
@@ -155,7 +154,7 @@ object testeval {
 
     val expected = """
 object testeval {
-  var x = 0                                       //> x : Int = 0
+  var x = 0                                       //> x  : Int = 0
 
   while (true) {
     x += 1
@@ -167,8 +166,7 @@ object testeval {
                                                   //| 5
                                                   //| 6
                                                   //| 7
-                                                  //| 8
-                                                  //| Output exceeds cutoff limit. 
+                                                  //| Output exceeds cutoff limit.
 }"""
     import EvalTester._
     withCutOffValue(50) {
@@ -179,6 +177,55 @@ object testeval {
     }
   }
 
+  @Test
+  def parens_eval() {
+    val initial = """
+object Main {
+  (1 + 2)
+}
+      
+"""
+
+    val expected = """
+object Main {
+  (1 + 2)                                         //> res0: Int(3) = 3
+}
+"""
+    runTest("eval-test/parens.sc", initial, expected)
+  }
+
+  @Test
+  def for_yield_eval() {
+    val initial = """
+object Main {
+  for (x <- 1 to 3) yield x*x
+}
+      
+"""
+    val expected = """
+object Main {
+  for (x <- 1 to 3) yield x*x                     //> res0: scala.collection.immutable.IndexedSeq[Int] = Vector(1, 4, 9)
+}
+"""
+    runTest("eval-test/foryield.sc", initial, expected)
+  }
+
+  @Test
+  def symbolic_names() {
+    val initial = """
+object Main {
+  val ?? = 10
+}
+      
+"""
+    val expected = """
+object Main {
+  val ?? = 10                                     //> ??  : Int = 10
+}
+"""
+    runTest("eval-test/symbolic.sc", initial, expected)
+  }
+  
   /** Temporarily set the cut off value to `v`. */
   private def withCutOffValue(v: Int)(block: => Unit) {
     val prefs = WorksheetPlugin.plugin.getPreferenceStore()
@@ -190,7 +237,7 @@ object testeval {
   }
 
   /** Run the eval test using the initial contents and check against the given expected output.
-   * 
+   *
    *  The `filename` must not exist, and it must be an absolute path, starting at the workspace root.
    *  The test blocks for at most `timeout` millis, but will finish as soon as the evaluator signals
    *  termination by calling 'endUpdate' on the `DocumentHolder` interface.
