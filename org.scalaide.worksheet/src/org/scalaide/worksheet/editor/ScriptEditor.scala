@@ -151,6 +151,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private val editorProxy = new DefaultEditorProxy
 
   override def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
+    super.handlePreferenceStoreChanged(event)
     sourceViewConfiguration.handlePropertyChangeEvent(event)
     getSourceViewer().invalidateTextPresentation()
   }
