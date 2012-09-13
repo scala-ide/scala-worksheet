@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.scalaide</groupId>
     <artifactId>org.scalaide.worksheet.build</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>org.scalaide.worksheet.source.feature</artifactId>
   <packaging>eclipse-feature</packaging>
