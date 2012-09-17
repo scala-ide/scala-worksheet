@@ -16,7 +16,10 @@ class ScriptDocumentProvider extends FileDocumentProvider {
 
     doc match {
       case docExt: IDocumentExtension3 =>
-        val partitioner = new ScalaDocumentPartitioner
+        // TODO: maybe it's not necessary to be conservative. This makes the partitioner
+        // always return 'true' when asked about changed partitioning. Fixes #82, that
+        // lost colorization when entering a new line between an expression and its result
+        val partitioner = new ScalaDocumentPartitioner(conservative=true)
         docExt.setDocumentPartitioner(ScalaPartitioning.SCALA_PARTITIONING, partitioner)
         partitioner.connect(doc)
     }
