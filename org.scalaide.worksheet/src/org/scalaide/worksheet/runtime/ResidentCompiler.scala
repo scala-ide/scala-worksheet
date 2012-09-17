@@ -15,13 +15,12 @@ object ResidentCompiler extends HasLogger {
     val scalaClassPath = scalaProject.scalaClasspath
     val bootClasspathArgs: String = scalaClassPath.scalaLib.get.toFile.getAbsolutePath
     val jrePath = scalaClassPath.jdkPaths.map(_.toFile)
-    val additionalCpEntries = scalaProject.outputFolderLocations :+ ScalaPlugin.plugin.compilerClasses.get
 
     // FIXME: We are currently ignoring the project's settings, which is bad. (What if the user wants to enable 
     //        continuations in the worksheet!)
     val args = List("-bootclasspath", bootClasspathArgs,
       "-javabootclasspath", jrePath.map(_.getAbsolutePath).mkString(File.pathSeparator),
-      "-classpath", additionalCpEntries.map(_.toFile.getAbsolutePath).mkString(File.pathSeparator),
+      "-classpath", scalaClassPath.userCp.map(_.toFile.getAbsolutePath).mkString(File.pathSeparator),
       "-d", worksheetConfig.binFolder.getAbsolutePath())
 
     logger.debug("Compilation arguments: " + args)
