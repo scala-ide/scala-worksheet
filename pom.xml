@@ -61,7 +61,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <repo.scala-ide>${repo.scala-ide.root}/incoming-release-29/jenkins/site</repo.scala-ide>
+        <repo.scala-ide>${repo.scala-ide.root}/releases-29/milestone/site</repo.scala-ide>
       </properties>
     </profile>
     <profile>
