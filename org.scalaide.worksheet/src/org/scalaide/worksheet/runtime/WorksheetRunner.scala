@@ -60,6 +60,7 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
                 case CompilationFailed(errors) =>
                   logger.debug("compilation errors in " + (unit.file.name))
                   reportBuildErrors(unit, errors)
+                  editor.endUpdate()
 
                 case CompilationSuccess =>
                   executor ! ProgramExecutor.RunProgram(unit, decl.fullName, classpath, editor)
