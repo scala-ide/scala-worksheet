@@ -7,7 +7,7 @@
   </prerequisites>
   <groupId>org.scalaide</groupId>
   <artifactId>org.scalaide.worksheet.build</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
   <name>Scala Worksheet</name>
   <packaging>pom</packaging>
 

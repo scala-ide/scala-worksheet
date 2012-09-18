@@ -2,7 +2,7 @@
 <feature
   id="org.scalaide.worksheet.source.feature"
   label="Scala Worksheet sources"
-  version="0.1.1.qualifier"
+  version="0.1.2.qualifier"
   provider-name="Scala IDE">
 
   <description url="http://github.com/scala-ide/scala-worksheet/wiki/Getting-Started">

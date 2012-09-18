@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.scalaide</groupId>
     <artifactId>org.scalaide.worksheet.build</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.2-SNAPSHOT</version>
   </parent>
   <artifactId>org.scalaide.worksheet.update-site</artifactId>
   <packaging>eclipse-update-site</packaging>
