@@ -21,6 +21,12 @@ import org.scalaide.worksheet.editor.action.RunEvaluationAction
 import org.eclipse.swt.SWT
 import scala.tools.eclipse.InteractiveCompilationUnit
 import scala.tools.eclipse.ui.InteractiveCompilationUnitEditor
+import org.eclipse.jdt.core.compiler.IProblem
+import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
+import org.eclipse.jface.text.Position
+import scala.collection.JavaConverters
+import org.eclipse.jface.text.source.IAnnotationModelExtension
+import scala.tools.eclipse.util.SWTUtils
 
 object ScriptEditor {
 
@@ -184,8 +190,10 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "format")
   }
 
+  type IAnnotationModelExtended = IAnnotationModel with IAnnotationModelExtension with IAnnotationModelExtension2
+
   /** Return the annotation model associated with the current document. */
-  private def annotationModel: IAnnotationModel with IAnnotationModelExtension2 = getDocumentProvider.getAnnotationModel(getEditorInput).asInstanceOf[IAnnotationModel with IAnnotationModelExtension2]
+  private def annotationModel: IAnnotationModelExtended = getDocumentProvider.getAnnotationModel(getEditorInput).asInstanceOf[IAnnotationModelExtended]
 
   def selectionChanged(selection: ITextSelection) {
     import scala.collection.JavaConverters.asScalaIteratorConverter
@@ -194,7 +202,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     setStatusLineErrorMessage(msg)
   }
 
-  def getViewer: ISourceViewer = getSourceViewer
+  def getViewer: ISourceViewer = getSourceViewer()
 
   override protected def editorSaved(): Unit = {
     super.editorSaved()
@@ -227,7 +235,30 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = {
     ScriptCompilationUnit.fromEditor(ScriptEditor.this) foreach f
   }
-  
+
   override def getInteractiveCompilationUnit(): Option[InteractiveCompilationUnit] = ScriptCompilationUnit.fromEditor(this)
-    
+
+  @volatile
+  private var previousAnnotations = List[ProblemAnnotation]()
+
+  def updateErrorAnnotations(errors: List[IProblem]) {
+    def position(p: IProblem) = new Position(p.getSourceStart, p.getSourceEnd - p.getSourceStart + 1)
+
+    val newAnnotations = for (e <- errors if !isPureExpressionWarning(e)) yield {
+      val annotation = new ProblemAnnotation(e, null) // no compilation unit
+      (annotation, position(e))
+    }
+
+    val newMap = newAnnotations.toMap
+    import JavaConverters._
+    annotationModel.replaceAnnotations(previousAnnotations.toArray, newMap.asJava)
+    previousAnnotations = newAnnotations.map(_._1)
+
+    // This shouldn't be necessary in @dragos' opinion. But see #84 and 
+    // http://stackoverflow.com/questions/12507620/race-conditions-in-annotationmodel-error-annotations-lost-in-reconciler
+    SWTUtils.asyncExec { getSourceViewer.invalidateTextPresentation() }
+  }
+
+  private def isPureExpressionWarning(e: IProblem): Boolean =
+    e.getMessage == "a pure expression does nothing in statement position; you may be omitting necessary parentheses"
 }
