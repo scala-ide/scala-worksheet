@@ -6,6 +6,7 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.text.SourceInserter
 import scala.tools.eclipse.BuildSuccessListener
+import scala.tools.eclipse.util.SWTUtils
 
 object WorksheetRunner {
 
@@ -59,8 +60,12 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
               compiler.compile(source) match {
                 case CompilationFailed(errors) =>
                   logger.debug("compilation errors in " + (unit.file.name))
-                  reportBuildErrors(unit, errors)
                   editor.endUpdate()
+                  // Fix the race condition in error markers by updating them
+                  // on the UI thread. Otherwise, the 'replaceWith' call before
+                  // might remove all markers, considering their positions 'deleted' 
+                  // by the replace action
+                  SWTUtils.asyncExec { reportBuildErrors(unit, errors) }
 
                 case CompilationSuccess =>
                   executor ! ProgramExecutor.RunProgram(unit, decl.fullName, classpath, editor)
