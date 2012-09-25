@@ -42,7 +42,7 @@ import scalariform.ScalaVersions
 import scala.tools.eclipse.ScalaHover
 import org.scalaide.worksheet.ScriptCompilationUnit
 
-class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ITextEditor) extends SourceViewerConfiguration {
+class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration {
   @inline private def scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
   
   private val javaColorManager = JavaPlugin.getDefault.getJavaTextTools.getColorManager
