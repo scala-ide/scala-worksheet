@@ -120,7 +120,6 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
 
           // connect the out and error streams to the buffer used by the mixer
           val writer = new StringWriter()
-          connectListener(process.getStreamsProxy().getErrorStreamMonitor(), writer)
           connectListener(process.getStreamsProxy().getOutputStreamMonitor(), writer)
 
           val maxOutput = WorksheetPlugin.plugin.getPreferenceStore().getInt(WorksheetPreferences.P_CUTOFF_VALUE)
