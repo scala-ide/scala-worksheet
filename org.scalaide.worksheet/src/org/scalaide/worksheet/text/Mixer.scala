@@ -1,13 +1,13 @@
 package org.scalaide.worksheet.text
 
 import java.io.{ FileInputStream, InputStreamReader, IOException }
-
 import scala.runtime.ScalaRunTime.stringOf
 import java.lang.reflect.InvocationTargetException
-//import scala.reflect.runtime.ReflectionUtils._
 import collection.mutable.ArrayBuffer
+import scala.collection.mutable.ListBuffer
+import scala.tools.eclipse.logging.HasLogger
 
-class Mixer {
+class Mixer extends HasLogger {
 
   protected val stdSeparator = "//> "
   protected val ctdSeparator = "//| "
@@ -16,18 +16,23 @@ class Mixer {
 
   type Comments = Seq[(Int, Array[Char])]
 
-  def parseComments(comments: Array[Char]): Iterator[(Int, Array[Char])] = new Iterator[(Int, Array[Char])] {
+  def parseComments(comments: Array[Char]): Seq[(Int, Array[Char])] = {
     var idx = 0
-    def hasNext = idx < comments.length
-    def next() = {
+    val buf = new ListBuffer[(Int, Array[Char])]
+    while (idx < comments.length) {
       val nextSpace = comments indexOf (' ', idx)
       var nextNL = comments indexOf ('\n', nextSpace + 1)
       if (nextNL < 0) nextNL = comments.length
-      val result =
-        (new String(comments.slice(idx, nextSpace)).toInt, comments.slice(nextSpace + 1, nextNL))
-      idx = nextNL + 1
-      result
+      try {
+        try {
+          buf += ((new String(comments.slice(idx, nextSpace)).toInt, comments.slice(nextSpace + 1, nextNL)))
+        } finally idx = nextNL + 1
+      } catch {
+        case nfe: NumberFormatException =>
+          logger.debug("NFE: " + nfe.getMessage(), nfe)
+      }
     }
+    buf.toSeq
   }
 
   /** Combine source characters with righ-hand side comments.
