@@ -9,4 +9,42 @@
   </parent>
   <artifactId>org.scalaide.worksheet</artifactId>
   <packaging>eclipse-plugin</packaging>
+  
+  <dependencies>
+    <dependency>
+        <groupId>org.scalaide</groupId>
+        <artifactId>org.scalaide.worksheet.runtime.library</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>copy</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.scalaide</groupId>
+                    <artifactId>org.scalaide.worksheet.runtime.library</artifactId>
+                    <type>jar</type>
+                    <destFileName>worksheet-runtime-library.jar</destFileName>
+                  </artifactItem>
+                </artifactItems>
+                <stripVersion>true</stripVersion>
+                <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
 </project>

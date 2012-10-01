@@ -2,6 +2,7 @@ package org.scalaide.worksheet.runtime
 
 import java.io.File
 
+import scala.tools.nsc.interactive.ProgramInstrumenter
 import scala.tools.eclipse.logging.HasLogger
 
 import org.scalaide.worksheet.ScriptCompilationUnit
@@ -25,9 +26,9 @@ class SourceInstrumenter(config: Configuration) extends HasLogger {
 
   private def instrumentProgram(unit: ScriptCompilationUnit): Either[Throwable, InstrumentationResult] = {
     unit.scalaProject.withPresentationCompiler { compiler =>
+      val instrumenter = new ProgramInstrumenter(compiler)
       val source = unit.batchSourceFile(SourceInserter.stripRight(unit.getContents))
-      compiler.withResponse[Unit] { compiler.askReload(List(source), _) } // just make sure it's loaded
-      compiler.withResponse[(String, Array[Char])] { compiler.askInstrumented(source, -1, _) }.get
+      compiler.withResponse[(String, Array[Char])] { instrumenter.askInstrumented(source, -1, _) }.get
     }() match {
       case Left((fullName, program)) =>
         if (fullName.isEmpty) Left(MissingTopLevelObjectDeclaration(unit))
