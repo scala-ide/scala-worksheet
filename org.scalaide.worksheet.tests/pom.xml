@@ -44,10 +44,9 @@
 								<artifactItem>
 									<groupId>org.mockito</groupId>
 									<artifactId>mockito-all</artifactId>
-									<outputDirectory>${project.build.directory}/lib
-									</outputDirectory>
 								</artifactItem>
 							</artifactItems>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
