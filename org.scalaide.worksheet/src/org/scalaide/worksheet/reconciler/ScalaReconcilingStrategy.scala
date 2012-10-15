@@ -15,7 +15,7 @@ import scala.tools.eclipse.util.SWTUtils
 
 class ScalaReconcilingStrategy(textEditor: ScriptEditor) extends IReconcilingStrategy with HasLogger {
   private var document: IDocument = _
-  private lazy val scriptUnit = ScriptCompilationUnit.fromEditor(textEditor).get // we know the editor is a Scala Script editor
+  private lazy val scriptUnit = ScriptCompilationUnit.fromEditor(textEditor)
 
   override def setDocument(doc: IDocument) {
     document = doc
