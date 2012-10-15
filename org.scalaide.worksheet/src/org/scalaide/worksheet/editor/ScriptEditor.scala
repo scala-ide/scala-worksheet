@@ -231,11 +231,9 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     WorksheetsManager.Instance ! ProgramExecutor.StopRun(_)
   }
 
-  private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = {
-    ScriptCompilationUnit.fromEditor(ScriptEditor.this) foreach f
-  }
+  private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = f(ScriptCompilationUnit.fromEditor(this))
 
-  override def getInteractiveCompilationUnit(): Option[InteractiveCompilationUnit] = ScriptCompilationUnit.fromEditor(this)
+  override def getInteractiveCompilationUnit(): InteractiveCompilationUnit = ScriptCompilationUnit.fromEditor(this)
 
   @volatile
   private var previousAnnotations = List[ProblemAnnotation]()

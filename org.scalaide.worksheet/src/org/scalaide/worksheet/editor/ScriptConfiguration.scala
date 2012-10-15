@@ -100,7 +100,7 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
   }
 
   override def getTextHover(viewer: ISourceViewer, contentType: String): ITextHover = {
-    new ScalaHover(ScriptCompilationUnit.fromEditor(textEditor).get)
+    new ScalaHover(ScriptCompilationUnit.fromEditor(textEditor))
   }
 
   override def getTabWidth(viewer: ISourceViewer): Int = ScriptEditor.TAB_WIDTH

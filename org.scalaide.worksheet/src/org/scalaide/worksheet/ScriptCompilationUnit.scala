@@ -112,20 +112,21 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
 }
 
 object ScriptCompilationUnit {
-  def fromEditorInput(editorInput: IEditorInput): Option[ScriptCompilationUnit] = {
-    getFile(editorInput).map(ScriptCompilationUnit.apply)
+  def fromEditor(scriptEditor: ScriptEditor): ScriptCompilationUnit = {
+    val input = scriptEditor.getEditorInput
+    if(input == null) throw new NullPointerException("No edito input for editor " + scriptEditor + ". Hint: Maybe the editor isn't yet fully initialized?")
+    else {
+      val unit = fromEditorInput(input)
+      unit.connect(scriptEditor.getDocumentProvider().getDocument(input))
+    }
   }
 
-  def fromEditor(textEditor: ITextEditor): Option[ScriptCompilationUnit] = {
-    val input = textEditor.getEditorInput
-    for (unit <- fromEditorInput(input))
-      yield unit.connect(textEditor.getDocumentProvider().getDocument(input))
-  }
-
-  private def getFile(editorInput: IEditorInput): Option[IFile] =
+  private def fromEditorInput(editorInput: IEditorInput): ScriptCompilationUnit = ScriptCompilationUnit(getFile(editorInput))
+  
+  private def getFile(editorInput: IEditorInput): IFile =
     editorInput match {
       case fileEditorInput: FileEditorInput if fileEditorInput.getName.endsWith(ScriptEditor.SCRIPT_EXTENSION) =>
-        Some(fileEditorInput.getFile)
-      case _ => None
+        fileEditorInput.getFile
+      case _ => null
     }
 }
