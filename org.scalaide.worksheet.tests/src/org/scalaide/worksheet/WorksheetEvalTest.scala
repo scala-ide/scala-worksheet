@@ -133,7 +133,10 @@ object testeval {
                                                   //| 5
                                                   //| 6
                                                   //| 7
-                                                  //| Output exceeds cutoff limit. 
+                                                  //| 8
+                                                  //| 9
+                                                  //| 10
+                                                  //| Output exceeds cutoff limit.
 }"""
 
     withCutOffValue(50) { runTest("eval-test/test4.sc", initial, expected) }
@@ -166,6 +169,9 @@ object testeval {
                                                   //| 5
                                                   //| 6
                                                   //| 7
+                                                  //| 8
+                                                  //| 9
+                                                  //| 10
                                                   //| Output exceeds cutoff limit.
 }"""
     import EvalTester._
@@ -224,6 +230,28 @@ object Main {
 }
 """
     runTest("eval-test/symbolic.sc", initial, expected)
+  }
+  
+  @Test
+  def cutOff_is_perEvaluation_t97() {
+    val initial = """
+object  myws { 
+   val even = for(i <- 1 until 1000) yield 2*i
+   val odd  = for(i <- 1 until 1000) yield (2*i+1)
+}
+"""
+
+    val expected = """
+object  myws {
+   val even = for(i <- 1 until 1000) yield 2*i    //> even  : scala.collection.immutable.IndexedSeq[Int] = Vector(2, 4, 6, 8, 10, 1
+                                                  //| 2, 14, 16, 18, 2
+                                                  //| Output exceeds cutoff limit.
+   val odd  = for(i <- 1 until 1000) yield (2*i+1)//> odd  : scala.collection.immutable.IndexedSeq[Int] = Vector(3, 5, 7, 9, 11, 1
+                                                  //| 3, 15, 17, 19, 
+                                                  //| Output exceeds cutoff limit.
+}"""
+
+    withCutOffValue(100) { runTest("eval-test/test97.sc", initial, expected) }
   }
   
   /** Temporarily set the cut off value to `v`. */
