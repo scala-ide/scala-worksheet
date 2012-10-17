@@ -2,19 +2,37 @@ package org.scalaide.worksheet
 
 import org.eclipse.ui.plugin.AbstractUIPlugin
 import org.osgi.framework.BundleContext
+import scala.tools.eclipse.util.OSGiUtils
+import org.eclipse.core.runtime.Platform
+import org.osgi.framework.Bundle
+import scala.tools.eclipse.util.Utils
+import org.eclipse.core.runtime.IPath
+import scala.tools.eclipse.logging.HasLogger
+import org.eclipse.core.runtime.Path
 
-object WorksheetPlugin {
+object WorksheetPlugin extends HasLogger {
   @volatile var plugin: WorksheetPlugin = _
-  private val PLUGIN_ID = "Worksheet Plugin"
+  private final val PluginId = "org.scalaide.worksheet"
+  
+  private final val worksheetBundle: Bundle = Platform.getBundle(WorksheetPlugin.PluginId)
+  final val worksheetLibrary: Option[IPath] = {
+    val path2lib = OSGiUtils.pathInBundle(worksheetBundle, "target/lib/worksheet-runtime-library.jar")
+    if(path2lib.isEmpty)
+      eclipseLog.error("The Scala Worksheet cannot be started correctly because worksheet runtime library is missing. Please report the issue.")
+
+    path2lib
+  }
+
 
   def prefStore = plugin.getPreferenceStore
 
   def getImageDescriptor(path: String) = {
-    AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+    AbstractUIPlugin.imageDescriptorFromPlugin(PluginId, path);
   }
 }
 
 class WorksheetPlugin extends AbstractUIPlugin {
+
   override def start(context: BundleContext) = {
     super.start(context)
     WorksheetPlugin.plugin = this

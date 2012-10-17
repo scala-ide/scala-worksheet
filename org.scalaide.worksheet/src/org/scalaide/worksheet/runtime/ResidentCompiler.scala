@@ -1,7 +1,6 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-
 import scala.tools.eclipse.ScalaPlugin
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.logging.HasLogger
@@ -9,6 +8,7 @@ import scala.tools.nsc.CompilerCommand
 import scala.tools.nsc.Settings
 import scala.tools.nsc.reporters.StoreReporter
 import scala.tools.nsc.util.Position
+import org.scalaide.worksheet.WorksheetPlugin
 
 object ResidentCompiler extends HasLogger {
   def apply(scalaProject: ScalaProject, worksheetConfig: Configuration): ResidentCompiler = {
@@ -20,7 +20,7 @@ object ResidentCompiler extends HasLogger {
     //        continuations in the worksheet!)
     val args = List("-bootclasspath", bootClasspathArgs,
       "-javabootclasspath", jrePath.map(_.getAbsolutePath).mkString(File.pathSeparator),
-      "-classpath", scalaClassPath.userCp.map(_.toFile.getAbsolutePath).mkString(File.pathSeparator),
+      "-classpath", (WorksheetPlugin.worksheetLibrary.map(_.toOSString()).toSeq ++ scalaClassPath.userCp.map(_.toFile.getAbsolutePath)).mkString(File.pathSeparator),
       "-d", worksheetConfig.binFolder.getAbsolutePath())
 
     logger.debug("Compilation arguments: " + args)
