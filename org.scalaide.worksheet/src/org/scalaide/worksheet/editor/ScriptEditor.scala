@@ -198,8 +198,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   def selectionChanged(selection: ITextSelection) {
     import scala.collection.JavaConverters.asScalaIteratorConverter
     val iterator = annotationModel.getAnnotationIterator(selection.getOffset, selection.getLength, true, true).asInstanceOf[java.util.Iterator[Annotation]]
-    val msg = iterator.asScala.find(a => ScriptEditor.annotationsShownInHover(a.getType)).map(_.getText).getOrElse(null)
-    setStatusLineErrorMessage(msg)
+    iterator.asScala.find(a => ScriptEditor.annotationsShownInHover(a.getType)).map(_.getText).foreach(setStatusLineErrorMessage)
   }
 
   def getViewer: ISourceViewer = getSourceViewer()
