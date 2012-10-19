@@ -1,19 +1,17 @@
-package org.scalaide.worksheet
+package org.scalaide.worksheet.runtime
 
 import scala.tools.eclipse.ScalaProject
 import scala.tools.eclipse.testsetup.SDTTestUtils.createProjects
 import scala.tools.eclipse.testsetup.SDTTestUtils.deleteProjects
+
 import org.eclipse.core.resources.IFolder
-import org.junit.After
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
-import scala.tools.eclipse.testsetup.SDTTestUtils
-import org.junit.Assert
-import org.scalaide.worksheet.testutil.EvalTester
-import org.junit.BeforeClass
 import org.junit.AfterClass
+import org.junit.Assert
+import org.junit.BeforeClass
+import org.junit.Test
+import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.properties.WorksheetPreferences
+import org.scalaide.worksheet.testutil.EvalTester.runEvalSync
 
 object WorksheetEvalTest {
   @BeforeClass
@@ -36,7 +34,6 @@ object WorksheetEvalTest {
 }
 
 class WorksheetEvalTest {
-  import SDTTestUtils._
 
   @Test
   def simple_evaluation_succeeds() {
@@ -174,7 +171,6 @@ object testeval {
                                                   //| 10
                                                   //| Output exceeds cutoff limit.
 }"""
-    import EvalTester._
     withCutOffValue(50) {
       val res = runEvalSync("eval-test/test5.sc", initial, 5000)
       val lastChar = res.init.trim.last // last character is }, we go one before that
@@ -253,7 +249,59 @@ object  myws {
 
     withCutOffValue(100) { runTest("eval-test/test97.sc", initial, expected) }
   }
-  
+
+  @Test
+  def multipleTopLevelObjects_shouldNotCauseError_t64() {
+    val initial = """ 
+object Y {
+ val x = 3
+}
+object X {
+ val y = 9
+}
+"""
+    val expected = """
+object Y {
+ val x = 3                                        //> x  : Int = 3
+}
+object X {
+ val y = 9
+}
+"""
+    runTest("eval-test/multipleObjects.sc", initial, expected)
+  }
+
+  @Test
+  def decodeSpecialNames_t62() {
+    val initial = """
+object o {
+  val * = 3
+}
+"""
+      
+    val expected = """
+object o {
+  val * = 3                                       //> *  : Int = 3
+}
+"""
+    runTest("eval-test/decodeSpecialNames.sc", initial, expected)
+  }
+
+  @Test
+  def wrongInstrumentation_Of_ForLoops_t100() {
+    val initial = """
+object a {
+  for (x <- List(1,2,3)) yield x*x
+}
+"""
+   val expected = """
+object a {
+  for (x <- List(1,2,3)) yield x*x                //> res0: List[Int] = List(1, 4, 9)
+}
+"""
+    runTest("eval-test/wrongInstrumentationForLoops.sc", initial, expected)
+  }
+
   /** Temporarily set the cut off value to `v`. */
   private def withCutOffValue(v: Int)(block: => Unit) {
     val prefs = WorksheetPlugin.plugin.getPreferenceStore()
@@ -271,8 +319,6 @@ object  myws {
    *  termination by calling 'endUpdate' on the `DocumentHolder` interface.
    */
   def runTest(filename: String, contents: String, expected: String, timeout: Int = 30000) {
-    import EvalTester._
-
     val res = runEvalSync(filename, contents, timeout)
 
     Assert.assertEquals("correct output", expected.trim, res.trim)
