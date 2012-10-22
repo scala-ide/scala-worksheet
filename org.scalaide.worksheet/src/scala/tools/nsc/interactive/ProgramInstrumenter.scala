@@ -2,8 +2,9 @@ package scala.tools.nsc.interactive
 
 import scala.tools.nsc.util.SourceFile
 import scala.tools.eclipse.ScalaPresentationCompiler
+import scala.tools.eclipse.logging.HasLogger
 
-final class ProgramInstrumenter(compiler: ScalaPresentationCompiler) { self =>
+final class ProgramInstrumenter(compiler: ScalaPresentationCompiler) extends HasLogger { self =>
   private object Instrumenter extends ScratchPadMaker2 {
     override protected val global: Global = self.compiler
 
@@ -53,9 +54,13 @@ final class ProgramInstrumenter(compiler: ScalaPresentationCompiler) { self =>
    *  @param line         The line up to which results should be printed, -1 = whole document.
    *  @param response     The response
    */
-  def askInstrumented(source: SourceFile, line: Int, response: Response[(String, Array[Char])]): Unit = compiler.askOption {
-    () =>
-      compiler.withResponse[Unit] { compiler.askReload(List(source), _) }.get // just make sure it's loaded
-      Instrumenter.askInstrumentation(source, line, response)
+  def askInstrumented(source: SourceFile, line: Int, response: Response[(String, Array[Char])]): Unit = try {
+    compiler.withResponse[Unit] { compiler.askReload(List(source), _) }.get // just make sure it's loaded
+    compiler.askOption { () => Instrumenter.askInstrumentation(source, line, response) }
+  } finally {
+    if (!response.isComplete) {
+      logger.error("Result missing during instrumentation")
+      response.raise(new MissingResponse)
+    }
   }
 }
