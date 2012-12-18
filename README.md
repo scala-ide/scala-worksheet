@@ -9,6 +9,7 @@ There are 5 Eclipse plugins:
 
 * the plugin itself
 * the `plugin.tests` fragment
+* the plugin's runtime library (needed for producing the worksheet's output)
 * an Eclipse feature
 * an Eclipse source feature
 * an Eclipse update-site
@@ -18,14 +19,6 @@ based on Tycho, enabling command line builds.
 
 ## Note:
 
-There are several profiles for choosing what version
-of the Scala IDE and Scala compiler you want to build against:
-
-* `scala-ide-2.0-scala-2.9`
-* `scala-ide-2.0.x-scala-2.9`
-* `scala-ide-master-scala-2.9`
-* `scala-ide-master-scala-trunk`
-
-Run maven like this:
-
-    mvn -P scala-ide-master-scala-trunk clean install
+There are several profiles for choosing what version of the Scala IDE, Scala compiler and Eclipse 
+you want to build against. Read [here][https://github.com/scala-ide/scala-worksheet/wiki/Build-the-Worksheet] 
+for more details.
