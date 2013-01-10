@@ -11,7 +11,7 @@ import scala.tools.eclipse.lexical.XmlCommentScanner
 import scala.tools.eclipse.lexical.XmlPIScanner
 import scala.tools.eclipse.lexical.XmlTagScanner
 import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
-import scala.tools.eclipse.ui.AutoCloseBracketStrategy
+import scala.tools.eclipse.ui.BracketAutoEditStrategy
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.preference.IPreferenceStore
@@ -161,7 +161,7 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
 //      case IJavaPartitions.JAVA_CHARACTER | IDocument.DEFAULT_CONTENT_TYPE =>
 //        Array(new AutoCloseBracketStrategy(), new DefaultIndentLineAutoEditStrategy())
       case _ =>
-        Array(new AutoCloseBracketStrategy(), new DefaultIndentLineAutoEditStrategy(), new EvaluationResultsAutoEditStrategy())
+        Array(new BracketAutoEditStrategy(), new DefaultIndentLineAutoEditStrategy(), new EvaluationResultsAutoEditStrategy())
 //        Array(new org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy())
     }
   }
