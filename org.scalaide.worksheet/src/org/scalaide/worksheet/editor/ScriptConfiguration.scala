@@ -161,7 +161,7 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
 //      case IJavaPartitions.JAVA_CHARACTER | IDocument.DEFAULT_CONTENT_TYPE =>
 //        Array(new AutoCloseBracketStrategy(), new DefaultIndentLineAutoEditStrategy())
       case _ =>
-        Array(new BracketAutoEditStrategy(), new DefaultIndentLineAutoEditStrategy(), new EvaluationResultsAutoEditStrategy())
+        Array(new BracketAutoEditStrategy(scalaPreferenceStore), new DefaultIndentLineAutoEditStrategy(), new EvaluationResultsAutoEditStrategy())
 //        Array(new org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy())
     }
   }
