@@ -301,6 +301,23 @@ object a {
 """
     runTest("eval-test/wrongInstrumentationForLoops.sc", initial, expected)
   }
+  
+  @Test
+  def unicodeCharactersAreAllowed() {
+    val initial = """
+object Snowman {
+  def ☃ = "yes, this is a snowman"
+  println(s"${☃}")
+}
+"""
+    val expected = """
+object Snowman {
+  def ☃ = "yes, this is a snowman"                //> ☃ : => String
+  println(s"${☃}")                                //> yes, this is a snowman
+}
+"""
+    runTest("eval-test/Snowman.sc", initial, expected)
+  }
 
   /** Temporarily set the cut off value to `v`. */
   private def withCutOffValue(v: Int)(block: => Unit) {
