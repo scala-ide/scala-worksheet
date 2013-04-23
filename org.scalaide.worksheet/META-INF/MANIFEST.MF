@@ -33,7 +33,8 @@ Require-Bundle:
 Import-Package: 
  com.ibm.icu.text;apply-aspects:=false;org.eclipse.swt.graphics;apply-aspects:=false,
  scala.tools.eclipse;apply-aspects:=false,
- scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter;apply-aspects:=false
+ scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter;apply-aspects:=false,
+ scala.tools.eclipse.semantichighlighting
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Activator: org.scalaide.worksheet.WorksheetPlugin
 Bundle-ClassPath: .
