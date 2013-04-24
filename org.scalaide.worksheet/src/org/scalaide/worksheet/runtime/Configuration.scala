@@ -1,13 +1,11 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-import java.io.FileWriter
+import java.io.{FileOutputStream, OutputStreamWriter}
 
 import scala.tools.eclipse.ScalaProject
-
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.runtime.IPath
-
 import org.eclipse.core.runtime.Path
 
 private[runtime] object Configuration {
@@ -70,9 +68,10 @@ final private[runtime] class Configuration private (project: IProject) {
     val absolutePath = new Path(srcFolder.getAbsolutePath()).append(name)
     val source = createFile(absolutePath)
     assert(source.isFile())
-
-    val writer = new FileWriter(source)
-    try writer.write(content) // FIXME: what about the encoding?
+    
+    val charset = project.getDefaultCharset
+    val writer = new OutputStreamWriter(new FileOutputStream(source), charset)
+    try writer.write(content)
     finally writer.close() // FIXME: This is not really safe
 
     source
