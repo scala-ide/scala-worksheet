@@ -27,6 +27,9 @@ import org.eclipse.jface.text.Position
 import scala.collection.JavaConverters
 import org.eclipse.jface.text.source.IAnnotationModelExtension
 import scala.tools.eclipse.util.SWTUtils
+import java.nio.charset.Charset
+import java.nio.charset.UnsupportedCharsetException
+import java.nio.charset.IllegalCharsetNameException
 
 object ScriptEditor {
 
@@ -72,6 +75,16 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     private def doc: IDocument = getDocumentProvider.getDocument(getEditorInput)
 
     override def getContents: String = doc.get
+
+    override def encoding: Charset = {
+      val projectEncoding = getInteractiveCompilationUnit.scalaProject.underlying.getDefaultCharset()
+      try Charset.forName(projectEncoding)
+      catch {
+        case _: IllegalCharsetNameException | _: IllegalArgumentException | _: UnsupportedCharsetException => 
+          eclipseLog.error("Unrecognized project's encoding '%s'. Using '%s'.".format(projectEncoding, DocumentHandler.DefaultEncoding))
+          DocumentHandler.DefaultEncoding
+      }
+    }
 
     override def replaceWith(content: String, revealPos: Int): Unit = {
       // we need to turn off evaluation on save if we don't want to loop forever 

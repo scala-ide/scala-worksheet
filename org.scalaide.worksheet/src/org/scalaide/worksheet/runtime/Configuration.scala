@@ -2,11 +2,11 @@ package org.scalaide.worksheet.runtime
 
 import java.io.File
 import java.io.{FileOutputStream, OutputStreamWriter}
-
 import scala.tools.eclipse.ScalaProject
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.runtime.IPath
 import org.eclipse.core.runtime.Path
+import java.nio.charset.Charset
 
 private[runtime] object Configuration {
   private val RootFolder = new Path(".worksheet")
@@ -64,13 +64,12 @@ final private[runtime] class Configuration private (project: IProject) {
     }
   }
 
-  def touchSource(name: String, content: Array[Char] = Array[Char]()): File = {
+  def touchSource(name: String, content: Array[Char], encoding: Charset): File = {
     val absolutePath = new Path(srcFolder.getAbsolutePath()).append(name)
     val source = createFile(absolutePath)
     assert(source.isFile())
-    
-    val charset = project.getDefaultCharset
-    val writer = new OutputStreamWriter(new FileOutputStream(source), charset)
+
+    val writer = new OutputStreamWriter(new FileOutputStream(source), encoding.name)
     try writer.write(content)
     finally writer.close() // FIXME: This is not really safe
 

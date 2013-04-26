@@ -56,12 +56,12 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
           val stripped = SourceInserter.stripRight(editor.getContents.toCharArray())
           editor.replaceWith(stripped.mkString)
 
-          instrumenter.instrument(unit) match {
+          instrumenter.instrument(unit, editor.encoding) match {
             case Left(ex) => eclipseLog.error("Error during instrumentation of " + unit, ex)
             case Right((decl, source)) =>
               compiler.compile(source) match {
                 case CompilationFailed(errors) =>
-                  logger.debug("compilation errors in " + (unit.file.name))
+                  logger.debug("compilation errors in " + (unit.file.name) + ": " + errors.mkString(","))
                   editor.endUpdate()
                   // Fix the race condition in error markers by updating them
                   // on the UI thread. Otherwise, the 'replaceWith' call before
