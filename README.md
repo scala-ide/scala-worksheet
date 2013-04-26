@@ -1,5 +1,5 @@
-Scala Worksheet plugin
-===================
+Scala Worksheet plugin for Eclipse
+==================================
 
 A simple worksheet implementation for Scala IDE. It is a glorified editor, with
 the option of evaluating the script and placing the results of each expression in
@@ -19,10 +19,14 @@ based on Tycho, enabling command line builds.
 
 ## Build
 
+Simply run the ``./build.sh`` script.
+
 The worksheet build is based on
 [plugin-profiles](https://github.com/scala-ide/plugin-profiles) and
 can be built against several versions of the IDE, Eclipse and Scala
-compiler. For example:
+compiler.
+
+Launchin the ``build.sh`` script will exand to the following Maven command:
 
 ```
 mvn -Peclipse-indigo,scala-2.10.x,scala-ide-stable clean install
