@@ -18,6 +18,8 @@ import org.eclipse.debug.core.model.IProcess
 import org.eclipse.debug.core.model.IStreamMonitor
 import org.eclipse.jdt.launching.JavaRuntime
 import org.eclipse.jdt.launching.VMRunnerConfiguration
+import org.eclipse.jface.dialogs.MessageDialog
+import org.eclipse.swt.widgets.Display
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.WorksheetPlugin
@@ -60,16 +62,35 @@ object ProgramExecutor {
     }
   }
 
-  /** Listen to Process terminate event, and require clean up of the evaluation executor.
+  /**
+   *  Listen to Process terminate event. <p>
+   *  Display non-modal error dialog upon abnormal termination, and
+   *  require clean up of the evaluation executor.
    */
-  private class DebugEventListener(service: ProgramExecutor, launchRef: AtomicReference[ILaunch]) extends IDebugEventSetListener {
+  private class DebugEventListener(service: ProgramExecutor, launchRef: AtomicReference[ILaunch],
+      terminalMessage: => String) extends IDebugEventSetListener {
     // from org.eclipse.debug.core.IDebugEventSetListener
     override def handleDebugEvents(debugEvents: Array[DebugEvent]) {
       debugEvents foreach {
         _ match {
           case EclipseDebugEvent(DebugEvent.TERMINATE, element) =>
-            if (Option(element) == getFirstProcess(launchRef.get))
+            if (Option(element) == getFirstProcess(launchRef.get)) {
+              val process = getFirstProcess(launchRef.get).get
+              if (process.getExitValue()!= 0) {
+                Display.getDefault().asyncExec(new Runnable() {
+                  def run() {
+                    val stderr = process.getStreamsProxy().getErrorStreamMonitor().getContents()
+                    val shell = Display.getCurrent().getActiveShell()
+                    MessageDialog.openError(shell, "Worksheet terminated unexpectedly",
+                      s"Worksheet process has terminated unexpectedly (exit value ${process.getExitValue()})\n" +
+                      "At the time of termination, the following text was available in the output streams:\n\n" +
+                      s"Standard output:\n$terminalMessage\n" +
+                      s"Standard error: \n$stderr")
+                  }
+                })
+              }
               service ! FinishedRun
+            }
           case _ =>
         }
       }
@@ -105,12 +126,36 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
           val vmRunnerConfig = new VMRunnerConfiguration(mainClass, cp.toArray)
           vmRunnerConfig.setVMArguments(Array("-Dfile.encoding="+doc.encoding.name()))
 
+          // obtain and assign VM arguments, split by whitespace
+          // empty string arguments are eliminated, since the jvm will regard one as a main class argument.
+          val vmArgs = WorksheetPlugin.plugin.getPreferenceStore().getString(WorksheetPreferences.P_VM_ARGS)
+            .split("""\s""").filterNot(_.isEmpty)
+          vmRunnerConfig.setVMArguments(vmArgs)
+
           // a launch is need to get the created process
           val launch: ILaunch = new Launch(null, null, null)
           launchRef.set(launch)
 
-          // listener to know whan the process terminates
-          debugEventListener = new DebugEventListener(ProgramExecutor.this, launchRef)
+          // StringWriter instance for buffering consumption from stdout
+          val stdoutWriter = new StringWriter()
+
+          // assemble message upon abnormal termination of worksheet process
+          def terminalMessage = {
+            val stdoutStream = getFirstProcess(launch).get.getStreamsProxy().getOutputStreamMonitor()
+            stdoutStream.synchronized {
+              stdoutWriter.write(stdoutStream.getContents())
+              stdoutStream match {
+                case flushableStream: IFlushableStreamMonitor =>
+                  flushableStream.flushContents()
+                case _ =>
+              }
+              stdoutWriter.toString()
+            }
+          }
+
+
+          // listener to know when the process terminates
+          debugEventListener = new DebugEventListener(ProgramExecutor.this, launchRef, terminalMessage)
           DebugPlugin.getDefault().addDebugEventListener(debugEventListener)
 
           // launch the vm
@@ -120,15 +165,14 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
           val process = getFirstProcess(launch).get
 
           // connect the out and error streams to the buffer used by the mixer
-          val writer = new StringWriter()
-          connectListener(process.getStreamsProxy().getOutputStreamMonitor(), writer)
+          connectListener(process.getStreamsProxy().getOutputStreamMonitor(), stdoutWriter)
 
           val maxOutput = WorksheetPlugin.plugin.getPreferenceStore().getInt(WorksheetPreferences.P_CUTOFF_VALUE)
           // start the mixer
-          editorUpdater = IncrementalDocumentMixer(doc, writer, maxOutput)
+          editorUpdater = IncrementalDocumentMixer(doc, stdoutWriter, maxOutput)
           link(editorUpdater)
 
-          // switch behavior. Waits for the end or the interuption of the evaluation
+          // switch behavior. Waits for the end or the interruption of the evaluation
           running()
 
         case msg @ StopRun(unitId) => ignoreStopRun(msg)
@@ -155,8 +199,8 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
   }
 
   private def reset(): Unit = {
-    // While we shut down the slave actors, we are not interested in listening 
-    // to termination events (which could be triggered by the below actions)  
+    // While we shut down the slave actors, we are not interested in listening
+    // to termination events (which could be triggered by the below actions)
     trapExit = false
 
     if (editorUpdater != null) {
@@ -189,12 +233,12 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
     val listener = new StreamListener(writer)
 
     // there is some possible race condition between getting the already current content
-    // add getting update through the listener. IFlushableStreamMonitor has a solution for it.
+    // and getting update through the listener. IFlushableStreamMonitor has a solution for it.
     stream match {
       case flushableStream: IFlushableStreamMonitor =>
         flushableStream.synchronized {
           flushableStream.addListener(listener)
-          listener.streamAppended(flushableStream.getContents(), flushableStream)
+          writer.write(flushableStream.getContents())
           flushableStream.flushContents()
           flushableStream.setBuffered(false)
         }
