@@ -103,6 +103,7 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
 
           // simple configuration, main class and classpath
           val vmRunnerConfig = new VMRunnerConfiguration(mainClass, cp.toArray)
+          vmRunnerConfig.setVMArguments(Array("-Dfile.encoding="+doc.encoding.name()))
 
           // a launch is need to get the created process
           val launch: ILaunch = new Launch(null, null, null)
