@@ -301,20 +301,18 @@ object a {
 """
     runTest("eval-test/wrongInstrumentationForLoops.sc", initial, expected)
   }
-  
-  @Ignore("Unfortunately this tests fails on MacOSX when executed from the command line, while it works fine when executed inside Eclipse. " + 
-          "This test was created while working on a fix for the encoding issue reported in #124. We'll keep the mentioned ticket opened until this test is fixed")
+
   @Test
   def unicodeCharactersAreAllowed() {
     val initial = """
 object Snowman {
-  def ☃ = "yes, this is a snowman"
+  def ☃ : AnyRef = "yes, this is a snowman"
   println("%s".format(☃))
 }
 """
     val expected = """
 object Snowman {
-  def ☃ = "yes, this is a snowman"                //> ☃ : => java.lang.String
+  def ☃ : AnyRef = "yes, this is a snowman"       //> ☃ : => AnyRef
   println("%s".format(☃))                         //> yes, this is a snowman
 }
 """
