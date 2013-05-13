@@ -82,10 +82,10 @@ object ProgramExecutor {
                     val stderr = process.getStreamsProxy().getErrorStreamMonitor().getContents()
                     val shell = Display.getCurrent().getActiveShell()
                     MessageDialog.openError(shell, "Worksheet terminated unexpectedly",
-                      s"Worksheet process has terminated unexpectedly (exit value ${process.getExitValue()})\n" +
+                      "Worksheet process has terminated unexpectedly (exit value "+process.getExitValue()+")\n" +
                       "At the time of termination, the following text was available in the output streams:\n\n" +
-                      s"Standard output:\n$terminalMessage\n" +
-                      s"Standard error: \n$stderr")
+                      "Standard output:\n"+terminalMessage+"\n" +
+                      "Standard error: \n"+stderr)
                   }
                 })
               }
