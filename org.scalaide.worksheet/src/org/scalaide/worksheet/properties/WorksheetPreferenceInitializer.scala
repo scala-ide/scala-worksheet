@@ -11,5 +11,6 @@ class WorksheetPreferenceInitializer extends AbstractPreferenceInitializer {
     val store = WorksheetPlugin.plugin.getPreferenceStore
     store.setDefault(P_EVALUATE_ON_SAVE, true)
     store.setDefault(P_CUTOFF_VALUE, 1000)
+    store.setDefault(P_VM_ARGS, "")
   }
 }

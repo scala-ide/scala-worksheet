@@ -15,7 +15,7 @@ import org.eclipse.swt.events.SelectionEvent
 import org.eclipse.ui.dialogs.PreferencesUtil
 import org.scalaide.worksheet.WorksheetPlugin
 
-class Preferences extends FieldEditorPreferencePage with IWorkbenchPreferencePage {
+class Preferences extends FieldEditorPreferencePage(FieldEditorPreferencePage.GRID) with IWorkbenchPreferencePage {
   import WorksheetPreferences._
 
   setPreferenceStore(WorksheetPlugin.plugin.getPreferenceStore)
@@ -28,7 +28,8 @@ Configure worksheet behavior.
     val evalOnSave = new BooleanFieldEditor(P_EVALUATE_ON_SAVE, "Evaluate worksheet on save", parent)
     evalOnSave.setEnabled(false, parent)
     addField(evalOnSave)
-    addField(new IntegerFieldEditor(P_CUTOFF_VALUE, "Maximum number of output characters to be shown after evaluation", getFieldEditorParent))
+    addField(new IntegerFieldEditor(P_CUTOFF_VALUE, "Output character limit per statement", parent))
+    addField(new StringFieldEditor(P_VM_ARGS, "Default VM arguments for worksheets", parent))
   }
 
   def init(workbench: IWorkbench) {}
@@ -39,4 +40,5 @@ object WorksheetPreferences {
   val BASE = "org.scalaide.worksheet."
   val P_EVALUATE_ON_SAVE = BASE + "evalOnSave"
   val P_CUTOFF_VALUE = BASE + "cutoffValue"
+  val P_VM_ARGS = BASE + "jvmArgs"
 }

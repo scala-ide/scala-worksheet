@@ -35,7 +35,7 @@ class Mixer extends HasLogger {
     buf.toSeq
   }
 
-  /** Combine source characters with righ-hand side comments.
+  /** Combine source characters with right-hand side comments.
    *  @param source The stripped program source
    *  @param comments The right hand side program comments, in the format produced by the worksheet
    *         evaluator. Every line consists of a source offset (an integer number) and the comment
