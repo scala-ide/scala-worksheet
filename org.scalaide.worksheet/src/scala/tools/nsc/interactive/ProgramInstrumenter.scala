@@ -30,7 +30,7 @@ final class ProgramInstrumenter(compiler: ScalaPresentationCompiler) extends Has
     private def instrumentation(source: SourceFile, line: Int): (String, Array[Char]) = {
       val tree = global.typedTree(source, forceReload = true)
       val endOffset = if (line < 0) source.length else source.lineToOffset(line + 1)
-      val patcher = new Patcher(source.content, new LexicalStructure(source), endOffset)
+      val patcher = new Patcher(source.content, new LexStructure(source), endOffset)
       patcher.traverse(tree)
       (patcher.objectName, patcher.result)
     }

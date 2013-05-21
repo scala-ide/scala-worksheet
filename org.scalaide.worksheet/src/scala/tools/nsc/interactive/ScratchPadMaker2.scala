@@ -17,7 +17,7 @@ private[interactive] trait ScratchPadMaker2 {
 
   private case class Patch(offset: Int, text: String)
 
-  protected class Patcher(contents: Array[Char], lex: LexicalStructure, endOffset: Int) extends Traverser {
+  protected class Patcher(contents: Array[Char], lex: LexStructure, endOffset: Int) extends Traverser {
     var objectName: String = ""
 
     private val patches = new ArrayBuffer[Patch]
@@ -158,7 +158,7 @@ private[interactive] trait ScratchPadMaker2 {
     }
   }
 
-  class LexicalStructure(source: SourceFile) {
+  class LexStructure(source: SourceFile) {
     val token = new ArrayBuffer[Int]
     val startOffset = new ArrayBuffer[Int]
     val endOffset = new ArrayBuffer[Int]
