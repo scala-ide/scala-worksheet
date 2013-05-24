@@ -35,12 +35,21 @@
             id="org.scalaide.worksheet.commands.format"
             name="Format">
       </command>
+      <command
+            categoryId="org.scalaide.worksheet.commands.category"
+            id="org.scalaide.worksheet.commands.clearResults"
+            name="Clear Results">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="org.scalaide.worksheet.handlers.EvalScript"
             commandId="org.scalaide.worksheet.commands.evalScript">
+      </handler>
+      <handler
+            class="org.scalaide.worksheet.handlers.ClearResults"
+            commandId="org.scalaide.worksheet.commands.clearResults">
       </handler>
    </extension>
    <extension
@@ -56,6 +65,12 @@
             contextId="org.scalaide.worksheet.editorScope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+F">
+      </key>
+      <key
+            commandId="org.scalaide.worksheet.commands.clearResults"
+            contextId="org.scalaide.worksheet.editorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+C">
       </key>
    </extension>
    <extension
