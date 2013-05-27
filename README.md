@@ -26,7 +26,7 @@ The worksheet build is based on
 can be built against several versions of the IDE, Eclipse and Scala
 compiler.
 
-Launchin the ``build.sh`` script will exand to the following Maven command:
+Launching the ``build.sh`` script will exand to the following Maven command:
 
 ```
 mvn -Peclipse-indigo,scala-2.10.x,scala-ide-stable clean install
