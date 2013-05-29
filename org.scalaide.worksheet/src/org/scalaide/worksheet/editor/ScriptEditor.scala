@@ -1,15 +1,23 @@
 package org.scalaide.worksheet.editor
 
 import scala.tools.eclipse.ISourceViewerEditor
+import scala.tools.eclipse.InteractiveCompilationUnit
 import scala.tools.eclipse.logging.HasLogger
+import scala.tools.eclipse.ui.InteractiveCompilationUnitEditor
+import scala.tools.eclipse.util.SWTUtils
+import org.eclipse.jdt.core.compiler.IProblem
+import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
 import org.eclipse.jface.action.IMenuManager
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextSelection
+import org.eclipse.jface.text.Position
 import org.eclipse.jface.text.source.Annotation
 import org.eclipse.jface.text.source.IAnnotationModel
+import org.eclipse.jface.text.source.IAnnotationModelExtension
 import org.eclipse.jface.text.source.IAnnotationModelExtension2
 import org.eclipse.jface.text.source.ISourceViewer
 import org.eclipse.jface.util.PropertyChangeEvent
+import org.eclipse.swt.SWT
 import org.eclipse.swt.events.KeyAdapter
 import org.eclipse.swt.events.KeyEvent
 import org.eclipse.ui.editors.text.TextEditor
@@ -18,18 +26,6 @@ import org.eclipse.ui.texteditor.TextOperationAction
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
-import org.eclipse.swt.SWT
-import scala.tools.eclipse.InteractiveCompilationUnit
-import scala.tools.eclipse.ui.InteractiveCompilationUnitEditor
-import org.eclipse.jdt.core.compiler.IProblem
-import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
-import org.eclipse.jface.text.Position
-import scala.collection.JavaConverters
-import org.eclipse.jface.text.source.IAnnotationModelExtension
-import scala.tools.eclipse.util.SWTUtils
-import java.nio.charset.Charset
-import java.nio.charset.UnsupportedCharsetException
-import java.nio.charset.IllegalCharsetNameException
 
 object ScriptEditor {
 
@@ -75,16 +71,6 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     private def doc: IDocument = getDocumentProvider.getDocument(getEditorInput)
 
     override def getContents: String = doc.get
-
-    override def encoding: Charset = {
-      val projectEncoding = getInteractiveCompilationUnit.scalaProject.underlying.getDefaultCharset()
-      try Charset.forName(projectEncoding)
-      catch {
-        case _: IllegalCharsetNameException | _: IllegalArgumentException | _: UnsupportedCharsetException => 
-          eclipseLog.error("Unrecognized project's encoding '%s'. Using '%s'.".format(projectEncoding, DocumentHandler.DefaultEncoding))
-          DocumentHandler.DefaultEncoding
-      }
-    }
 
     override def replaceWith(content: String, revealPos: Int): Unit = {
       // we need to turn off evaluation on save if we don't want to loop forever 
@@ -260,7 +246,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     }
 
     val newMap = newAnnotations.toMap
-    import JavaConverters._
+    import scala.collection.JavaConverters._
     annotationModel.replaceAnnotations(previousAnnotations.toArray, newMap.asJava)
     previousAnnotations = newAnnotations.map(_._1)
 

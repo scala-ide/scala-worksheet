@@ -2,7 +2,6 @@ package org.scalaide.worksheet.testutil
 
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.runtime._
-import org.scalaide.worksheet.editor.DocumentHandler
 
 object EvalTester {
   import WorksheetUtils._
@@ -16,8 +15,6 @@ object EvalTester {
     override def beginUpdate() { done = false }
     
     override def getContents = doc
-
-    override def encoding = DocumentHandler.DefaultEncoding
 
     override def replaceWith(newDoc: String, revealOffset: Int) {
       doc = newDoc

@@ -1,12 +1,17 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-import java.io.{FileOutputStream, OutputStreamWriter}
+import java.io.FileOutputStream
+import java.io.OutputStreamWriter
+import java.nio.charset.Charset
+
 import scala.tools.eclipse.ScalaProject
+
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.runtime.IPath
 import org.eclipse.core.runtime.Path
-import java.nio.charset.Charset
+import org.scalaide.worksheet.WorksheetPlugin
+import org.scalaide.worksheet.properties.WorksheetPreferences
 
 private[runtime] object Configuration {
   private val RootFolder = new Path(".worksheet")
@@ -75,4 +80,7 @@ final private[runtime] class Configuration private (project: IProject) {
 
     source
   }
+
+  def vmArgs: VmArguments =
+    new VmArguments(project, WorksheetPlugin.prefStore.getString(WorksheetPreferences.P_VM_ARGS))
 }

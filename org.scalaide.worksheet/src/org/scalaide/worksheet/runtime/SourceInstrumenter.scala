@@ -16,10 +16,10 @@ class SourceInstrumenter(config: Configuration) extends HasLogger {
    */
   case class InstrumentationResult(decl: TopLevelObjectDecl, program: Array[Char])
 
-  def instrument(unit: ScriptCompilationUnit, encoding: Charset): Either[Throwable, (TopLevelObjectDecl, File)] = {
+  def instrument(unit: ScriptCompilationUnit): Either[Throwable, (TopLevelObjectDecl, File)] = {
     instrumentProgram(unit).right map {
       case InstrumentationResult(decl, program) =>
-        (decl, writeInstrumented(decl, program, encoding))
+        (decl, writeInstrumented(decl, program))
     }
   }
 
@@ -39,9 +39,9 @@ class SourceInstrumenter(config: Configuration) extends HasLogger {
   }
 
   /** Write instrumented source file to disk. */
-  private def writeInstrumented(decl: TopLevelObjectDecl, content: Array[Char], encoding: Charset): File = {
+  private def writeInstrumented(decl: TopLevelObjectDecl, content: Array[Char]): File = {
     val sourceName = decl.fullName + ".scala"
-    val sourceFile = config.touchSource(sourceName, content, encoding)
+    val sourceFile = config.touchSource(sourceName, content, config.vmArgs.fileEncoding)
     sourceFile
   }
 }

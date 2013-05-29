@@ -1,7 +1,5 @@
 package org.scalaide.worksheet.editor
 
-import java.nio.charset.Charset
-
 /** A document holder, such as the ScriptEditor.
  * 
  *  Implementers receive asynchronous updates through `replaceWith`, therefore
@@ -15,9 +13,6 @@ trait DocumentHolder {
   
   /** Return the contents of the document. */
   def getContents: String
-
-  /** Return the encoding used for `this` document. */
-  def encoding: Charset
   
   /** Replace the contents with the new text, and optionally reveal the given offset in
    *  the UI, if there is one. This method call is guaranteed to come after `beginUpdate`
@@ -33,8 +28,4 @@ trait DocumentHolder {
    *  to allow the user to interrupt the evaluation.
    */
   def endUpdate(): Unit
-}
-
-object DocumentHandler {
-  final val DefaultEncoding: Charset = Charset.forName("UTF-8")
 }
