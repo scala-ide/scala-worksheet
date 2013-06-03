@@ -9,6 +9,8 @@ import scala.tools.eclipse.util.Utils
 import org.eclipse.core.runtime.IPath
 import scala.tools.eclipse.logging.HasLogger
 import org.eclipse.core.runtime.Path
+import org.scalaide.worksheet.properties.WorksheetPreferences
+import org.eclipse.core.resources.IProject
 
 object WorksheetPlugin extends HasLogger {
   @volatile var plugin: WorksheetPlugin = _

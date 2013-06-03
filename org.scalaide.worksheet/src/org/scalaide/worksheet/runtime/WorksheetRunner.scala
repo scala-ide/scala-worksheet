@@ -56,7 +56,7 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
           val stripped = SourceInserter.stripRight(editor.getContents.toCharArray())
           editor.replaceWith(stripped.mkString)
 
-          instrumenter.instrument(unit, editor.encoding) match {
+          instrumenter.instrument(unit) match {
             case Left(ex) => eclipseLog.error("Error during instrumentation of " + unit, ex)
             case Right((decl, source)) =>
               compiler.compile(source) match {

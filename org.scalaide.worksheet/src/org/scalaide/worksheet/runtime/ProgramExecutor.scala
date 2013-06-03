@@ -123,13 +123,9 @@ private class ProgramExecutor private () extends DaemonActor with HasLogger {
 
           // simple configuration, main class and classpath
           val vmRunnerConfig = new VMRunnerConfiguration(mainClass, cp.toArray)
-          vmRunnerConfig.setVMArguments(Array("-Dfile.encoding="+doc.encoding.name()))
-
-          // obtain and assign VM arguments, split by whitespace
-          // empty string arguments are eliminated, since the jvm will regard one as a main class argument.
-          val vmArgs = WorksheetPlugin.plugin.getPreferenceStore().getString(WorksheetPreferences.P_VM_ARGS)
-            .split("""\s""").filterNot(_.isEmpty)
-          vmRunnerConfig.setVMArguments(vmArgs)
+          val config = Configuration(unit.scalaProject)
+          val vmArgs = config.vmArgs
+          vmRunnerConfig.setVMArguments(vmArgs.args)
 
           // a launch is need to get the created process
           val launch: ILaunch = new Launch(null, null, null)
