@@ -44,9 +44,8 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration {
   @inline private def scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
-  
-  private val javaColorManager = JavaPlugin.getDefault.getJavaTextTools.getColorManager
-  private val codeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
+
+  private val codeScanner = new ScalaCodeScanner(scalaPreferenceStore, ScalaVersions.DEFAULT)
 
   override def getPresentationReconciler(sv: ISourceViewer) = {
     val reconciler = super.getPresentationReconciler(sv).asInstanceOf[PresentationReconciler]
@@ -118,17 +117,17 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
     formatter
   }
 
-  private val scalaCodeScanner = new ScalaCodeScanner(javaColorManager, scalaPreferenceStore, ScalaVersions.DEFAULT)
+  private val scalaCodeScanner = new ScalaCodeScanner(scalaPreferenceStore, ScalaVersions.DEFAULT)
   private val singleLineCommentScanner = new SingleLineCommentScanner(scalaPreferenceStore, pluginPreferenceStore)
-  private val multiLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_COMMENT, javaColorManager, scalaPreferenceStore)
-  private val scaladocScanner = new SingleTokenScanner(ScalaSyntaxClasses.SCALADOC, javaColorManager, scalaPreferenceStore)
-  private val stringScanner = new SingleTokenScanner(ScalaSyntaxClasses.STRING, javaColorManager, scalaPreferenceStore)
-  private val multiLineStringScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_STRING, javaColorManager, scalaPreferenceStore)
-  private val xmlTagScanner = new XmlTagScanner(javaColorManager, scalaPreferenceStore)
-  private val xmlCommentScanner = new XmlCommentScanner(javaColorManager, scalaPreferenceStore)
-  private val xmlCDATAScanner = new XmlCDATAScanner(javaColorManager, scalaPreferenceStore)
-  private val xmlPCDATAScanner = new SingleTokenScanner(ScalaSyntaxClasses.DEFAULT, javaColorManager, scalaPreferenceStore)
-  private val xmlPIScanner = new XmlPIScanner(javaColorManager, scalaPreferenceStore)
+  private val multiLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_COMMENT, scalaPreferenceStore)
+  private val scaladocScanner = new SingleTokenScanner(ScalaSyntaxClasses.SCALADOC, scalaPreferenceStore)
+  private val stringScanner = new SingleTokenScanner(ScalaSyntaxClasses.STRING, scalaPreferenceStore)
+  private val multiLineStringScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_STRING, scalaPreferenceStore)
+  private val xmlTagScanner = new XmlTagScanner(scalaPreferenceStore)
+  private val xmlCommentScanner = new XmlCommentScanner(scalaPreferenceStore)
+  private val xmlCDATAScanner = new XmlCDATAScanner(scalaPreferenceStore)
+  private val xmlPCDATAScanner = new SingleTokenScanner(ScalaSyntaxClasses.DEFAULT, scalaPreferenceStore)
+  private val xmlPIScanner = new XmlPIScanner(scalaPreferenceStore)
 
   override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
     val detector = DeclarationHyperlinkDetector()
