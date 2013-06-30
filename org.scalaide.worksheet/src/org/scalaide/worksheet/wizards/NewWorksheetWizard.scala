@@ -2,7 +2,7 @@ package org.scalaide.worksheet.wizards
 
 import scala.tools.eclipse.logging.HasLogger
 import scala.tools.eclipse.util.SWTUtils
-import scala.tools.eclipse.util.Utils.any2optionable
+import scala.tools.eclipse.util.Utils
 
 import org.eclipse.jface.viewers.IStructuredSelection
 
@@ -22,6 +22,7 @@ class NewWorksheetWizard extends Wizard with INewWizard with HasLogger {
   // from org.eclipse.jface.wizard.Wizard
 
   override def performFinish(): Boolean = {
+    import Utils._
     val file = newFileWizardPage.createNewFile()
     
     if (file != null) {
