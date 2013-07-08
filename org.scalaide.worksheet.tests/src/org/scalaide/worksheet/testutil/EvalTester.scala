@@ -45,6 +45,15 @@ object EvalTester {
     
     WorksheetsManager.Instance ! ProgramExecutor.StopRun(unit)
     
+    // if it timed out, wait for the evaluation to be stopped
+    if (!proxy.isDone) {
+      waited = 0
+      while (waited < timeout && !proxy.isDone) {
+        Thread.sleep(timeslice)
+        waited += timeslice
+      }
+    }
+
     proxy.getContents
   }
 }
