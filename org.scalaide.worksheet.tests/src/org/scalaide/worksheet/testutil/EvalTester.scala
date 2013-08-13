@@ -56,4 +56,10 @@ object EvalTester {
 
     proxy.getContents
   }
+
+  def wipeResults(contents: String): String = {
+    val proxy = new EditorProxy(contents)
+    proxy.clearResults
+    proxy.getContents
+  }
 }

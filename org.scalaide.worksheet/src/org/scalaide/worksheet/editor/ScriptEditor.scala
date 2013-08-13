@@ -26,6 +26,7 @@ import org.eclipse.ui.texteditor.TextOperationAction
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
+import org.scalaide.worksheet.editor.action.ClearResultsAction
 
 object ScriptEditor {
 
@@ -175,6 +176,11 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     formatAction.setActionDefinitionId("org.scalaide.worksheet.commands.format")
     setAction("format", formatAction)
 
+    // Adding action to clear results in the editor popup dialog
+    val clearResultsAction = new ClearResultsAction(this)
+    clearResultsAction.setActionDefinitionId("org.scalaide.worksheet.commands.clearResults")
+    setAction("clearResults", clearResultsAction)
+
     // Adding run evaluation action in the editor popup dialog
     val evalScriptAction = new RunEvaluationAction(this)
     evalScriptAction.setActionDefinitionId("org.scalaide.worksheet.commands.evalScript")
@@ -187,6 +193,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     // add the format menu itemevalScript    
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "evalScript")
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "format")
+    addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "clearResults")
   }
 
   type IAnnotationModelExtended = IAnnotationModel with IAnnotationModelExtension with IAnnotationModelExtension2
@@ -220,6 +227,12 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     import org.scalaide.worksheet.runtime.WorksheetsManager
     import org.scalaide.worksheet.runtime.WorksheetRunner
     WorksheetsManager.Instance ! WorksheetRunner.RunEvaluation(_, editorProxy)
+  }
+
+  private[worksheet] def clearResults(): Unit = {
+    editorProxy.beginUpdate()
+    editorProxy.clearResults()
+    editorProxy.endUpdate()
   }
 
   private[worksheet] def stopEvaluation(): Unit = withScriptCompilationUnit {

@@ -1,5 +1,8 @@
 package org.scalaide.worksheet.editor
 
+import java.nio.charset.Charset
+import org.scalaide.worksheet.text.SourceInserter
+
 /** A document holder, such as the ScriptEditor.
  * 
  *  Implementers receive asynchronous updates through `replaceWith`, therefore
@@ -28,4 +31,10 @@ trait DocumentHolder {
    *  to allow the user to interrupt the evaluation.
    */
   def endUpdate(): Unit
+
+  def clearResults(): Unit = {
+    val stripped = SourceInserter.stripRight(getContents.toCharArray)
+    replaceWith(stripped.mkString)
+  }
 }
+

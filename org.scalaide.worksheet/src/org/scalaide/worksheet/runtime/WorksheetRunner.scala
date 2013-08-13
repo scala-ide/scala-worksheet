@@ -53,8 +53,7 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
         case RunEvaluation(unit, editor) =>
           unit.clearBuildErrors()
 
-          val stripped = SourceInserter.stripRight(editor.getContents.toCharArray())
-          editor.replaceWith(stripped.mkString)
+          editor.clearResults()
 
           instrumenter.instrument(unit) match {
             case Left(ex) => eclipseLog.error("Error during instrumentation of " + unit, ex)
