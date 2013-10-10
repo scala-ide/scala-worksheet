@@ -32,7 +32,7 @@ Configure worksheet behavior.
     addField(new StringFieldEditor(P_VM_ARGS, "Default VM arguments for worksheets", parent))
   }
 
-  def init(workbench: IWorkbench) {}
+  override def init(workbench: IWorkbench) {}
 
 }
 

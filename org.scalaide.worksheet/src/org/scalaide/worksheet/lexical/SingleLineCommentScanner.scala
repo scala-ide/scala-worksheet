@@ -28,14 +28,14 @@ class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val w
   var tokenOffset: Int = -1
   var tokenLength: Int = -1
 
-  def setRange(document: IDocument, offset: Int, length: Int) {
+  override def setRange(document: IDocument, offset: Int, length: Int) {
     this.document = document
     this.offset = offset
     this.length = length
     this.state = Init
   }
 
-  def nextToken(): IToken = {
+  override def nextToken(): IToken = {
     def commonWorkMiddle(markerDelimiterString: String) = {
       tokenOffset = offset
       tokenLength = length - markerDelimiterString.length()
@@ -111,9 +111,9 @@ class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val w
     syntaxClass.getTextAttribute(prefStore)
   }
 
-  def getTokenOffset = tokenOffset
+  override def getTokenOffset = tokenOffset
 
-  def getTokenLength = tokenLength
+  override def getTokenLength = tokenLength
 }
 
 object SingleLineCommentScanner {

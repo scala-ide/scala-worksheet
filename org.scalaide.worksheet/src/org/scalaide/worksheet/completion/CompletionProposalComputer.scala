@@ -15,15 +15,15 @@ import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.ScriptCompilationUnit
 
 class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletions with IContentAssistProcessor {
-  def getCompletionProposalAutoActivationCharacters() = Array('.')
+  override def getCompletionProposalAutoActivationCharacters() = Array('.')
 
-  def getContextInformationAutoActivationCharacters() = Array[Char]()
+  override def getContextInformationAutoActivationCharacters() = Array[Char]()
 
-  def getErrorMessage = "No error"
+  override def getErrorMessage = "No error"
 
-  def getContextInformationValidator = null
+  override def getContextInformationValidator = null
 
-  def computeCompletionProposals(viewer: ITextViewer, offset: Int): Array[ICompletionProposal] = {
+  override def computeCompletionProposals(viewer: ITextViewer, offset: Int): Array[ICompletionProposal] = {
     EditorUtils.getEditorCompilationUnit(textEditor) match {
       case Some(scu: ScriptCompilationUnit) =>
         // TODO: Not sure if this is the best way. Maybe compilation units should always be connected to something..
@@ -43,7 +43,7 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
 
   }
 
-  def computeContextInformation(viewer: ITextViewer, offset: Int): Array[IContextInformation] = {
+  override def computeContextInformation(viewer: ITextViewer, offset: Int): Array[IContextInformation] = {
     null
   }
 }

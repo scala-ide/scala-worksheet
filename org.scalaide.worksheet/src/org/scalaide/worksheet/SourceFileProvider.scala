@@ -8,7 +8,7 @@ import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IPath
 
 class SourceFileProvider extends scala.tools.eclipse.sourcefileprovider.SourceFileProvider {
-  def createFrom(path: IPath): Option[InteractiveCompilationUnit] = {
+  override def createFrom(path: IPath): Option[InteractiveCompilationUnit] = {
     val file = handling(classOf[Exception]).by(_ => None).apply {
       val root = ResourcesPlugin.getWorkspace().getRoot()
       Option(root.getFile(path))
