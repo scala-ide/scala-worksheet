@@ -20,7 +20,7 @@ trait SelectionTracker extends TextEditor {
   def selectionChanged(selection: ITextSelection)
 
   lazy val selectionListener = new ISelectionListener() {
-    def selectionChanged(part: IWorkbenchPart, selection: ISelection) {
+    override def selectionChanged(part: IWorkbenchPart, selection: ISelection) {
       selection match {
         case textSel: ITextSelection => SelectionTracker.this.selectionChanged(textSel)
         case _                       =>

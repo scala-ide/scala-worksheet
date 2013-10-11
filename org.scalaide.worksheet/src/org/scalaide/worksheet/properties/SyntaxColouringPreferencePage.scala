@@ -65,9 +65,9 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
   private var treeViewer: TreeViewer = _
   private var previewer: SourceViewer = _
 
-  def init(workbench: IWorkbench) {}
+  override def init(workbench: IWorkbench) {}
 
-  def createContents(parent: Composite): Control = {
+  override def createContents(parent: Composite): Control = {
     initializeDialogUnits(parent)
 
     val scrolled = new ScrolledPageContent(parent, SWT.H_SCROLL | SWT.V_SCROLL)

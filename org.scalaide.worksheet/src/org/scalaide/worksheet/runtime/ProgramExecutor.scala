@@ -46,7 +46,7 @@ object ProgramExecutor {
 
   /** Transfer data for the stream (out and error) of an IProcess to the mixer buffer. */
   private class StreamListener(writer: Writer) extends IStreamListener {
-    def streamAppended(text: String, monitor: IStreamMonitor) {
+    override def streamAppended(text: String, monitor: IStreamMonitor) {
       writer.write(text)
     }
   }
