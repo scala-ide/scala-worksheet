@@ -69,7 +69,7 @@ class CompletionTests {
 
         body(i, position, completion.findCompletions(wordRegion)(pos + 1, unit)(src, compiler))
       }
-    }()
+    }
   }
 
   import Assert._
