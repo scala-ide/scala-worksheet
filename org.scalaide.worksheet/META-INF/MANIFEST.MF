@@ -21,8 +21,10 @@ Require-Bundle:
  org.eclipse.ui.editors,
  org.eclipse.ui.forms,
  org.eclipse.ui.ide,
- org.scala-ide.scala.library,
- org.scala-ide.scala.compiler,
+ org.scala-lang.scala-library,
+ org.scala-lang.scala-compiler,
+ org.scala-lang.scala-reflect,
+ org.scala-lang.scala-actors,
  org.scala-ide.sdt.core,
  scalariform,
  org.scala-ide.sbt.full.library,
@@ -35,7 +37,7 @@ Import-Package:
  scala.tools.eclipse;apply-aspects:=false,
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter;apply-aspects:=false,
  scala.tools.eclipse.semantichighlighting
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: org.scalaide.worksheet.WorksheetPlugin
 Bundle-ClassPath: .
 Export-Package: org.scalaide.worksheet,
