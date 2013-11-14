@@ -17,6 +17,11 @@ There are 5 Eclipse plugins:
 The projects can readily be imported inside Eclipse. Additionally, you have maven `pom` files
 based on Tycho, enabling command line builds.
 
+## Download:
+
+* Released version: Included in each of the available [milestone update-sites](http://scala-ide.org/download/milestone.html)
+* Nightly update site: [4.0.x-2.10.x](http://download.scala-ide.org/nightly-update-worksheet-scalaide40-210/site/), [4.0.x-2.11.x](http://download.scala-ide.org/nightly-update-worksheet-scalaide40-211/site/) and [3.0.x-2.10.x](http://download.scala-ide.org/nightly-update-worksheet-scalaide30-210/site/)
+
 ## Build
 
 Simply run the ``./build.sh`` script.
