@@ -7,7 +7,7 @@ import scala.tools.eclipse.logging.HasLogger
 import scala.tools.nsc.CompilerCommand
 import scala.tools.nsc.Settings
 import scala.tools.nsc.reporters.StoreReporter
-import scala.tools.nsc.util.Position
+import scala.reflect.internal.util.Position
 import org.scalaide.worksheet.WorksheetPlugin
 
 object ResidentCompiler extends HasLogger {

@@ -7,9 +7,9 @@ import scala.tools.eclipse.util.EclipseResource
 import scala.tools.eclipse.util.FileUtils
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.io.AbstractFile
-import scala.tools.nsc.util.BatchSourceFile
-import scala.tools.nsc.util.{Position, NoPosition}
-import scala.tools.nsc.util.ScriptSourceFile
+import scala.reflect.internal.util.BatchSourceFile
+import scala.reflect.internal.util.{Position, NoPosition}
+import scala.reflect.internal.util.ScriptSourceFile
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IMarker
 import org.eclipse.jdt.core.compiler.IProblem

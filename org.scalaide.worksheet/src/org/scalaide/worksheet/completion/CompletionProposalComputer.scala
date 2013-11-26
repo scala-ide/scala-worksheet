@@ -5,7 +5,7 @@ import scala.tools.eclipse.ScalaWordFinder
 import scala.tools.eclipse.completion.ScalaCompletions
 import scala.tools.eclipse.ui.ScalaCompletionProposal
 import scala.tools.eclipse.util.EditorUtils
-import scala.tools.nsc.util.SourceFile
+import scala.reflect.internal.util.SourceFile
 
 import org.eclipse.jface.text.ITextViewer
 import org.eclipse.jface.text.contentassist.ICompletionProposal
