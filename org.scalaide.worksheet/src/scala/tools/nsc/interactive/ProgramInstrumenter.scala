@@ -1,6 +1,6 @@
 package scala.tools.nsc.interactive
 
-import scala.tools.nsc.util.SourceFile
+import scala.reflect.internal.util.SourceFile
 import scala.tools.eclipse.ScalaPresentationCompiler
 import scala.tools.eclipse.logging.HasLogger
 
