@@ -1,7 +1,7 @@
 package org.scalaide.worksheet.completion
 
 import scala.tools.eclipse.testsetup.TestProjectSetup
-import scala.tools.nsc.util.OffsetPosition
+import scala.reflect.internal.util.OffsetPosition
 import scala.tools.eclipse.completion.CompletionProposal
 import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.tools.eclipse.testsetup.SDTTestUtils
@@ -46,7 +46,7 @@ class CompletionTests {
       for (i <- 0 until positions.size) {
         val pos = positions(i)
 
-        val position = new scala.tools.nsc.util.OffsetPosition(src, pos)
+        val position = new OffsetPosition(src, pos)
         var wordRegion = ScalaWordFinder.findWord(content, position.point)
 
         //        val selection = mock(classOf[ISelectionProvider])
