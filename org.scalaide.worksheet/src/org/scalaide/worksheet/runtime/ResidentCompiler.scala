@@ -16,14 +16,12 @@ object ResidentCompiler extends HasLogger {
     val bootClasspathArgs: String = scalaClassPath.scalaLib.get.toFile.getAbsolutePath
     val jrePath = scalaClassPath.jdkPaths.map(_.toFile)
 
-    // FIXME: We are currently ignoring the project's settings, which is bad. (What if the user wants to enable 
-    //        continuations in the worksheet!)
-    val args = List("-bootclasspath", bootClasspathArgs,
-      "-javabootclasspath", jrePath.map(_.getAbsolutePath).mkString(File.pathSeparator),
-      "-classpath", (WorksheetPlugin.worksheetLibrary.map(_.toOSString()).toSeq ++ scalaClassPath.userCp.map(_.toFile.getAbsolutePath)).mkString(File.pathSeparator),
-      "-d", worksheetConfig.binFolder.getAbsolutePath())
+    // scalacArguments returns all project settings (but not user classpath, nor output directory)
+    val args = scalaProject.scalacArguments ++ Seq(
+        "-classpath", (WorksheetPlugin.worksheetLibrary.map(_.toOSString()).toSeq ++ scalaClassPath.userCp.map(_.toFile.getAbsolutePath)).mkString(File.pathSeparator),
+        "-d", worksheetConfig.binFolder.getAbsolutePath())
 
-    logger.debug("Compilation arguments: " + args)
+    logger.debug("Compilation arguments: " + args.mkString("\n"))
     new ResidentCompiler(args)
   }
 
@@ -34,11 +32,11 @@ object ResidentCompiler extends HasLogger {
   case class CompilationError(msg: String, pos: Position)
 }
 
-class ResidentCompiler private (arguments: List[String]) extends HasLogger {
+class ResidentCompiler private (arguments: Seq[String]) extends HasLogger {
   import ResidentCompiler._
 
   private val reporter = new StoreReporter()
-  private val settings = new Settings(println(_)) // FIXME: This should really use the `scalaProject` settings (otherwise, how to enable continuations?)
+  private val settings = new Settings(println(_))
   private val compiler = new scala.tools.nsc.Global(settings, reporter)
 
   def compile(source: File): CompilationResult = this.synchronized {
@@ -52,10 +50,10 @@ class ResidentCompiler private (arguments: List[String]) extends HasLogger {
   }
 
   private def runCompilation(source: File): Unit = {
-    val sourcePath = source.getAbsolutePath()
-    logger.debug("compiling " + sourcePath)
+    val sources = source.getAbsolutePath()
+    logger.debug("compiling " + sources)
 
-    val command = new CompilerCommand(sourcePath :: arguments, settings)
+    val command = new CompilerCommand(sources :: arguments.toList, settings)
     val run = new compiler.Run()
     logger.info("compiling: " + command.files)
     run compile command.files
