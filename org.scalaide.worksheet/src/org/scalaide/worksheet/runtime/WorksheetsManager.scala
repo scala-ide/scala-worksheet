@@ -9,6 +9,7 @@ import scala.tools.eclipse.logging.HasLogger
 import scala.actors.AbstractActor
 import org.eclipse.core.runtime.IPath
 import scala.actors.UncaughtException
+import scala.util.Try
 
 object WorksheetsManager {
   lazy val Instance: Actor = {
@@ -41,8 +42,15 @@ private class WorksheetsManager private extends DaemonActor with HasLogger {
         eclipseLog.error("Evaluator actor crashed " + reason)
         evictEvaluator(actor)
 
-      case any => exit("Unsupported message " + any)
+      case any =>
+        // don't shutdown, this is a singleton instance and won't be restarted
+        logger.info("Unsupported message " + any)
     }
+  }
+
+  override def exceptionHandler = {
+    case e: Exception =>
+      logger.info("UncaughtException: ", e)
   }
 
   private def evictEvaluator(actor: AbstractActor) {
@@ -50,9 +58,12 @@ private class WorksheetsManager private extends DaemonActor with HasLogger {
   }
 
   private def forwardIfEvaluatorExists(msg: StopRun): Unit = {
-    val scalaProject = msg.unit.scalaProject
-    for (evaluator <- worksheetEvaluator.get(scalaProject.underlying.getFullPath))
-      evaluator forward msg
+    // if the project is closed, `unit.scalaProject` throws NoSuchElementException
+    // TODO: ScalaPlugin.asScalaProject probably shouldn't filter out closed projects.
+    for {
+      scalaProject <- Try(msg.unit.scalaProject)
+      evaluator <- worksheetEvaluator.get(scalaProject.underlying.getFullPath)
+    } evaluator forward msg
   }
 
   private def obtainEvaluator(unit: ScriptCompilationUnit): Actor = {
