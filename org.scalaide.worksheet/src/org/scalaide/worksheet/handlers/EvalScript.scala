@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.handlers
 
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 
 import org.eclipse.core.commands.AbstractHandler
 import org.eclipse.core.commands.ExecutionEvent

@@ -2,7 +2,7 @@ package org.scalaide.worksheet.runtime
 
 import java.io.File
 import scala.tools.nsc.interactive.ProgramInstrumenter
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.text.SourceInserter
 import java.nio.charset.Charset

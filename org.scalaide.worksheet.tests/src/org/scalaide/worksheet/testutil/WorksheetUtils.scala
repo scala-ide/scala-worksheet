@@ -2,7 +2,7 @@ package org.scalaide.worksheet.testutil
 
 import org.scalaide.worksheet.ScriptCompilationUnit
 import java.io.ByteArrayInputStream
-import scala.tools.eclipse.testsetup.SDTTestUtils
+import org.scalaide.core.testsetup.SDTTestUtils
 import org.eclipse.core.runtime.Path
 import org.eclipse.core.resources.IResource
 

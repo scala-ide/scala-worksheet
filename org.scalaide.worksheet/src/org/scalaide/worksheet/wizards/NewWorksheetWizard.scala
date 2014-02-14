@@ -1,8 +1,8 @@
 package org.scalaide.worksheet.wizards
 
-import scala.tools.eclipse.logging.HasLogger
-import scala.tools.eclipse.util.SWTUtils
-import scala.tools.eclipse.util.Utils
+import org.scalaide.logging.HasLogger
+import org.scalaide.util.internal.eclipse.SWTUtils
+import org.scalaide.util.internal.Utils
 
 import org.eclipse.jface.viewers.IStructuredSelection
 

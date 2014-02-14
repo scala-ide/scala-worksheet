@@ -3,7 +3,7 @@ package org.scalaide.worksheet.runtime
 import java.nio.charset.Charset
 import java.nio.charset.IllegalCharsetNameException
 import java.nio.charset.UnsupportedCharsetException
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 import org.eclipse.core.resources.IProject
 import scala.Array.canBuildFrom
 

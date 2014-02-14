@@ -4,7 +4,7 @@ import java.io.StringWriter
 import java.io.Writer
 import java.util.concurrent.atomic.AtomicReference
 import scala.actors.{ Actor, DaemonActor }
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.debug.core.DebugEvent
 import org.eclipse.debug.core.DebugPlugin
@@ -24,7 +24,7 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.properties.WorksheetPreferences
-import scala.tools.eclipse.ui.DisplayThread
+import org.scalaide.util.internal.ui.DisplayThread
 
 object ProgramExecutor {
   def apply(): Actor = {

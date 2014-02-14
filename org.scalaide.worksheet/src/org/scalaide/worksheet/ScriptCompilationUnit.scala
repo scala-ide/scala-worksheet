@@ -1,10 +1,10 @@
 package org.scalaide.worksheet
 
-import scala.tools.eclipse.InteractiveCompilationUnit
-import scala.tools.eclipse.ScalaPlugin
-import scala.tools.eclipse.buildmanager.BuildProblemMarker
-import scala.tools.eclipse.util.EclipseResource
-import scala.tools.eclipse.util.FileUtils
+import org.scalaide.core.compiler.InteractiveCompilationUnit
+import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.internal.builder.BuildProblemMarker
+import org.scalaide.core.resources.EclipseResource
+import org.scalaide.util.internal.eclipse.FileUtils
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.io.AbstractFile
 import scala.reflect.internal.util.BatchSourceFile
@@ -18,7 +18,7 @@ import org.eclipse.ui.IEditorInput
 import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.editor.ScriptEditor
-import scala.tools.eclipse.resources.MarkerFactory
+import org.scalaide.core.resources.MarkerFactory
 
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying

@@ -10,7 +10,6 @@ Require-Bundle: org.scala-lang.scala-library,
  org.eclipse.equinox.weaving.aspectj,
  org.scala-ide.sdt.core,
  org.junit
-Import-Package: scala.tools.eclipse.testsetup,
- org.aspectj.weaver.loadtime.definition
+Import-Package: org.aspectj.weaver.loadtime.definition
 Bundle-ClassPath: .,
  target/lib/mockito-all-1.9.0.jar

@@ -1,13 +1,13 @@
 package org.scalaide.worksheet.runtime
 
 import scala.actors.{ Actor, DaemonActor }
-import scala.tools.eclipse.ScalaProject
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.core.internal.project.ScalaProject
+import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.text.SourceInserter
-import scala.tools.eclipse.BuildSuccessListener
-import scala.tools.eclipse.util.SWTUtils
+import org.scalaide.core.internal.project.BuildSuccessListener
+import org.scalaide.util.internal.eclipse.SWTUtils
 import org.scalaide.worksheet.WorksheetPlugin
 
 object WorksheetRunner {

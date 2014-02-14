@@ -1,7 +1,7 @@
 package org.scalaide.worksheet.lexical
 
-import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClass
-import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
+import org.scalaide.ui.syntax.ScalaSyntaxClass
+import org.scalaide.ui.syntax.ScalaSyntaxClasses
 
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.text.IDocument

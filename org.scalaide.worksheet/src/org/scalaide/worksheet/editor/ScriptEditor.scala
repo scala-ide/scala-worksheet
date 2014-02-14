@@ -1,10 +1,10 @@
 package org.scalaide.worksheet.editor
 
-import scala.tools.eclipse.ISourceViewerEditor
-import scala.tools.eclipse.InteractiveCompilationUnit
-import scala.tools.eclipse.logging.HasLogger
-import scala.tools.eclipse.ui.InteractiveCompilationUnitEditor
-import scala.tools.eclipse.util.SWTUtils
+import org.scalaide.ui.internal.editor.ISourceViewerEditor
+import org.scalaide.core.compiler.InteractiveCompilationUnit
+import org.scalaide.logging.HasLogger
+import org.scalaide.ui.internal.editor.InteractiveCompilationUnitEditor
+import org.scalaide.util.internal.eclipse.SWTUtils
 import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
 import org.eclipse.jface.action.IMenuManager
@@ -64,7 +64,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
    *  the evaluation's result.
    */
   private class DefaultEditorProxy extends DocumentHolder {
-    import scala.tools.eclipse.util.SWTUtils
+    import org.scalaide.util.internal.eclipse.SWTUtils
 
     @volatile private[ScriptEditor] var ignoreDocumentUpdate = false
     private val stopEvaluationListener = new StopEvaluationOnKeyPressed(this)

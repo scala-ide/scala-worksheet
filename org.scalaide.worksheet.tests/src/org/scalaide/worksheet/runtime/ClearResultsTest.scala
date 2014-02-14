@@ -1,8 +1,8 @@
 package org.scalaide.worksheet.runtime
 
-import scala.tools.eclipse.ScalaProject
-import scala.tools.eclipse.testsetup.SDTTestUtils.createProjects
-import scala.tools.eclipse.testsetup.SDTTestUtils.deleteProjects
+import org.scalaide.core.internal.project.ScalaProject
+import org.scalaide.core.testsetup.SDTTestUtils.createProjects
+import org.scalaide.core.testsetup.SDTTestUtils.deleteProjects
 import org.eclipse.core.resources.IFolder
 import org.junit.AfterClass
 import org.junit.Assert
