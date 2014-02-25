@@ -2,10 +2,10 @@ package org.scalaide.worksheet.runtime
 
 import scala.actors.{ Actor, DaemonActor }
 import scala.collection.immutable
-import scala.tools.eclipse.ScalaProject
+import org.scalaide.core.internal.project.ScalaProject
 import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.actors.Exit
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 import scala.actors.AbstractActor
 import org.eclipse.core.runtime.IPath
 import scala.actors.UncaughtException

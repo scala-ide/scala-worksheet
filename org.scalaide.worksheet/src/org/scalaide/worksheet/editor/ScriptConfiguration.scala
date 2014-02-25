@@ -1,17 +1,11 @@
 package org.scalaide.worksheet.editor
 
-import scala.tools.eclipse.ScalaPlugin
-import scala.tools.eclipse.formatter.ScalaFormattingStrategy
-import scala.tools.eclipse.hyperlink.text.detector.DeclarationHyperlinkDetector
-import scala.tools.eclipse.lexical.ScalaCodeScanner
-import scala.tools.eclipse.lexical.ScalaPartitions
-import scala.tools.eclipse.lexical.SingleTokenScanner
-import scala.tools.eclipse.lexical.XmlCDATAScanner
-import scala.tools.eclipse.lexical.XmlCommentScanner
-import scala.tools.eclipse.lexical.XmlPIScanner
-import scala.tools.eclipse.lexical.XmlTagScanner
-import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClasses
-import scala.tools.eclipse.ui.BracketAutoEditStrategy
+import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.internal.formatter.ScalaFormattingStrategy
+import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
+import org.scalaide.core.internal.lexical._
+import org.scalaide.ui.syntax.ScalaSyntaxClasses
+import org.scalaide.ui.internal.editor.autoedits.BracketAutoEditStrategy
 import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.preference.IPreferenceStore
@@ -39,7 +33,7 @@ import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.lexical.SingleLineCommentScanner
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
 import scalariform.ScalaVersions
-import scala.tools.eclipse.ScalaHover
+import org.scalaide.ui.internal.editor.ScalaHover
 import org.scalaide.worksheet.ScriptCompilationUnit
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration {

@@ -1,8 +1,8 @@
 package scala.tools.nsc.interactive
 
 import scala.reflect.internal.util.SourceFile
-import scala.tools.eclipse.ScalaPresentationCompiler
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.core.compiler.ScalaPresentationCompiler
+import org.scalaide.logging.HasLogger
 
 final class ProgramInstrumenter(compiler: ScalaPresentationCompiler) extends HasLogger { self =>
   private object Instrumenter extends ScratchPadMaker2 {

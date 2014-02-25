@@ -1,9 +1,9 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-import scala.tools.eclipse.ScalaPlugin
-import scala.tools.eclipse.ScalaProject
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.internal.project.ScalaProject
+import org.scalaide.logging.HasLogger
 import scala.tools.nsc.CompilerCommand
 import scala.tools.nsc.Settings
 import scala.tools.nsc.reporters.StoreReporter

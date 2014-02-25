@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.properties
 
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 import org.eclipse.jface.preference._
 import org.eclipse.ui.IWorkbenchPreferencePage
 import org.eclipse.ui.IWorkbench

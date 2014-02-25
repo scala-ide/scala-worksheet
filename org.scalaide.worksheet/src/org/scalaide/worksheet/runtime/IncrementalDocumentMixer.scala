@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import scala.actors.{Actor, DaemonActor, TIMEOUT}
 import scala.collection.mutable.LinkedHashMap
 import scala.collection.mutable.ListBuffer
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.text.{ Mixer, SourceInserter }

@@ -5,7 +5,7 @@ import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.Charset
 
-import scala.tools.eclipse.ScalaProject
+import org.scalaide.core.internal.project.ScalaProject
 
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.runtime.IPath

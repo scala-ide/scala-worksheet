@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.lexical
 
-import scala.tools.eclipse.properties.syntaxcolouring.ScalaSyntaxClass
+import org.scalaide.ui.syntax.ScalaSyntaxClass
 
 object SyntaxClasses {
   object EvalResult {

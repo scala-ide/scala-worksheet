@@ -2,12 +2,12 @@ package org.scalaide.worksheet
 
 import org.eclipse.ui.plugin.AbstractUIPlugin
 import org.osgi.framework.BundleContext
-import scala.tools.eclipse.util.OSGiUtils
+import org.scalaide.util.internal.eclipse.OSGiUtils
 import org.eclipse.core.runtime.Platform
 import org.osgi.framework.Bundle
-import scala.tools.eclipse.util.Utils
+import org.scalaide.util.internal.Utils
 import org.eclipse.core.runtime.IPath
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 import org.eclipse.core.runtime.Path
 import org.scalaide.worksheet.properties.WorksheetPreferences
 import org.eclipse.core.resources.IProject

@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.reconciler
 
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
 import org.eclipse.jface.text._
@@ -11,7 +11,7 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.collection.JavaConverters
 import org.scalaide.worksheet.editor.ScriptEditor
 import org.eclipse.ltk.internal.ui.refactoring.util.SWTUtil
-import scala.tools.eclipse.util.SWTUtils
+import org.scalaide.util.internal.eclipse.SWTUtils
 
 class ScalaReconcilingStrategy(textEditor: ScriptEditor) extends IReconcilingStrategy with HasLogger {
   private var document: IDocument = _

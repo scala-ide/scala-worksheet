@@ -5,7 +5,7 @@ import scala.runtime.ScalaRunTime.stringOf
 import java.lang.reflect.InvocationTargetException
 import collection.mutable.ArrayBuffer
 import scala.collection.mutable.ListBuffer
-import scala.tools.eclipse.logging.HasLogger
+import org.scalaide.logging.HasLogger
 
 class Mixer extends HasLogger {
 

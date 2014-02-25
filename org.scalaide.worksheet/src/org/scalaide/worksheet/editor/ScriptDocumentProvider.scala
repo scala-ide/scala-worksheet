@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.editor
 
-import scala.tools.eclipse.lexical.ScalaDocumentPartitioner
+import org.scalaide.core.internal.lexical.ScalaDocumentPartitioner
 
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.IDocumentExtension3

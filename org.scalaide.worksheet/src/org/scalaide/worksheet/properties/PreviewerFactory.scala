@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.properties
 
-import scala.tools.eclipse.lexical.ScalaDocumentPartitioner
+import org.scalaide.core.internal.lexical.ScalaDocumentPartitioner
 import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.resource.JFaceResources

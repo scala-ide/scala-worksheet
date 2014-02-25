@@ -1,15 +1,15 @@
 package org.scalaide.worksheet.completion
 
-import scala.tools.eclipse.testsetup.TestProjectSetup
+import org.scalaide.core.testsetup.TestProjectSetup
+import org.scalaide.core.testsetup.SDTTestUtils
 import scala.reflect.internal.util.OffsetPosition
-import scala.tools.eclipse.completion.CompletionProposal
+import org.scalaide.core.completion.CompletionProposal
+import org.scalaide.core.completion.ScalaCompletions
 import org.scalaide.worksheet.ScriptCompilationUnit
-import scala.tools.eclipse.testsetup.SDTTestUtils
 import org.eclipse.core.runtime.Path
 import org.eclipse.core.resources.IFile
 import scala.tools.nsc.interactive.Response
-import scala.tools.eclipse.completion.ScalaCompletions
-import scala.tools.eclipse.ScalaWordFinder
+import org.scalaide.util.internal.ScalaWordFinder
 import org.junit.Assert
 import org.junit.Test
 

@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage
 import org.eclipse.core.runtime.IPath
 import org.eclipse.core.resources.ResourcesPlugin
-import scala.tools.eclipse.ScalaPlugin
+import org.scalaide.core.ScalaPlugin
 
 /** Wizard page based of the new file creation page from the framework.
  *  The advanced section has be removed.
