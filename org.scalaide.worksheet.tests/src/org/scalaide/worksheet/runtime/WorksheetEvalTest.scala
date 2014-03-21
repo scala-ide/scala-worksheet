@@ -172,9 +172,10 @@ object testeval {
                                                   //| Output exceeds cutoff limit.
 }"""
     withCutOffValue(50) {
-      val res = runEvalSync("eval-test/test5.sc", initial, 5000)
+      val res = runEvalSync("eval-test/test5.sc", initial, 10000)
       val lastChar = res.init.trim.last // last character is }, we go one before that
-      Assert.assertTrue("Last character is spinner: " + lastChar, Set('/', '|', '-', '\\').contains(lastChar))
+      val tail = res.trim.substring(res.length - 20)
+      Assert.assertTrue("Last character is spinner: " + lastChar + ": " + tail, Set('/', '|', '-', '\\').contains(lastChar))
       Assert.assertEquals("correct output", expected.init.trim, res.init.trim.init.trim) // we cut the last character
     }
   }
