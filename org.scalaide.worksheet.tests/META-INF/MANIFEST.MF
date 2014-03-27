@@ -6,7 +6,7 @@ Bundle-Version: 0.2.3.qualifier
 Bundle-Vendor: scala-ide.org
 Fragment-Host: org.scalaide.worksheet
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.scala-lang.scala-library,
+Require-Bundle: org.scala-ide.scala.library,
  org.eclipse.equinox.weaving.aspectj,
  org.scala-ide.sdt.core,
  org.junit

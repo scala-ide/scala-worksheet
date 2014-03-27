@@ -28,8 +28,7 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
       case Some(scu: ScriptCompilationUnit) =>
         // TODO: Not sure if this is the best way. Maybe compilation units should always be connected to something..
         scu.connect(viewer.getDocument)
-        val completions = scu.withSourceFile { findCompletions(viewer, offset, scu) } getOrElse List[ICompletionProposal]()
-        completions.toArray
+        scu.withSourceFile { findCompletions(viewer, offset, scu) }(List[ICompletionProposal]()).toArray
       case _ => Array()
     }
   }
