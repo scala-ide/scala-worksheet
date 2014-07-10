@@ -1,7 +1,7 @@
 package org.scalaide.worksheet
 
 import org.scalaide.core.compiler.InteractiveCompilationUnit
-import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.internal.builder.BuildProblemMarker
 import org.scalaide.core.resources.EclipseResource
 import org.scalaide.util.internal.eclipse.FileUtils
@@ -30,7 +30,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
 
   override def file: AbstractFile = EclipseResource(workspaceFile)
 
-  override lazy val scalaProject = ScalaPlugin.plugin.asScalaProject(workspaceFile.getProject).get
+  override lazy val scalaProject = IScalaPlugin().asScalaProject(workspaceFile.getProject).get
 
   /** Return the compiler ScriptSourceFile corresponding to this unit. */
   override def sourceFile(contents: Array[Char]): ScriptSourceFile = {

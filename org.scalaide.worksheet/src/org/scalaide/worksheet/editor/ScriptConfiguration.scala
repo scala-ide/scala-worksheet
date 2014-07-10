@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.editor
 
-import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.internal.formatter.ScalaFormattingStrategy
 import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
 import org.scalaide.core.internal.lexical._
@@ -37,7 +37,7 @@ import org.scalaide.ui.internal.editor.hover.ScalaHover
 import org.scalaide.worksheet.ScriptCompilationUnit
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration {
-  @inline private def scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
+  @inline private def scalaPreferenceStore: IPreferenceStore = IScalaPlugin().getPreferenceStore()
 
   override def getPresentationReconciler(sv: ISourceViewer) = {
     val reconciler = super.getPresentationReconciler(sv).asInstanceOf[PresentationReconciler]
