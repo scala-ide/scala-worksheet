@@ -59,28 +59,28 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
   }
 
   override def currentProblems: List[IProblem] = {
-    scalaProject.withPresentationCompiler { pc =>
+    scalaProject.presentationCompiler { pc =>
       pc.problemsOf(file)
-    }(Nil)
+    }.getOrElse(Nil)
   }
 
   /** Reconcile the unit. Return all compilation errors.
    *  Blocks until the unit is type-checked.
    */
   override def reconcile(newContents: String): List[IProblem] =
-    scalaProject.withPresentationCompiler { pc =>
+    scalaProject.presentationCompiler { pc =>
       askReload(newContents.toCharArray)
       pc.problemsOf(file)
-    }(Nil)
+    }.getOrElse(Nil)
 
   def askReload(newContents: Array[Char] = getContents): Unit =
-    scalaProject.withPresentationCompiler { pc =>
+    scalaProject.presentationCompiler { pc =>
       val src = batchSourceFile(newContents)
       pc.withResponse[Unit] { response =>
         pc.askReload(List(src), response)
         response.get
       }
-    }()
+    }
 
   def clearBuildErrors(): Unit = {
     FileUtils.clearBuildErrors(workspaceFile, null)
@@ -122,7 +122,7 @@ object ScriptCompilationUnit {
   }
 
   private def fromEditorInput(editorInput: IEditorInput): ScriptCompilationUnit = ScriptCompilationUnit(getFile(editorInput))
-  
+
   private def getFile(editorInput: IEditorInput): IFile =
     editorInput match {
       case fileEditorInput: FileEditorInput if fileEditorInput.getName.endsWith(ScriptEditor.SCRIPT_EXTENSION) =>

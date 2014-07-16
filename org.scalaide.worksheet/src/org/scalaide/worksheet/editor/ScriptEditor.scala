@@ -27,6 +27,7 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
 import org.scalaide.worksheet.editor.action.ClearResultsAction
+import org.scalaide.util.internal.ui.DisplayThread
 
 object ScriptEditor {
 
@@ -74,7 +75,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     override def getContents: String = doc.get
 
     override def replaceWith(content: String, revealPos: Int): Unit = {
-      // we need to turn off evaluation on save if we don't want to loop forever 
+      // we need to turn off evaluation on save if we don't want to loop forever
       // (because of `editorSaved` implementation, i.e., automatic worksheet evaluation on save)
       if (!ignoreDocumentUpdate) runInUi {
         val (line, col) = lineColumn(caretOffset)
@@ -98,8 +99,8 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
     private def caretOffset: Int = {
       var offset = -1
-      SWTUtils.syncExec {
-        // Read the comment in `runInUi` 
+      DisplayThread.syncExec {
+        // Read the comment in `runInUi`
         if (!disposed) offset = getSourceViewer().getTextWidget().getCaretOffset()
       }
       offset
@@ -133,17 +134,17 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     /** Run `f' in the UI thread and make sure we were not disposed before.
      *  Disable redraws during the execution of this block to reduce flickering.
      */
-    private def runInUi(f: => Unit): Unit = SWTUtils.asyncExec {
-      /* We need to make sure that the editor was not `disposed` before executing `f` 
-       * in the UI thread. The reason is that it is possible that after calling 
-       * `SWTUtils.asyncExec`, but before the passed closure is executed, the editor 
-       * may be disposed. If the editor is disposed, executing `f` will likely end up 
+    private def runInUi(f: => Unit): Unit = DisplayThread.asyncExec {
+      /* We need to make sure that the editor was not `disposed` before executing `f`
+       * in the UI thread. The reason is that it is possible that after calling
+       * `SWTUtils.asyncExec`, but before the passed closure is executed, the editor
+       * may be disposed. If the editor is disposed, executing `f` will likely end up
        * throwing a NPE.
-       * 
-       * FIXME: 
-       * Having said all the above, there is still a possible race condition, i.e., what 
-       * if `disposed` becomes true while `f` is being executed (since the two actions can 
-       * happen in parallel on two different threads). Well, this is indeed an issue, which 
+       *
+       * FIXME:
+       * Having said all the above, there is still a possible race condition, i.e., what
+       * if `disposed` becomes true while `f` is being executed (since the two actions can
+       * happen in parallel on two different threads). Well, this is indeed an issue, which
        * I fear need some thinking to be effectively fixed.
        */
       if (!disposed) {
@@ -171,7 +172,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   override def createActions() {
     super.createActions()
 
-    // Adding source formatting action in the editor popup dialog 
+    // Adding source formatting action in the editor popup dialog
     val formatAction = new TextOperationAction(EditorMessages.resourceBundle, "Editor.Format.", this, ISourceViewer.FORMAT)
     formatAction.setActionDefinitionId("org.scalaide.worksheet.commands.format")
     setAction("format", formatAction)
@@ -190,7 +191,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   override def editorContextMenuAboutToShow(menu: IMenuManager) {
     super.editorContextMenuAboutToShow(menu)
 
-    // add the format menu itemevalScript    
+    // add the format menu itemevalScript
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "evalScript")
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "format")
     addAction(menu, ITextEditorActionConstants.GROUP_EDIT, "clearResults")
@@ -263,9 +264,9 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     annotationModel.replaceAnnotations(previousAnnotations.toArray, newMap.asJava)
     previousAnnotations = newAnnotations.map(_._1)
 
-    // This shouldn't be necessary in @dragos' opinion. But see #84 and 
+    // This shouldn't be necessary in @dragos' opinion. But see #84 and
     // http://stackoverflow.com/questions/12507620/race-conditions-in-annotationmodel-error-annotations-lost-in-reconciler
-    SWTUtils.asyncExec { getSourceViewer.invalidateTextPresentation() }
+    DisplayThread.asyncExec { getSourceViewer.invalidateTextPresentation() }
   }
 
   private def isPureExpressionWarning(e: IProblem): Boolean =

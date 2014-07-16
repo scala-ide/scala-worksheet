@@ -27,7 +27,6 @@ object IncrementalDocumentMixer {
 private class IncrementalDocumentMixer private (editor: DocumentHolder, source: Writer, val maximumOutputSize: Int) extends DaemonActor with HasLogger {
   import IncrementalDocumentMixer.{ RefreshDocumentTimeout, InfiniteLoopTicks}
 
-  private val originalContent = editor.getContents
   private val stripped = SourceInserter.stripRight(editor.getContents.toCharArray)
   private val mixer = new Mixer
 
@@ -76,13 +75,13 @@ private class IncrementalDocumentMixer private (editor: DocumentHolder, source: 
   }
 
   def pruneOutputPerEvaluation(newText: String): String = {
-    // Groups together `lines` that share the same offset (lines order is maintained)   
+    // Groups together `lines` that share the same offset (lines order is maintained)
     def groupLinesByOffset(lines: List[String]): LinkedHashMap[String, ListBuffer[String]] = {
       val offsetExtractor = """^(\d*)""".r
       val groupedEvaluations = LinkedHashMap.empty[String, ListBuffer[String]]
 
       for(line <- lines) offsetExtractor.findFirstIn(line) match {
-        case Some(offset) => 
+        case Some(offset) =>
           groupedEvaluations.get(offset) match {
             case None => groupedEvaluations += (offset -> ListBuffer(line))
             case Some(result) => groupedEvaluations += ((offset, result += line))
@@ -96,7 +95,7 @@ private class IncrementalDocumentMixer private (editor: DocumentHolder, source: 
 
     val lines = newText.split('\n')
     val linesByOffset = groupLinesByOffset(lines.toList)
-    
+
     val evaluationResults = for((offset, evaluationOutputs) <- linesByOffset) yield {
       val evaluationResult = evaluationOutputs.mkString("\n")
       (if(evaluationResult.length <= maximumOutputSize) evaluationResult
@@ -105,7 +104,7 @@ private class IncrementalDocumentMixer private (editor: DocumentHolder, source: 
         evaluationResult.take(maximumOutputSize) + '\n' + offset + " Output exceeds cutoff limit."
       })
     }
-    
+
     evaluationResults.mkString("\n")
   }
 

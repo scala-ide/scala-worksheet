@@ -9,6 +9,7 @@ import org.scalaide.worksheet.text.SourceInserter
 import org.scalaide.core.internal.project.BuildSuccessListener
 import org.scalaide.util.internal.eclipse.SWTUtils
 import org.scalaide.worksheet.WorksheetPlugin
+import org.scalaide.util.internal.ui.DisplayThread
 
 object WorksheetRunner {
 
@@ -64,9 +65,9 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
                   editor.endUpdate()
                   // Fix the race condition in error markers by updating them
                   // on the UI thread. Otherwise, the 'replaceWith' call before
-                  // might remove all markers, considering their positions 'deleted' 
+                  // might remove all markers, considering their positions 'deleted'
                   // by the replace action
-                  SWTUtils.asyncExec { reportBuildErrors(unit, errors) }
+                  DisplayThread.asyncExec { reportBuildErrors(unit, errors) }
 
                 case CompilationSuccess =>
                   executor ! ProgramExecutor.RunProgram(unit, decl.fullName, classpath, editor)
@@ -91,8 +92,8 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
   /** The classpath, as a list of local filesystem path
    */
   private def classpath: Seq[String] = {
-    WorksheetPlugin.worksheetLibrary.map(_.toOSString()).toSeq ++ 
-    scalaProject.scalaClasspath.fullClasspath.map(_.getAbsolutePath()) ++ 
+    WorksheetPlugin.worksheetLibrary.map(_.toOSString()).toSeq ++
+    scalaProject.scalaClasspath.fullClasspath.map(_.getAbsolutePath()) ++
     scalaProject.outputFolderLocations.map(_.toOSString()) :+ config.binFolder.getAbsolutePath()
   }
 

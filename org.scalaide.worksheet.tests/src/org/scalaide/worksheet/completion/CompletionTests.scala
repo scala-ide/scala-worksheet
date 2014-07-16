@@ -15,14 +15,14 @@ import org.junit.Test
 
 object CompletionTests extends TestProjectSetup("completion", bundleName = "org.scalaide.worksheet.tests")
 
-/**  Copy-pasted and adapted from sdt.core.tests. Needs some refactoring 
+/**  Copy-pasted and adapted from sdt.core.tests. Needs some refactoring
  */
 class CompletionTests {
   import CompletionTests._
 
   private def withCompletions(path2source: String)(body: (Int, OffsetPosition, List[CompletionProposal]) => Unit) {
     project // just kick in initialization
-    
+
     val ifile = SDTTestUtils.workspace.getRoot.findMember(new Path(path2source)).asInstanceOf[IFile]
     val unit = ScriptCompilationUnit(ifile)
 
@@ -33,12 +33,12 @@ class CompletionTests {
       dummy.get
 
       val tree = new Response[compiler.Tree]
-      compiler.askType(src, true, tree)
+      compiler.askLoadedTyped(src, true, tree)
       tree.get
 
       val contents = unit.getContents
-      // mind that the space in the marker is very important (the presentation compiler 
-      // seems to get lost when the position where completion is asked 
+      // mind that the space in the marker is very important (the presentation compiler
+      // seems to get lost when the position where completion is asked
       val positions = SDTTestUtils.positionsOf(contents, " /*!*/")
       val content = unit.getContents.mkString
 
@@ -47,14 +47,14 @@ class CompletionTests {
         val pos = positions(i)
 
         val position = new OffsetPosition(src, pos)
-        var wordRegion = ScalaWordFinder.findWord(content, position.point)
+        val wordRegion = ScalaWordFinder.findWord(content, position.point)
 
         //        val selection = mock(classOf[ISelectionProvider])
 
         /* FIXME:
-         * I would really love to call `completion.computeCompletionProposals`, but for some unclear 
-         * reason that call is not working. Some debugging shows that the position is not right (off by one), 
-         * however, increasing the position makes the computed `wordRegion` wrong... hard to understand where 
+         * I would really love to call `completion.computeCompletionProposals`, but for some unclear
+         * reason that call is not working. Some debugging shows that the position is not right (off by one),
+         * however, increasing the position makes the computed `wordRegion` wrong... hard to understand where
          * the bug is!
         val textViewer = mock(classOf[ITextViewer])
         when(textViewer.getSelectionProvider()).thenReturn(selection)
@@ -80,9 +80,9 @@ class CompletionTests {
 
     withCompletions(path2source) { (i, position, compl) =>
 
-      var completions = if (!withImportProposal) compl.filter(!_.needImport) else compl
+      val completions = if (!withImportProposal) compl.filter(!_.needImport) else compl
 
-      // remove parens as the compiler trees' printer has been slightly modified in 2.10 
+      // remove parens as the compiler trees' printer has been slightly modified in 2.10
       // (and we need the test to pass for 2.9.0/-1 and 2.8.x as well).
       val completionsNoParens: List[String] = completions.map(c => normalizeCompletion(c.display)).sorted
       val expectedNoParens: List[String] = expectedCompletions(i).map(normalizeCompletion).sorted

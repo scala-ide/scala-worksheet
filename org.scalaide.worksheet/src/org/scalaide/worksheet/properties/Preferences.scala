@@ -1,18 +1,11 @@
 package org.scalaide.worksheet.properties
 
-import org.scalaide.logging.HasLogger
-import org.eclipse.jface.preference._
-import org.eclipse.ui.IWorkbenchPreferencePage
+import org.eclipse.jface.preference.BooleanFieldEditor
+import org.eclipse.jface.preference.FieldEditorPreferencePage
+import org.eclipse.jface.preference.IntegerFieldEditor
+import org.eclipse.jface.preference.StringFieldEditor
 import org.eclipse.ui.IWorkbench
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
-import org.eclipse.jface.preference.IPreferenceStore
-import org.eclipse.swt.widgets.Link
-import org.eclipse.swt.widgets.Composite
-import org.eclipse.swt.widgets.Control
-import org.eclipse.jdt.internal.ui.preferences.PreferencesMessages
-import org.eclipse.swt.SWT
-import org.eclipse.swt.events.SelectionEvent
-import org.eclipse.ui.dialogs.PreferencesUtil
+import org.eclipse.ui.IWorkbenchPreferencePage
 import org.scalaide.worksheet.WorksheetPlugin
 
 class Preferences extends FieldEditorPreferencePage(FieldEditorPreferencePage.GRID) with IWorkbenchPreferencePage {

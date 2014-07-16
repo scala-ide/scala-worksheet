@@ -36,9 +36,6 @@ private[editor] object DocumentCommandUpdater {
    * find out if the command needs to be updated.
    */
   def apply(document: IDocument, command: DocumentCommand): DocumentCommandUpdater = {
-    // the line delimiters used in the document
-    val lineDelimiters: Array[String] = document.getLegalLineDelimiters
-
     // the offset of the the first character after the removed text
     val removedTextEnd: Int = command.offset + command.length
 
@@ -182,11 +179,11 @@ private[editor] class DocumentCommandUpdater(
   /**
    * Return the text which will be shifted by this command. It is the part between the last
    * character to be removed and the start of the padding in the last line.
-   * 
+   *
    * code code code code       //>result
    *  to there -->|
    *               ^^^^^ text to shift
-   * 
+   *
    * if the text to remove ends in the padding section, an empty string is returned.
    */
   private lazy val codeToShift = {
@@ -205,11 +202,11 @@ private[editor] class DocumentCommandUpdater(
   def checkAndUpdate() {
     /* updating the command is needed only if the 'last line' contains an evaluation
      * result comment, or in one case if the 'first line' contains such comment
-     * 
+     *
      * the command is not updated if the first or the last character of the text
      * to be removed is situated inside an evaluation result comment, including the marker
      */
-    
+
     /* first case: removing a new line delimiter, plus more code
      */
     if (firstLineRemovedTextStart == firstLineInfo.getLength && command.length > 0) {
@@ -217,26 +214,26 @@ private[editor] class DocumentCommandUpdater(
         case Some(offset) if offset >= lastLineRemovedTextEnd =>
           /* With the last line containing an evaluation result comment
            * (the first line may or may not contain an evaluation result comment)
-           * 
+           *
            * code code code code    //> result
            *                                  |<-- from here
            * some line
            * some line
            * code code code code    //> result
-           *  to there -->|                   
+           *  to there -->|
            */
           updateCommand(false, -paddingAndCommentLength)
         case None =>
           firstLineResultCommentOffset match {
             case Some(offset) =>
               /* With only the first line containing an evaluation result comment
-               * 
+               *
                * code code code code    //> result
                *                                  |<-- from here
                * some line
                * some line
                * code code code code
-               *  to there -->|                   
+               *  to there -->|
                */
               updateCommand(true, -paddingAndCommentLength)
             case None =>
@@ -245,13 +242,13 @@ private[editor] class DocumentCommandUpdater(
       }
     } else {
       /* second case: everything else
-       * 
+       *
        * code code code code    //> result
        *       |<-- from here
        * some line
        * some line
        * code code code code    //> result
-       *  to there -->|                   
+       *  to there -->|
        */
       lastLineResultCommentOffset match {
         // check that the 'last line' contains a comment, and the command doesn't 'break' it
@@ -272,7 +269,7 @@ private[editor] class DocumentCommandUpdater(
 
   /**
    * Perform the update. First stage.
-   * 
+   *
    * @param keepFirstResultComment indicate which result comment to keep. The comment needs to exist.
    * @param the shift needed to command.offset to correctly update the command
    */
@@ -287,7 +284,7 @@ private[editor] class DocumentCommandUpdater(
 
   /**
    * Perform the update. Second stage.
-   * 
+   *
    * @param the result comment to keep.
    * @param the result comment original offset
    * @param the shift needed to command.offset to correctly update the command
@@ -311,13 +308,13 @@ private[editor] class DocumentCommandUpdater(
 
   /**
    * Perform the update. Third stage, case 1: the code to insert contains a new line
-   * 
+   *
    * Generate the following new code to replace the code to remove + the remainder of the last line without the line delimiter:
-   * 
+   *
    * [first line code to insert] [padding] [//> result comment] [
    * remainder of
    * the code to insert] [code to shift]
-   * 
+   *
    */
   private def updateCommandMultiLine(resultComment: String, resultCommentOffset: Int, newLineDelimiterOffset: Int, commandOffsetDiff: Int) {
     // length of the new padding (at least 1)
@@ -344,13 +341,13 @@ private[editor] class DocumentCommandUpdater(
 
   /**
    * Perform the update. Third stage, case 2: neither the code to remove nor the code to insert contain a new line
-   * 
+   *
    * code code code code         //> result comment
    *       |<--->|
    *              ^^^^^^ padding
-   * 
+   *
    * Generate the following new code to replace the code to remove + the code to shift + some of the padding:
-   * 
+   *
    * [code to insert] [code to shift] [additional padding]
    */
   private def updateCommandSimpleChange() {
@@ -388,12 +385,12 @@ private[editor] class DocumentCommandUpdater(
       command.length = command.length + codeToShift.length + paddingToRemove
     }
   }
-  
+
   /**
    * Perform the update. Third stage, case 3: the code to insert contains no new line
-   * 
+   *
    * Generate the following new code to replace the code to remove + the remainder of the last line without the line delimiter:
-   * 
+   *
    * [code to insert] [code to shift] [padding] [//> result comment]
    */
   private def updateCommandSingleLine(resultComment: String, resultCommentOffset: Int, commandOffsetDiff: Int) {
