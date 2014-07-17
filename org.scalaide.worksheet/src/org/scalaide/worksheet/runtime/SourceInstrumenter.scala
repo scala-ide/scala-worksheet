@@ -1,11 +1,14 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
+
+import scala.Left
+import scala.Right
 import scala.tools.nsc.interactive.ProgramInstrumenter
+
 import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.text.SourceInserter
-import java.nio.charset.Charset
 
 case class TopLevelObjectDecl(fullName: String)
 
@@ -24,17 +27,18 @@ class SourceInstrumenter(config: Configuration) extends HasLogger {
   }
 
   private def instrumentProgram(unit: ScriptCompilationUnit): Either[Throwable, InstrumentationResult] = {
-    unit.scalaProject.withPresentationCompiler { compiler =>
+    unit.scalaProject.presentationCompiler { compiler =>
       val instrumenter = new ProgramInstrumenter(compiler)
       val source = unit.batchSourceFile(SourceInserter.stripRight(unit.getContents))
       compiler.withResponse[(String, Array[Char])] { instrumenter.askInstrumented(source, -1, _) }.get
-    }() match {
-      case Left((fullName, program)) =>
+    } match {
+      case Some(Left((fullName, program))) =>
         if (fullName.isEmpty) Left(MissingTopLevelObjectDeclaration(unit))
         else Right(InstrumentationResult(TopLevelObjectDecl(fullName), program))
 
-      case Right(ex) =>
+      case Some(Right(ex)) =>
         Left(ProgramInstrumentationFailed(unit, ex))
+      case None => Left(ProgramInstrumentationFailed(unit, new UnsupportedOperationException("Presentation compiler exception on unsupported operation")))
     }
   }
 

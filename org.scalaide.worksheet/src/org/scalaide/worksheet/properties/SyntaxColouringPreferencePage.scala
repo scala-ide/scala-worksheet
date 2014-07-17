@@ -267,7 +267,6 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
       grabExcessVerticalSpace = true,
       widthHint = convertWidthInCharsToPixels(20),
       heightHint = convertHeightInCharsToPixels(12)))
-    updatePreviewerColours()
 
     setUpSelectionListeners()
 
@@ -278,9 +277,6 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
   }
 
   private def setUpSelectionListeners() {
-    overlayStore.addPropertyChangeListener { event: PropertyChangeEvent =>
-      updatePreviewerColours()
-    }
     enabledCheckBox.addSelectionListener { () =>
       for (syntaxClass <- selectedSyntaxClass)
         overlayStore.setValue(syntaxClass.enabledKey, enabledCheckBox.getSelection)
@@ -314,7 +310,7 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
   }
 
   private def createPreviewer(parent: Composite): SourceViewer = {
-    val preview = new SyntaxColouringPreviewText 
+    val preview = new SyntaxColouringPreviewText
     PreviewerFactory.createPreviewer(parent, overlayStore, preview.previewText)
   }
 
@@ -347,10 +343,6 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
       massSetEnablement(true)
       enabledCheckBox.setEnabled(canBeDisabled)
       syntaxBackgroundColorEditor.getButton.setEnabled(backgroundColorEnabled)
-  }
-
-  private def updatePreviewerColours() {
-    val textWidget = previewer.getTextWidget
   }
 
 }

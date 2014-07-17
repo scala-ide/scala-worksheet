@@ -1,17 +1,14 @@
 package org.scalaide.worksheet.reconciler
 
+import org.eclipse.jface.text.DocumentEvent
+import org.eclipse.jface.text.IDocument
+import org.eclipse.jface.text.IDocumentListener
+import org.eclipse.jface.text.IRegion
+import org.eclipse.jface.text.reconciler.DirtyRegion
+import org.eclipse.jface.text.reconciler.IReconcilingStrategy
 import org.scalaide.logging.HasLogger
-import org.eclipse.jdt.core.compiler.IProblem
-import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
-import org.eclipse.jface.text._
-import org.eclipse.jface.text.reconciler._
-import org.eclipse.jface.text.source._
-import org.eclipse.ui.texteditor._
 import org.scalaide.worksheet.ScriptCompilationUnit
-import scala.collection.JavaConverters
 import org.scalaide.worksheet.editor.ScriptEditor
-import org.eclipse.ltk.internal.ui.refactoring.util.SWTUtil
-import org.scalaide.util.internal.eclipse.SWTUtils
 
 class ScalaReconcilingStrategy(textEditor: ScriptEditor) extends IReconcilingStrategy with HasLogger {
   private var document: IDocument = _

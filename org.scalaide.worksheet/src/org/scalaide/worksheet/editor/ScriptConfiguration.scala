@@ -39,8 +39,6 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration {
   @inline private def scalaPreferenceStore: IPreferenceStore = ScalaPlugin.prefStore
 
-  private val codeScanner = new ScalaCodeScanner(scalaPreferenceStore, ScalaVersions.DEFAULT)
-
   override def getPresentationReconciler(sv: ISourceViewer) = {
     val reconciler = super.getPresentationReconciler(sv).asInstanceOf[PresentationReconciler]
 
@@ -144,7 +142,6 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
   }
 
   override def getAutoEditStrategies(sourceViewer: ISourceViewer, contentType: String): Array[org.eclipse.jface.text.IAutoEditStrategy] = {
-    val partitioning = getConfiguredDocumentPartitioning(sourceViewer)
     contentType match {
       // TODO: see why no jdt provided strategy is working
 //      case IJavaPartitions.JAVA_DOC | IJavaPartitions.JAVA_MULTI_LINE_COMMENT =>

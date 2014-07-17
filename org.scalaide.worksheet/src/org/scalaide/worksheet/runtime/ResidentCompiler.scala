@@ -13,8 +13,6 @@ import org.scalaide.worksheet.WorksheetPlugin
 object ResidentCompiler extends HasLogger {
   def apply(scalaProject: ScalaProject, worksheetConfig: Configuration): ResidentCompiler = {
     val scalaClassPath = scalaProject.scalaClasspath
-    val bootClasspathArgs: String = scalaClassPath.scalaLib.get.toFile.getAbsolutePath
-    val jrePath = scalaClassPath.jdkPaths.map(_.toFile)
 
     // scalacArguments returns all project settings (but not user classpath, nor output directory)
     val args = scalaProject.scalacArguments ++ Seq(
