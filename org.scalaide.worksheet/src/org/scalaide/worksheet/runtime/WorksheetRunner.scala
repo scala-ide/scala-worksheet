@@ -1,15 +1,18 @@
 package org.scalaide.worksheet.runtime
 
 import scala.actors.{ Actor, DaemonActor }
-import org.scalaide.core.internal.project.ScalaProject
 import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.text.SourceInserter
-import org.scalaide.core.internal.project.BuildSuccessListener
+import org.scalaide.core.api.ScalaProject
+import org.scalaide.core.api.ScalaProjectMessage
+import org.scalaide.core.api.BuildSuccess
 import org.scalaide.util.internal.eclipse.SWTUtils
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.util.internal.ui.DisplayThread
+import scala.collection.mutable.Publisher
+import scala.collection.mutable.Subscriber
 
 object WorksheetRunner {
 
@@ -31,7 +34,7 @@ object WorksheetRunner {
  *  It instantiates the instrumented program in-process, using a different class-loader.
  *  A more advanced evaluator would spawn a new VM, to allow debugging in the future.
  */
-private class WorksheetRunner private (scalaProject: ScalaProject) extends DaemonActor with HasLogger {
+private class WorksheetRunner private (scalaProject: ScalaProject) extends DaemonActor with Subscriber[ScalaProjectMessage, Publisher[ScalaProjectMessage]] with HasLogger {
   import WorksheetRunner._
   import ResidentCompiler._
 
@@ -40,13 +43,14 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
   private var compiler = ResidentCompiler(scalaProject, config)
   private val executor = ProgramExecutor()
 
-  private object buildListener extends BuildSuccessListener {
-    def buildSuccessful() {
-      WorksheetRunner.this ! RefreshResidentCompiler
+
+  override def notify(pub: Publisher[ScalaProjectMessage], event:ScalaProjectMessage) = {
+    event match {
+      case e: BuildSuccess => WorksheetRunner.this ! RefreshResidentCompiler
     }
   }
 
-  scalaProject.addBuildSuccessListener(buildListener)
+  scalaProject.subscribe(this)
 
   override def act() = {
     loop {
@@ -83,7 +87,7 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
           compiler = ResidentCompiler(scalaProject, config)
 
         case any =>
-          scalaProject.removeBuildSuccessListener(buildListener)
+          scalaProject.removeSubscription(this)
           exit("Unsupported message " + any)
       }
     }

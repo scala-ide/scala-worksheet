@@ -2,7 +2,7 @@ package org.scalaide.worksheet.runtime
 
 import scala.actors.{ Actor, DaemonActor }
 import scala.collection.immutable
-import org.scalaide.core.internal.project.ScalaProject
+import org.scalaide.core.api.ScalaProject
 import org.scalaide.worksheet.ScriptCompilationUnit
 import scala.actors.Exit
 import org.scalaide.logging.HasLogger
