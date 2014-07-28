@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.runtime
 
-import org.scalaide.core.internal.project.ScalaProject
+import org.scalaide.core.api.ScalaProject
 import org.scalaide.core.testsetup.SDTTestUtils.createProjects
 import org.scalaide.core.testsetup.SDTTestUtils.deleteProjects
 import org.eclipse.core.resources.IFolder
