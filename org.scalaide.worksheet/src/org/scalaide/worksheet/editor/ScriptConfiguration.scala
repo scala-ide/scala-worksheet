@@ -33,7 +33,7 @@ import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.lexical.SingleLineCommentScanner
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
 import scalariform.ScalaVersions
-import org.scalaide.ui.internal.editor.ScalaHover
+import org.scalaide.ui.internal.editor.hover.ScalaHover
 import org.scalaide.worksheet.ScriptCompilationUnit
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration {
