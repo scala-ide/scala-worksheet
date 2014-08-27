@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage
 import org.eclipse.core.runtime.IPath
 import org.eclipse.core.resources.ResourcesPlugin
-import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.IScalaPlugin
 
 /** Wizard page based of the new file creation page from the framework.
  *  The advanced section has be removed.
@@ -41,7 +41,7 @@ class NewWorksheetWizardPage(selection: IStructuredSelection) extends WizardNewF
     val project = ResourcesPlugin.getWorkspace().getRoot().getProject(fullPath.segment(0))
 
     (for {
-      prj <- ScalaPlugin.plugin.asScalaProject(project).toSeq
+      prj <- IScalaPlugin().asScalaProject(project).toSeq
       (sourceFolder, _) <- prj.sourceOutputFolders
       sourcePath = sourceFolder.getFullPath()
       if (sourcePath.isPrefixOf(fullPath))

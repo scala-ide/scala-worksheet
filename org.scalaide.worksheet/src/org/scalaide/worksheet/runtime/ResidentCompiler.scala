@@ -1,7 +1,7 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.api.ScalaProject
 import org.scalaide.logging.HasLogger
 import scala.tools.nsc.CompilerCommand
