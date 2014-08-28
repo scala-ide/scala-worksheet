@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.runtime
 
-import org.scalaide.core.api.ScalaProject
+import org.scalaide.core.IScalaProject
 import org.scalaide.core.testsetup.SDTTestUtils.createProjects
 import org.scalaide.core.testsetup.SDTTestUtils.deleteProjects
 import org.eclipse.core.resources.IFolder
@@ -24,7 +24,7 @@ object WorksheetEvalTest {
     }
   }
 
-  private var project: ScalaProject = _
+  private var project: IScalaProject = _
 
   @AfterClass
   def deleteProject() {

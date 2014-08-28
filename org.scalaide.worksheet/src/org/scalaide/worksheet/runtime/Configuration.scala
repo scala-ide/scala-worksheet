@@ -5,7 +5,7 @@ import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.Charset
 
-import org.scalaide.core.api.ScalaProject
+import org.scalaide.core.IScalaProject
 
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.runtime.IPath
@@ -18,7 +18,7 @@ private[runtime] object Configuration {
   private val SrcFolder = RootFolder.append("src")
   private val BinFolder = RootFolder.append("bin")
 
-  def apply(project: ScalaProject): Configuration =
+  def apply(project: IScalaProject): Configuration =
     new Configuration(project.underlying)
 }
 

@@ -2,7 +2,7 @@ package org.scalaide.worksheet.runtime
 
 import java.io.File
 import org.scalaide.core.IScalaPlugin
-import org.scalaide.core.api.ScalaProject
+import org.scalaide.core.IScalaProject
 import org.scalaide.logging.HasLogger
 import scala.tools.nsc.CompilerCommand
 import scala.tools.nsc.Settings
@@ -11,7 +11,7 @@ import scala.reflect.internal.util.Position
 import org.scalaide.worksheet.WorksheetPlugin
 
 object ResidentCompiler extends HasLogger {
-  def apply(scalaProject: ScalaProject, worksheetConfig: Configuration): ResidentCompiler = {
+  def apply(scalaProject: IScalaProject, worksheetConfig: Configuration): ResidentCompiler = {
     val scalaClassPath = scalaProject.scalaClasspath
 
     // scalacArguments returns all project settings (but not user classpath, nor output directory)
