@@ -5,9 +5,9 @@ import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.text.SourceInserter
-import org.scalaide.core.api.ScalaProject
-import org.scalaide.core.api.ScalaProjectEvent
-import org.scalaide.core.api.BuildSuccess
+import org.scalaide.core.IScalaProject
+import org.scalaide.core.IScalaProjectEvent
+import org.scalaide.core.BuildSuccess
 import org.scalaide.util.internal.eclipse.SWTUtils
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.util.internal.ui.DisplayThread
@@ -16,7 +16,7 @@ import scala.collection.mutable.Subscriber
 
 object WorksheetRunner {
 
-  private[runtime] def apply(scalaProject: ScalaProject): Actor = {
+  private[runtime] def apply(scalaProject: IScalaProject): Actor = {
     val worksheet = new WorksheetRunner(scalaProject)
     worksheet.start()
     worksheet
@@ -34,7 +34,7 @@ object WorksheetRunner {
  *  It instantiates the instrumented program in-process, using a different class-loader.
  *  A more advanced evaluator would spawn a new VM, to allow debugging in the future.
  */
-private class WorksheetRunner private (scalaProject: ScalaProject) extends DaemonActor with Subscriber[ScalaProjectEvent, Publisher[ScalaProjectEvent]] with HasLogger {
+private class WorksheetRunner private (scalaProject: IScalaProject) extends DaemonActor with Subscriber[IScalaProjectEvent, Publisher[IScalaProjectEvent]] with HasLogger {
   import WorksheetRunner._
   import ResidentCompiler._
 
@@ -44,7 +44,7 @@ private class WorksheetRunner private (scalaProject: ScalaProject) extends Daemo
   private val executor = ProgramExecutor()
 
 
-  override def notify(pub: Publisher[ScalaProjectEvent], event:ScalaProjectEvent) = {
+  override def notify(pub: Publisher[IScalaProjectEvent], event:IScalaProjectEvent) = {
     event match {
       case e: BuildSuccess => WorksheetRunner.this ! RefreshResidentCompiler
     }
