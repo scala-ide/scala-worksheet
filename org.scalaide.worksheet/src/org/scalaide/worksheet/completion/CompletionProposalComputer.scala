@@ -1,6 +1,6 @@
 package org.scalaide.worksheet.completion
 
-import org.scalaide.core.compiler.ScalaPresentationCompiler
+import org.scalaide.core.compiler.IScalaPresentationCompiler
 import org.scalaide.util.internal.ScalaWordFinder
 import org.scalaide.core.completion.ScalaCompletions
 import org.scalaide.ui.internal.completion.ScalaCompletionProposal
@@ -34,7 +34,7 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
     }
   }
 
-  private def findCompletions(viewer: ITextViewer, position: Int, scu: ScriptCompilationUnit)(sourceFile: SourceFile, compiler: ScalaPresentationCompiler): List[ICompletionProposal] = {
+  private def findCompletions(viewer: ITextViewer, position: Int, scu: ScriptCompilationUnit)(sourceFile: SourceFile, compiler: IScalaPresentationCompiler): List[ICompletionProposal] = {
     val region = ScalaWordFinder.findCompletionPoint(viewer.getDocument.get, position)
 
     val res = findCompletions(region)(position, scu)(sourceFile, compiler).sortBy(_.relevance).reverse

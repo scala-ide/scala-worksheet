@@ -1,10 +1,10 @@
 package scala.tools.nsc.interactive
 
 import scala.reflect.internal.util.SourceFile
-import org.scalaide.core.compiler.ScalaPresentationCompiler
+import org.scalaide.core.compiler.IScalaPresentationCompiler
 import org.scalaide.logging.HasLogger
 
-final class ProgramInstrumenter(compiler: ScalaPresentationCompiler) extends HasLogger { self =>
+final class ProgramInstrumenter(compiler: IScalaPresentationCompiler) extends HasLogger { self =>
   private object Instrumenter extends ScratchPadMaker2 {
     override protected val global: Global = self.compiler
 
@@ -47,8 +47,9 @@ final class ProgramInstrumenter(compiler: ScalaPresentationCompiler) extends Has
    *  @param response     The response
    */
   def askInstrumented(source: SourceFile, line: Int, response: Response[(String, Array[Char])]): Unit = try {
-    compiler.withResponse[Unit] { compiler.askReload(List(source), _) }.get // just make sure it's loaded
-    compiler.askOption { () => Instrumenter.askInstrumentation(source, line, response) }
+    import org.scalaide.core.compiler.IScalaPresentationCompiler.Implicits._ 
+    IScalaPresentationCompiler.withResponse[Unit] { compiler.askReload(List(source), _) }.get // just make sure it's loaded
+    compiler.asyncExec { Instrumenter.askInstrumentation(source, line, response) }.getOption()
   } finally {
     if (!response.isComplete) {
       logger.error("Result missing during instrumentation")

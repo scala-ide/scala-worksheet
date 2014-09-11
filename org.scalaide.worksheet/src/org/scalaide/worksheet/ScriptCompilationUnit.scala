@@ -47,7 +47,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
   override def getContents: Array[Char] = document.map(_.get.toCharArray).getOrElse(file.toCharArray)
 
   /** no-op */
-  override def scheduleReconcile(): Response[Unit] = {
+  override def initialReconcile(): Response[Unit] = {
     val r = new Response[Unit]
     r.set()
     r
@@ -60,7 +60,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
 
   override def currentProblems: List[IProblem] = {
     scalaProject.presentationCompiler { pc =>
-      pc.problemsOf(file)
+      pc.problemsOf(this)
     }.getOrElse(Nil)
   }
 
@@ -70,16 +70,13 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
   override def reconcile(newContents: String): List[IProblem] =
     scalaProject.presentationCompiler { pc =>
       askReload(newContents.toCharArray)
-      pc.problemsOf(file)
+      pc.problemsOf(this)
     }.getOrElse(Nil)
 
   def askReload(newContents: Array[Char] = getContents): Unit =
     scalaProject.presentationCompiler { pc =>
-      val src = batchSourceFile(newContents)
-      pc.withResponse[Unit] { response =>
-        pc.askReload(List(src), response)
-        response.get
-      }
+      import org.scalaide.core.compiler.IScalaPresentationCompiler.Implicits._
+      pc.askReload(this, newContents).getOption()
     }
 
   def clearBuildErrors(): Unit = {

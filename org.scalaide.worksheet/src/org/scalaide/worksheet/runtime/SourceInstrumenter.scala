@@ -1,14 +1,13 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-
 import scala.Left
 import scala.Right
 import scala.tools.nsc.interactive.ProgramInstrumenter
-
 import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.text.SourceInserter
+import org.scalaide.core.compiler.IScalaPresentationCompiler
 
 case class TopLevelObjectDecl(fullName: String)
 
@@ -30,7 +29,7 @@ class SourceInstrumenter(config: Configuration) extends HasLogger {
     unit.scalaProject.presentationCompiler { compiler =>
       val instrumenter = new ProgramInstrumenter(compiler)
       val source = unit.batchSourceFile(SourceInserter.stripRight(unit.getContents))
-      compiler.withResponse[(String, Array[Char])] { instrumenter.askInstrumented(source, -1, _) }.get
+      IScalaPresentationCompiler.withResponse[(String, Array[Char])] { instrumenter.askInstrumented(source, -1, _) }.get
     } match {
       case Some(Left((fullName, program))) =>
         if (fullName.isEmpty) Left(MissingTopLevelObjectDeclaration(unit))
