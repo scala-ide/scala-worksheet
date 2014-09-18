@@ -35,8 +35,9 @@ import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
 import scalariform.ScalaVersions
 import org.scalaide.ui.internal.editor.hover.ScalaHover
 import org.scalaide.worksheet.ScriptCompilationUnit
+import org.eclipse.jface.util.IPropertyChangeListener
 
-class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration {
+class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration with IPropertyChangeListener {
   @inline private def scalaPreferenceStore: IPreferenceStore = IScalaPlugin().getPreferenceStore()
 
   override def getPresentationReconciler(sv: ISourceViewer) = {
@@ -127,7 +128,7 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
     Array(detector)
   }
 
-  def handlePropertyChangeEvent(event: PropertyChangeEvent) {
+  def propertyChange(event: PropertyChangeEvent) {
     scalaCodeScanner.adaptToPreferenceChange(event)
     scaladocScanner.adaptToPreferenceChange(event)
     stringScanner.adaptToPreferenceChange(event)

@@ -159,7 +159,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
   override def handlePreferenceStoreChanged(event: PropertyChangeEvent) = {
     super.handlePreferenceStoreChanged(event)
-    sourceViewConfiguration.handlePropertyChangeEvent(event)
+    sourceViewConfiguration.propertyChange(event)
     getSourceViewer().invalidateTextPresentation()
   }
 
