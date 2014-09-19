@@ -30,10 +30,10 @@ class ColorPreferenceInitializer extends AbstractPreferenceInitializer {
     underline: Boolean = false)(implicit worksheetPrefStore: IPreferenceStore) =
     {
       worksheetPrefStore.setDefault(syntaxClass.enabledKey, enabled)
-      worksheetPrefStore.setDefault(syntaxClass.foregroundColourKey, StringConverter.asString(foregroundRGB))
+      worksheetPrefStore.setDefault(syntaxClass.foregroundColorKey, StringConverter.asString(foregroundRGB))
       val defaultBackgroundColor = StringConverter.asString(backgroundRGB)
-      worksheetPrefStore.setDefault(syntaxClass.backgroundColourKey, defaultBackgroundColor)
-      worksheetPrefStore.setDefault(syntaxClass.backgroundColourEnabledKey, true)
+      worksheetPrefStore.setDefault(syntaxClass.backgroundColorKey, defaultBackgroundColor)
+      worksheetPrefStore.setDefault(syntaxClass.backgroundColorEnabledKey, true)
       worksheetPrefStore.setDefault(syntaxClass.boldKey, bold)
       worksheetPrefStore.setDefault(syntaxClass.italicKey, italic)
       worksheetPrefStore.setDefault(syntaxClass.underlineKey, underline)
