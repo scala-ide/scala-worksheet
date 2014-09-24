@@ -2,7 +2,6 @@ package org.scalaide.worksheet.wizards
 
 import org.scalaide.logging.HasLogger
 import org.scalaide.util.internal.eclipse.SWTUtils
-import org.scalaide.util.internal.Utils
 import org.eclipse.jface.viewers.IStructuredSelection
 import org.eclipse.jface.wizard.Wizard
 import org.eclipse.ui.INewWizard
@@ -21,7 +20,7 @@ class NewWorksheetWizard extends Wizard with INewWizard with HasLogger {
   // from org.eclipse.jface.wizard.Wizard
 
   override def performFinish(): Boolean = {
-    import Utils._
+    import org.scalaide.util.internal.Utils.WithAsInstanceOfOpt
     val file = newFileWizardPage.createNewFile()
 
     if (file != null) {

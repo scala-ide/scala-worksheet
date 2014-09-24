@@ -5,7 +5,7 @@ import org.osgi.framework.BundleContext
 import org.scalaide.util.internal.eclipse.OSGiUtils
 import org.eclipse.core.runtime.Platform
 import org.osgi.framework.Bundle
-import org.scalaide.util.internal.Utils
+import org.scalaide.util.internal.Utils.WithAsInstanceOfOpt
 import org.eclipse.core.runtime.IPath
 import org.scalaide.logging.HasLogger
 import org.eclipse.core.runtime.Path
