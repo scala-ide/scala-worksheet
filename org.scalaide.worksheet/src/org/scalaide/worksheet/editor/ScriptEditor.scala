@@ -4,7 +4,6 @@ import org.scalaide.ui.internal.editor.ISourceViewerEditor
 import org.scalaide.core.compiler.InteractiveCompilationUnit
 import org.scalaide.logging.HasLogger
 import org.scalaide.ui.internal.editor.InteractiveCompilationUnitEditor
-import org.scalaide.util.internal.eclipse.SWTUtils
 import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
 import org.eclipse.jface.action.IMenuManager
@@ -65,7 +64,6 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
    *  the evaluation's result.
    */
   private class DefaultEditorProxy extends DocumentHolder {
-    import org.scalaide.util.internal.eclipse.SWTUtils
 
     @volatile private[ScriptEditor] var ignoreDocumentUpdate = false
     private val stopEvaluationListener = new StopEvaluationOnKeyPressed(this)
@@ -137,7 +135,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     private def runInUi(f: => Unit): Unit = DisplayThread.asyncExec {
       /* We need to make sure that the editor was not `disposed` before executing `f`
        * in the UI thread. The reason is that it is possible that after calling
-       * `SWTUtils.asyncExec`, but before the passed closure is executed, the editor
+       * `DisplayThread.asyncExec`, but before the passed closure is executed, the editor
        * may be disposed. If the editor is disposed, executing `f` will likely end up
        * throwing a NPE.
        *

@@ -8,7 +8,6 @@ import org.scalaide.worksheet.text.SourceInserter
 import org.scalaide.core.IScalaProject
 import org.scalaide.core.IScalaProjectEvent
 import org.scalaide.core.BuildSuccess
-import org.scalaide.util.internal.eclipse.SWTUtils
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.util.internal.ui.DisplayThread
 import scala.collection.mutable.Publisher

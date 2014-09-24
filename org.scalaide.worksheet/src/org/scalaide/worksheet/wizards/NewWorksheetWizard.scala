@@ -1,7 +1,6 @@
 package org.scalaide.worksheet.wizards
 
 import org.scalaide.logging.HasLogger
-import org.scalaide.util.internal.eclipse.SWTUtils
 import org.eclipse.jface.viewers.IStructuredSelection
 import org.eclipse.jface.wizard.Wizard
 import org.eclipse.ui.INewWizard
