@@ -3,7 +3,7 @@ package org.scalaide.worksheet.properties
 import scala.PartialFunction.condOpt
 import org.scalaide.ui.internal.preferences.GridDataHelper.gridData
 import org.scalaide.ui.syntax.ScalaSyntaxClass
-import org.scalaide.util.internal.eclipse.EclipseUtils
+import org.scalaide.util.internal.eclipse.EclipseUtils.SelectedItems
 import org.scalaide.util.internal.eclipse.SWTUtils.fnToDoubleClickListener
 import org.scalaide.util.internal.eclipse.SWTUtils.fnToPropertyChangeListener
 import org.scalaide.util.internal.eclipse.SWTUtils.fnToSelectionAdapter
@@ -315,7 +315,7 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
   }
 
   private def selectedSyntaxClass: Option[ScalaSyntaxClass] = condOpt(treeViewer.getSelection) {
-    case EclipseUtils.SelectedItems(syntaxClass: ScalaSyntaxClass) => syntaxClass
+    case SelectedItems(syntaxClass: ScalaSyntaxClass) => syntaxClass
   }
 
   private def massSetEnablement(enabled: Boolean) = {
@@ -330,7 +330,7 @@ class SyntaxColouringPreferencePage extends PreferencePage with IWorkbenchPrefer
       massSetEnablement(false)
     case Some(syntaxClass) =>
       import syntaxClass._
-      import EclipseUtils._
+      import org.scalaide.util.internal.eclipse.EclipseUtils.PimpedPreferenceStore
       syntaxForegroundColorEditor.setColorValue(overlayStore getColor foregroundColourKey)
       syntaxBackgroundColorEditor.setColorValue(overlayStore getColor backgroundColourKey)
       val backgroundColorEnabled = overlayStore getBoolean backgroundColourEnabledKey
