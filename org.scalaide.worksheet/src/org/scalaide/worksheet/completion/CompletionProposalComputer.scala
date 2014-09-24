@@ -39,7 +39,7 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
 
     val res = findCompletions(region)(position, scu)(sourceFile, compiler).sortBy(_.relevance).reverse
 
-    res.map(ScalaCompletionProposal(viewer.getSelectionProvider))
+    res.map(new ScalaCompletionProposal(_))
 
   }
 
