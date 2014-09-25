@@ -27,6 +27,7 @@ import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
 import org.scalaide.worksheet.editor.action.ClearResultsAction
 import org.scalaide.util.internal.ui.DisplayThread
+import org.eclipse.jdt.ui.PreferenceConstants
 
 object ScriptEditor {
 
@@ -43,7 +44,7 @@ object ScriptEditor {
 class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEditor with InteractiveCompilationUnitEditor with HasLogger {
   private def prefStore = WorksheetPlugin.prefStore
 
-  private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, this)
+  private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, PreferenceConstants.getPreferenceStore, this)
   setSourceViewerConfiguration(sourceViewConfiguration)
   //  setPreferenceStore(prefStore)
   setPartName("Scala Script Editor")
