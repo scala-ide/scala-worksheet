@@ -19,6 +19,7 @@ import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.texteditor.ITextEditor
 import org.scalaide.worksheet.editor.ScriptEditor
 import org.scalaide.core.resources.MarkerFactory
+import org.scalaide.core.compiler.ISourceMap
 
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying
@@ -27,14 +28,21 @@ import org.scalaide.core.resources.MarkerFactory
 case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCompilationUnit {
 
   @volatile private var document: Option[IDocument] = None
+  @volatile private var lastInfo: ISourceMap = _
 
   override def file: AbstractFile = EclipseResource(workspaceFile)
 
   override lazy val scalaProject = IScalaPlugin().asScalaProject(workspaceFile.getProject).get
 
-  /** Return the compiler ScriptSourceFile corresponding to this unit. */
-  override def sourceFile(contents: Array[Char]): ScriptSourceFile = {
-    ScriptSourceFile.apply(file, contents)
+  override def lastSourceMap(): ISourceMap = {
+    if (lastInfo eq null)
+      lastInfo = sourceMap(getContents())
+    lastInfo
+  }
+
+  override def sourceMap(contents: Array[Char]): ISourceMap = {
+    lastInfo = ISourceMap.plainScala(file, contents)
+    lastInfo
   }
 
   /** Return the compiler ScriptSourceFile corresponding to this unit. */
@@ -46,38 +54,10 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
 
   override def getContents: Array[Char] = document.map(_.get.toCharArray).getOrElse(file.toCharArray)
 
-  /** no-op */
-  override def initialReconcile(): Response[Unit] = {
-    val r = new Response[Unit]
-    r.set()
-    r
-  }
-
   def connect(doc: IDocument): this.type = {
     document = Option(doc)
     this
   }
-
-  override def currentProblems: List[IProblem] = {
-    scalaProject.presentationCompiler { pc =>
-      pc.problemsOf(this)
-    }.getOrElse(Nil)
-  }
-
-  /** Reconcile the unit. Return all compilation errors.
-   *  Blocks until the unit is type-checked.
-   */
-  override def reconcile(newContents: String): List[IProblem] =
-    scalaProject.presentationCompiler { pc =>
-      askReload(newContents.toCharArray)
-      pc.problemsOf(this)
-    }.getOrElse(Nil)
-
-  def askReload(newContents: Array[Char] = getContents): Unit =
-    scalaProject.presentationCompiler { pc =>
-      import org.scalaide.core.compiler.IScalaPresentationCompiler.Implicits._
-      pc.askReload(this, newContents).getOption()
-    }
 
   def clearBuildErrors(): Unit = {
     FileUtils.clearBuildErrors(workspaceFile, null)

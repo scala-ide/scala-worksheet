@@ -9,8 +9,9 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy
 import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.ScriptEditor
+import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension
 
-class ScalaReconcilingStrategy(textEditor: ScriptEditor) extends IReconcilingStrategy with HasLogger {
+class ScalaReconcilingStrategy(textEditor: ScriptEditor) extends IReconcilingStrategy with IReconcilingStrategyExtension with HasLogger {
   private var document: IDocument = _
   private lazy val scriptUnit = ScriptCompilationUnit.fromEditor(textEditor)
 
@@ -24,24 +25,26 @@ class ScalaReconcilingStrategy(textEditor: ScriptEditor) extends IReconcilingStr
     logger.debug("Incremental reconciliation not implemented.")
   }
 
-  override def reconcile(partition: IRegion) {
-    val errors = scriptUnit.reconcile(document.get)
+  override def reconcile(partition: IRegion): Unit = try {
+    val errors = scriptUnit.forceReconcile()
 
     textEditor.updateErrorAnnotations(errors)
+  } catch {
+    case e => eclipseLog.error("Exception while reconciling worksheet", e)
   }
 
-  /** Ask the underlying unit to reload on each document change event.
-   *
-   *  This is certainly wasteful, but otherwise the AST trees are not up to date
-   *  in the interval between the last keystroke and reconciliation (which has a delay of
-   *  500ms usually). The user can be quick and ask for completions in this interval, and get
-   *  wrong results.
-   */
+  /** Ask the underlying unit to be scheduled for the next reconciliation round */
   private object reloader extends IDocumentListener {
     override def documentChanged(event: DocumentEvent) {
-      scriptUnit.askReload()
+      scriptUnit.scheduleReconcile(document.get.toCharArray)
     }
 
     override def documentAboutToBeChanged(event: DocumentEvent) {}
   }
+
+  def initialReconcile(): Unit = {
+    scriptUnit.initialReconcile()
+  }
+
+  def setProgressMonitor(x$1: org.eclipse.core.runtime.IProgressMonitor): Unit = {}
 }
