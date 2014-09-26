@@ -103,7 +103,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
     private def caretOffset: Int = {
       var offset = -1
-      DisplayThread.syncExec {
+      DisplayThread().syncExec {
         // Read the comment in `runInUi`
         if (!disposed) offset = getSourceViewer().getTextWidget().getCaretOffset()
       }
@@ -138,7 +138,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     /** Run `f' in the UI thread and make sure we were not disposed before.
      *  Disable redraws during the execution of this block to reduce flickering.
      */
-    private def runInUi(f: => Unit): Unit = DisplayThread.asyncExec {
+    private def runInUi(f: => Unit): Unit = DisplayThread().asyncExec {
       /* We need to make sure that the editor was not `disposed` before executing `f`
        * in the UI thread. The reason is that it is possible that after calling
        * `DisplayThread.asyncExec`, but before the passed closure is executed, the editor
@@ -288,7 +288,7 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
     // This shouldn't be necessary in @dragos' opinion. But see #84 and
     // http://stackoverflow.com/questions/12507620/race-conditions-in-annotationmodel-error-annotations-lost-in-reconciler
-    DisplayThread.asyncExec { getSourceViewer.invalidateTextPresentation() }
+    DisplayThread().asyncExec { getSourceViewer.invalidateTextPresentation() }
   }
 
   private def isPureExpressionWarning(e: IProblem): Boolean =

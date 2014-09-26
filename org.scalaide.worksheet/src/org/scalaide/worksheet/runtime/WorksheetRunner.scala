@@ -9,7 +9,7 @@ import org.scalaide.core.IScalaProject
 import org.scalaide.core.IScalaProjectEvent
 import org.scalaide.core.BuildSuccess
 import org.scalaide.worksheet.WorksheetPlugin
-import org.scalaide.util.internal.ui.DisplayThread
+import org.scalaide.util.DisplayThread
 import scala.collection.mutable.Publisher
 import scala.collection.mutable.Subscriber
 
@@ -70,7 +70,7 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Daem
                   // on the UI thread. Otherwise, the 'replaceWith' call before
                   // might remove all markers, considering their positions 'deleted'
                   // by the replace action
-                  DisplayThread.asyncExec { reportBuildErrors(unit, errors) }
+                  DisplayThread().asyncExec { reportBuildErrors(unit, errors) }
 
                 case CompilationSuccess =>
                   executor ! ProgramExecutor.RunProgram(unit, decl.fullName, classpath, editor)

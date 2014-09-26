@@ -4,7 +4,7 @@ import org.scalaide.core.compiler.InteractiveCompilationUnit
 import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.internal.builder.BuildProblemMarker
 import org.scalaide.core.resources.EclipseResource
-import org.scalaide.util.internal.eclipse.FileUtils
+import org.scalaide.util.FileUtils
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.io.AbstractFile
 import scala.reflect.internal.util.BatchSourceFile
@@ -60,7 +60,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
   }
 
   def clearBuildErrors(): Unit = {
-    FileUtils.clearBuildErrors(workspaceFile, null)
+    FileUtils().clearBuildErrors(workspaceFile, null)
   }
 
   /** Build errors need to be mapped back to the original source. Right now

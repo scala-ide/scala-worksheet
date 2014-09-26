@@ -9,7 +9,7 @@ import org.eclipse.ui.PartInitException
 import org.eclipse.ui.PlatformUI
 import org.eclipse.ui.ide.IDE
 import org.scalaide.worksheet.editor.ScriptEditor
-import org.scalaide.util.internal.ui.DisplayThread
+import org.scalaide.util.DisplayThread
 
 /**
  * A wizard to create a new Scala worksheet file.
@@ -19,12 +19,12 @@ class NewWorksheetWizard extends Wizard with INewWizard with HasLogger {
   // from org.eclipse.jface.wizard.Wizard
 
   override def performFinish(): Boolean = {
-    import org.scalaide.util.internal.Utils.WithAsInstanceOfOpt
+    import org.scalaide.util.UtilsImplicits.withAsInstanceOfOpt
     val file = newFileWizardPage.createNewFile()
 
     if (file != null) {
       // if it worked, open the file
-      DisplayThread.asyncExec {
+      DisplayThread().asyncExec {
         val page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
         try {
           val editor = IDE.openEditor(page, file, true)
