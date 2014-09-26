@@ -28,6 +28,11 @@ import org.scalaide.worksheet.editor.action.RunEvaluationAction
 import org.scalaide.worksheet.editor.action.ClearResultsAction
 import org.scalaide.util.internal.ui.DisplayThread
 import org.eclipse.jdt.ui.PreferenceConstants
+import org.eclipse.jface.action.Action
+import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
+import org.scalaide.util.internal.eclipse.EditorUtils
+import org.eclipse.jdt.ui.actions.IJavaEditorActionDefinitionIds
+import org.eclipse.ui.editors.text.TextFileDocumentProvider
 
 object ScriptEditor {
 
@@ -185,6 +190,24 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
     val evalScriptAction = new RunEvaluationAction(this)
     evalScriptAction.setActionDefinitionId("org.scalaide.worksheet.commands.evalScript")
     setAction("evalScript", evalScriptAction)
+
+    val openAction = new Action {
+      private def scalaCompilationUnit: Option[ScriptCompilationUnit] =
+        Option(getInteractiveCompilationUnit) map (_.asInstanceOf[ScriptCompilationUnit])
+
+      override def run {
+        scalaCompilationUnit foreach { scu =>
+          val detector = DeclarationHyperlinkDetector()
+          val region = EditorUtils.textSelection2region(getSelectionProvider.getSelection.asInstanceOf[ITextSelection])
+          detector.detectHyperlinks(ScriptEditor.this, region, false) match {
+            case Array(hyperlink) => hyperlink.open()
+            case _ => () // didn't find it
+          }
+        }
+      }
+    }
+    openAction.setActionDefinitionId(IJavaEditorActionDefinitionIds.OPEN_EDITOR)
+    setAction("OpenEditor", openAction)
   }
 
   override def editorContextMenuAboutToShow(menu: IMenuManager) {
