@@ -67,7 +67,7 @@ class CompletionTests {
         val completions: List[ICompletionProposal] = completion.computeCompletionProposals(context, monitor).map(_.asInstanceOf[ICompletionProposal]).toList
         */
 
-        body(i, position, completion.findCompletions(wordRegion)(pos + 1, unit)(src, compiler))
+        body(i, position, completion.findCompletions(wordRegion, pos + 1, unit))
       }
     }
   }
