@@ -147,6 +147,7 @@ object testeval {
 
   while (true) {
     x += 1
+    Thread.sleep(10)
     println(x)
   }
 }
@@ -158,6 +159,7 @@ object testeval {
 
   while (true) {
     x += 1
+    Thread.sleep(10)
     println(x)
   }                                               //> 1
                                                   //| 2
