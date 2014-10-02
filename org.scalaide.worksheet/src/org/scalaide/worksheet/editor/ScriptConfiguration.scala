@@ -3,7 +3,6 @@ package org.scalaide.worksheet.editor
 import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.internal.formatter.ScalaFormattingStrategy
 import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
-import org.scalaide.core.internal.lexical._
 import org.scalaide.ui.syntax.ScalaSyntaxClasses
 import org.scalaide.ui.internal.editor.autoedits.BracketAutoEditStrategy
 import org.eclipse.jdt.internal.ui.JavaPlugin
@@ -35,30 +34,21 @@ import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
 import scalariform.ScalaVersions
 import org.scalaide.ui.internal.editor.hover.ScalaHover
 import org.scalaide.worksheet.ScriptCompilationUnit
+import org.eclipse.jface.util.IPropertyChangeListener
+import org.scalaide.core.lexical.ScalaCodeScanners
+import org.scalaide.core.lexical.ScalaPartitions
 
-class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration {
+class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, javaPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration with IPropertyChangeListener {
   @inline private def scalaPreferenceStore: IPreferenceStore = IScalaPlugin().getPreferenceStore()
 
   override def getPresentationReconciler(sv: ISourceViewer) = {
     val reconciler = super.getPresentationReconciler(sv).asInstanceOf[PresentationReconciler]
 
-    def handlePartition(partitionType: String, tokenScanner: ITokenScanner) {
+    for ((partitionType, tokenScanner) <- codeHighlightingScanners) {
       val dr = new DefaultDamagerRepairer(tokenScanner)
       reconciler.setDamager(dr, partitionType)
       reconciler.setRepairer(dr, partitionType)
     }
-
-    handlePartition(IDocument.DEFAULT_CONTENT_TYPE, scalaCodeScanner)
-    handlePartition(IJavaPartitions.JAVA_DOC, scaladocScanner)
-    handlePartition(IJavaPartitions.JAVA_SINGLE_LINE_COMMENT, singleLineCommentScanner)
-    handlePartition(IJavaPartitions.JAVA_MULTI_LINE_COMMENT, multiLineCommentScanner)
-    handlePartition(IJavaPartitions.JAVA_STRING, stringScanner)
-    handlePartition(ScalaPartitions.SCALA_MULTI_LINE_STRING, multiLineStringScanner)
-    handlePartition(ScalaPartitions.XML_TAG, xmlTagScanner)
-    handlePartition(ScalaPartitions.XML_COMMENT, xmlCommentScanner)
-    handlePartition(ScalaPartitions.XML_CDATA, xmlCDATAScanner)
-    handlePartition(ScalaPartitions.XML_PCDATA, xmlPCDATAScanner)
-    handlePartition(ScalaPartitions.XML_PI, xmlPIScanner)
 
     reconciler
   }
@@ -109,17 +99,7 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
     formatter
   }
 
-  private val scalaCodeScanner = new ScalaCodeScanner(scalaPreferenceStore, ScalaVersions.DEFAULT)
-  private val singleLineCommentScanner = new SingleLineCommentScanner(scalaPreferenceStore, pluginPreferenceStore)
-  private val multiLineCommentScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_COMMENT, scalaPreferenceStore)
-  private val scaladocScanner = new SingleTokenScanner(ScalaSyntaxClasses.SCALADOC, scalaPreferenceStore)
-  private val stringScanner = new SingleTokenScanner(ScalaSyntaxClasses.STRING, scalaPreferenceStore)
-  private val multiLineStringScanner = new SingleTokenScanner(ScalaSyntaxClasses.MULTI_LINE_STRING, scalaPreferenceStore)
-  private val xmlTagScanner = new XmlTagScanner(scalaPreferenceStore)
-  private val xmlCommentScanner = new XmlCommentScanner(scalaPreferenceStore)
-  private val xmlCDATAScanner = new XmlCDATAScanner(scalaPreferenceStore)
-  private val xmlPCDATAScanner = new SingleTokenScanner(ScalaSyntaxClasses.DEFAULT, scalaPreferenceStore)
-  private val xmlPIScanner = new XmlPIScanner(scalaPreferenceStore)
+  private val codeHighlightingScanners = ScalaCodeScanners.codeHighlightingScanners(scalaPreferenceStore, javaPreferenceStore)
 
   override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
     val detector = DeclarationHyperlinkDetector()
@@ -127,18 +107,8 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, textEdito
     Array(detector)
   }
 
-  def handlePropertyChangeEvent(event: PropertyChangeEvent) {
-    scalaCodeScanner.adaptToPreferenceChange(event)
-    scaladocScanner.adaptToPreferenceChange(event)
-    stringScanner.adaptToPreferenceChange(event)
-    multiLineStringScanner.adaptToPreferenceChange(event)
-    singleLineCommentScanner.adaptToPreferenceChange(event)
-    multiLineCommentScanner.adaptToPreferenceChange(event)
-    xmlTagScanner.adaptToPreferenceChange(event)
-    xmlCommentScanner.adaptToPreferenceChange(event)
-    xmlCDATAScanner.adaptToPreferenceChange(event)
-    xmlPCDATAScanner.adaptToPreferenceChange(event)
-    xmlPIScanner.adaptToPreferenceChange(event)
+  def propertyChange(event: PropertyChangeEvent) {
+    codeHighlightingScanners.values.foreach(_.adaptToPreferenceChange(event))
   }
 
   override def getAutoEditStrategies(sourceViewer: ISourceViewer, contentType: String): Array[org.eclipse.jface.text.IAutoEditStrategy] = {

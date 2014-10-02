@@ -113,7 +113,7 @@
       </page>
       <page
             category="org.scalaide.worksheet.preferences"
-            class="org.scalaide.worksheet.properties.SyntaxColouringPreferencePage"
+            class="org.scalaide.worksheet.properties.SyntaxColoringPreferencePage"
             id="org.scalaide.worksheet.preferences.syntaxColoring"
             name="SyntaxColoring">
       </page>
@@ -121,7 +121,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.scalaide.worksheet.properties.ColourPreferenceInitializer">
+            class="org.scalaide.worksheet.properties.ColorPreferenceInitializer">
       </initializer>
       <initializer
             class="org.scalaide.worksheet.properties.WorksheetPreferenceInitializer">
