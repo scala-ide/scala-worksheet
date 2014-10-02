@@ -47,7 +47,7 @@ class CompletionTests {
         val pos = positions(i)
 
         val position = new OffsetPosition(src, pos)
-        val wordRegion = ScalaWordFinder().findWord(content, position.point)
+        val wordRegion = ScalaWordFinder.findWord(content, position.point)
 
         //        val selection = mock(classOf[ISelectionProvider])
 

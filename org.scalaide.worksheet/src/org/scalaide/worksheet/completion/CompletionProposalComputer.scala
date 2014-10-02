@@ -4,7 +4,7 @@ import org.scalaide.core.compiler.IScalaPresentationCompiler
 import org.scalaide.util.ScalaWordFinder
 import org.scalaide.core.completion.ScalaCompletions
 import org.scalaide.ui.internal.completion.ScalaCompletionProposal
-import org.scalaide.util.EditorUtils
+import org.scalaide.util.eclipse.EditorUtils
 import scala.reflect.internal.util.SourceFile
 
 import org.eclipse.jface.text.ITextViewer
@@ -24,7 +24,7 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
   override def getContextInformationValidator = null
 
   override def computeCompletionProposals(viewer: ITextViewer, offset: Int): Array[ICompletionProposal] = {
-    EditorUtils().getEditorCompilationUnit(textEditor) match {
+    EditorUtils.getEditorCompilationUnit(textEditor) match {
       case Some(scu: ScriptCompilationUnit) =>
         // TODO: Not sure if this is the best way. Maybe compilation units should always be connected to something..
         scu.connect(viewer.getDocument)
@@ -35,7 +35,7 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
   }
 
   private def findCompletions(viewer: ITextViewer, position: Int, scu: ScriptCompilationUnit)(sourceFile: SourceFile, compiler: IScalaPresentationCompiler): List[ICompletionProposal] = {
-    val region = ScalaWordFinder().findCompletionPoint(viewer.getDocument.get, position)
+    val region = ScalaWordFinder.findCompletionPoint(viewer.getDocument.get, position)
 
     val res = findCompletions(region)(position, scu)(sourceFile, compiler).sortBy(_.relevance).reverse
 

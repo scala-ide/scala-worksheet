@@ -24,7 +24,7 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.properties.WorksheetPreferences
-import org.scalaide.util.DisplayThread
+import org.scalaide.util.ui.DisplayThread
 
 object ProgramExecutor extends HasLogger {
   def apply(): Actor = {
