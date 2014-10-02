@@ -1,9 +1,9 @@
 package org.scalaide.worksheet.editor
 
-import org.scalaide.ui.internal.editor.ISourceViewerEditor
+import org.scalaide.ui.editor.ISourceViewerEditor
+import org.scalaide.ui.editor.InteractiveCompilationUnitEditor
 import org.scalaide.core.compiler.InteractiveCompilationUnit
 import org.scalaide.logging.HasLogger
-import org.scalaide.ui.internal.editor.InteractiveCompilationUnitEditor
 import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
 import org.eclipse.jface.action.IMenuManager

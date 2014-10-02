@@ -32,11 +32,12 @@ import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.lexical.SingleLineCommentScanner
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
 import scalariform.ScalaVersions
-import org.scalaide.ui.internal.editor.hover.ScalaHover
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.eclipse.jface.util.IPropertyChangeListener
 import org.scalaide.core.lexical.ScalaCodeScanners
 import org.scalaide.core.lexical.ScalaPartitions
+import org.scalaide.ui.editor.hover.IScalaHover
+import org.eclipse.jface.text.information.InformationPresenter
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, javaPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration with IPropertyChangeListener {
   @inline private def scalaPreferenceStore: IPreferenceStore = IScalaPlugin().getPreferenceStore()
@@ -81,7 +82,16 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, javaPrefe
   }
 
   override def getTextHover(viewer: ISourceViewer, contentType: String): ITextHover = {
-    new ScalaHover
+    IScalaHover()
+  }
+
+  override def getInformationPresenter(sourceViewer: ISourceViewer) = {
+    val p = new InformationPresenter(getInformationControlCreator(sourceViewer))
+    val ip = IScalaHover.hoverInformationProvider(textEditor)
+
+    p.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer))
+    getConfiguredContentTypes(sourceViewer) foreach (p.setInformationProvider(ip, _))
+    p
   }
 
   override def getTabWidth(viewer: ISourceViewer): Int = ScriptEditor.TAB_WIDTH
