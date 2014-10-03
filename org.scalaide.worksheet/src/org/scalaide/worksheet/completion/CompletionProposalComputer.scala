@@ -39,8 +39,7 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
 
     val res = findCompletions(region)(position, scu)(sourceFile, compiler).sortBy(_.relevance).reverse
 
-    res.map(new ScalaCompletionProposal(_))
-
+    res.map(ScalaCompletionProposal.apply)
   }
 
   override def computeContextInformation(viewer: ITextViewer, offset: Int): Array[IContextInformation] = {

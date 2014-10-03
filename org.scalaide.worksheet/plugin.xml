@@ -127,4 +127,11 @@
             class="org.scalaide.worksheet.properties.WorksheetPreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            class="org.scalaide.worksheet.editor.ScriptDocumentSetupParticipant"
+            extensions="sc">
+      </participant>
+   </extension>
 </plugin>

@@ -26,7 +26,7 @@ import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.properties.WorksheetPreferences
 import org.scalaide.util.internal.ui.DisplayThread
 
-object ProgramExecutor {
+object ProgramExecutor extends HasLogger {
   def apply(): Actor = {
     val executor = new ProgramExecutor
     executor.start()
@@ -78,14 +78,18 @@ object ProgramExecutor {
             if (Option(element) == getFirstProcess(launchRef.get)) {
               val process = getFirstProcess(launchRef.get).get
               if (process.getExitValue()!= 0) {
+                val stderr = process.getStreamsProxy().getErrorStreamMonitor().getContents()
+                val message = s"""|Worksheet process has terminated unexpectedly (exit value ${process.getExitValue()}
+                                  |At the time of termination, the following text was available in the output streams:
+                                  |Standard output:
+                                  |  $terminalMessage
+                                  |Standard error:
+                                  |  $stderr
+                                  |""".stripMargin
+                logger.error(message)
                 DisplayThread asyncExec {
-                  val stderr = process.getStreamsProxy().getErrorStreamMonitor().getContents()
                   val shell = Display.getCurrent().getActiveShell()
-                  MessageDialog.openError(shell, "Worksheet terminated unexpectedly",
-                    "Worksheet process has terminated unexpectedly (exit value "+process.getExitValue()+")\n" +
-                    "At the time of termination, the following text was available in the output streams:\n\n" +
-                    "Standard output:\n"+terminalMessage+"\n" +
-                    "Standard error: \n"+stderr)
+                  MessageDialog.openError(shell, "Worksheet terminated unexpectedly", message)
                 }
               }
               service ! FinishedRun
