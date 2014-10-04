@@ -4,7 +4,7 @@ import org.scalaide.core.compiler.InteractiveCompilationUnit
 import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.internal.builder.BuildProblemMarker
 import org.scalaide.core.resources.EclipseResource
-import org.scalaide.util.internal.eclipse.FileUtils
+import org.scalaide.util.eclipse.FileUtils
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.io.AbstractFile
 import scala.reflect.internal.util.BatchSourceFile

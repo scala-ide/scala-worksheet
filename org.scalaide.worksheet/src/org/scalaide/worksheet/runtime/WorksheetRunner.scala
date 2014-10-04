@@ -9,7 +9,7 @@ import org.scalaide.core.IScalaProject
 import org.scalaide.core.IScalaProjectEvent
 import org.scalaide.core.BuildSuccess
 import org.scalaide.worksheet.WorksheetPlugin
-import org.scalaide.util.internal.ui.DisplayThread
+import org.scalaide.util.ui.DisplayThread
 import scala.collection.mutable.Publisher
 import scala.collection.mutable.Subscriber
 

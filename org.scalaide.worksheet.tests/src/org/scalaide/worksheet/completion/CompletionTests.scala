@@ -9,7 +9,7 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import org.eclipse.core.runtime.Path
 import org.eclipse.core.resources.IFile
 import scala.tools.nsc.interactive.Response
-import org.scalaide.util.internal.ScalaWordFinder
+import org.scalaide.util.ScalaWordFinder
 import org.junit.Assert
 import org.junit.Test
 

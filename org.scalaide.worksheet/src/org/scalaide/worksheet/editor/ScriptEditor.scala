@@ -26,11 +26,11 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.editor.action.RunEvaluationAction
 import org.scalaide.worksheet.editor.action.ClearResultsAction
-import org.scalaide.util.internal.ui.DisplayThread
+import org.scalaide.util.ui.DisplayThread
 import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.jface.action.Action
 import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
-import org.scalaide.util.internal.eclipse.EditorUtils
+import org.scalaide.util.eclipse.EditorUtils
 import org.eclipse.jdt.ui.actions.IJavaEditorActionDefinitionIds
 import org.eclipse.ui.editors.text.TextFileDocumentProvider
 
