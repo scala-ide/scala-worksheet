@@ -2,7 +2,6 @@ package org.scalaide.worksheet.editor
 
 import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.internal.formatter.ScalaFormattingStrategy
-import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
 import org.scalaide.ui.syntax.ScalaSyntaxClasses
 import org.scalaide.ui.internal.editor.autoedits.BracketAutoEditStrategy
 import org.eclipse.jdt.internal.ui.JavaPlugin
@@ -38,6 +37,7 @@ import org.scalaide.core.lexical.ScalaCodeScanners
 import org.scalaide.core.lexical.ScalaPartitions
 import org.scalaide.ui.editor.hover.IScalaHover
 import org.eclipse.jface.text.information.InformationPresenter
+import org.scalaide.ui.editor.SourceConfiguration
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, javaPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration with IPropertyChangeListener {
   @inline private def scalaPreferenceStore: IPreferenceStore = IScalaPlugin().getPreferenceStore()
@@ -112,7 +112,7 @@ class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, javaPrefe
   private val codeHighlightingScanners = ScalaCodeScanners.codeHighlightingScanners(scalaPreferenceStore, javaPreferenceStore)
 
   override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
-    val detector = DeclarationHyperlinkDetector()
+    val detector = SourceConfiguration.scalaDeclarationDetector
     detector.setContext(textEditor)
     Array(detector)
   }
