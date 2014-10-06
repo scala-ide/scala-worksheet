@@ -101,7 +101,7 @@ class CompletionTests {
 
       completionsNoParens.zip(expectedNoParens).foreach {
         case (found, expected) =>
-          assertTrue("Found `%s`, expected `%s`".format(found, expected), found == expected)
+          assertEquals("Found `%s`, expected `%s`".format(found, expected), expected, found)
       }
     }
   }
@@ -120,8 +120,8 @@ class CompletionTests {
   @Test
   def basicCompletions() {
     val oraclePos73 = List("toString(): String")
-    val oraclePos116 = List("forallChar => Boolean: Boolean")
-    val oraclePos147 = List("forallChar => Boolean: Boolean")
+    val oraclePos116 = List("forallp: Char => Boolean: Boolean")
+    val oraclePos147 = List("forallp: Char => Boolean: Boolean")
 
     runTest("completion/src/org/example/ScalaClass.scala", false)(oraclePos73, oraclePos116, oraclePos147)
   }
