@@ -3,7 +3,7 @@ package org.scalaide.worksheet.completion
 import org.scalaide.core.compiler.IScalaPresentationCompiler
 import org.scalaide.util.ScalaWordFinder
 import org.scalaide.core.completion.ScalaCompletions
-import org.scalaide.ui.internal.completion.ScalaCompletionProposal
+import org.scalaide.ui.completion.ScalaCompletionProposal
 import org.scalaide.util.eclipse.EditorUtils
 import scala.reflect.internal.util.SourceFile
 
@@ -28,18 +28,18 @@ class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletio
       case Some(scu: ScriptCompilationUnit) =>
         // TODO: Not sure if this is the best way. Maybe compilation units should always be connected to something..
         scu.connect(viewer.getDocument)
-        val completions = scu.withSourceFile { findCompletions(viewer, offset, scu) } getOrElse List[ICompletionProposal]()
+        val completions = findCompletions(viewer, offset, scu)
         completions.toArray
       case _ => Array()
     }
   }
 
-  private def findCompletions(viewer: ITextViewer, position: Int, scu: ScriptCompilationUnit)(sourceFile: SourceFile, compiler: IScalaPresentationCompiler): List[ICompletionProposal] = {
+  private def findCompletions(viewer: ITextViewer, position: Int, scu: ScriptCompilationUnit): List[ICompletionProposal] = {
     val region = ScalaWordFinder.findCompletionPoint(viewer.getDocument.get, position)
 
-    val res = findCompletions(region)(position, scu)(sourceFile, compiler).sortBy(_.relevance).reverse
+    val res = findCompletions(region, position, scu).sortBy(_.relevance).reverse
 
-    res.map(ScalaCompletionProposal.apply)
+    res.map(ScalaCompletionProposal(_))
   }
 
   override def computeContextInformation(viewer: ITextViewer, offset: Int): Array[IContextInformation] = {
