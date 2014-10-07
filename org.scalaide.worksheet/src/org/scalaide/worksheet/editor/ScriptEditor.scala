@@ -29,10 +29,10 @@ import org.scalaide.worksheet.editor.action.ClearResultsAction
 import org.scalaide.util.ui.DisplayThread
 import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.jface.action.Action
-import org.scalaide.core.hyperlink.detector.DeclarationHyperlinkDetector
 import org.scalaide.util.eclipse.EditorUtils
 import org.eclipse.jdt.ui.actions.IJavaEditorActionDefinitionIds
 import org.eclipse.ui.editors.text.TextFileDocumentProvider
+import org.scalaide.ui.editor.SourceConfiguration
 
 object ScriptEditor {
 
@@ -197,9 +197,10 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
 
       override def run {
         scalaCompilationUnit foreach { scu =>
-          val detector = DeclarationHyperlinkDetector()
+          val detector = SourceConfiguration.scalaDeclarationDetector
+          detector.setContext(ScriptEditor.this)
           val region = EditorUtils.textSelection2region(getSelectionProvider.getSelection.asInstanceOf[ITextSelection])
-          detector.detectHyperlinks(ScriptEditor.this, region, false) match {
+          detector.detectHyperlinks(getSourceViewer, region, false) match {
             case Array(hyperlink) => hyperlink.open()
             case _ => () // didn't find it
           }
