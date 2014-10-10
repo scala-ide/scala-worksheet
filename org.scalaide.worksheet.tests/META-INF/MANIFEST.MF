@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scala Plugin (Test)
 Bundle-SymbolicName: org.scalaide.worksheet.tests
-Bundle-Version: 0.2.5.qualifier
+Bundle-Version: 0.2.6.qualifier
 Bundle-Vendor: scala-ide.org
 Fragment-Host: org.scalaide.worksheet
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
