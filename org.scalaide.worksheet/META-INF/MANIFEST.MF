@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scala Worksheet plugin
 Bundle-SymbolicName: org.scalaide.worksheet;singleton:=true
-Bundle-Version: 0.2.5.qualifier
+Bundle-Version: 0.2.6.qualifier
 Bundle-Vendor: scala-ide.org
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -21,11 +21,11 @@ Require-Bundle:
  org.eclipse.ui.editors,
  org.eclipse.ui.forms,
  org.eclipse.ui.ide,
- org.scala-lang.scala-library,
- org.scala-lang.scala-compiler,
- org.scala-lang.scala-reflect,
- org.scala-lang.scala-actors,
- org.scala-ide.sdt.core,
+ org.scala-lang.scala-library;bundle-version="[2.11,2.12)",
+ org.scala-lang.scala-compiler;bundle-version="[2.11,2.12)",
+ org.scala-lang.scala-reflect;bundle-version="[2.11,2.12)",
+ org.scala-lang.scala-actors;bundle-version="[2.11,2.12)",
+ org.scala-ide.sdt.core;bundle-version="[4.0.0,5.0.0)",
  scalariform,
  org.scala-ide.sbt.full.library,
  org.eclipse.core.filesystem,

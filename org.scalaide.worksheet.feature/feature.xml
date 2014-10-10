@@ -2,7 +2,7 @@
 <feature
       id="org.scalaide.worksheet.feature"
       label="Scala Worksheet"
-      version="0.2.5.qualifier"
+      version="0.2.6.qualifier"
       provider-name="Scala IDE"
       plugin="org.scalaide.worksheet">
 
@@ -223,7 +223,7 @@
    </url>
 
    <requires>
-      <import feature="org.scala-ide.sdt.feature"/>
+      <import feature="org.scala-ide.sdt.feature" version="4.0.0" match="compatible"/>
    </requires>
 
    <plugin
