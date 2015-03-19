@@ -1,13 +1,15 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
+
 import scala.Left
 import scala.Right
 import scala.tools.nsc.interactive.ProgramInstrumenter
+
+import org.scalaide.core.compiler.IScalaPresentationCompiler
 import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.text.SourceInserter
-import org.scalaide.core.compiler.IScalaPresentationCompiler
 
 case class TopLevelObjectDecl(fullName: String)
 

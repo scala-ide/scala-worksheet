@@ -1,25 +1,23 @@
 package org.scalaide.worksheet
 
-import org.scalaide.core.compiler.InteractiveCompilationUnit
-import org.scalaide.core.IScalaPlugin
-import org.scalaide.core.internal.builder.BuildProblemMarker
-import org.scalaide.core.resources.EclipseResource
-import org.scalaide.util.eclipse.FileUtils
-import scala.tools.nsc.interactive.Response
-import scala.tools.nsc.io.AbstractFile
-import scala.reflect.internal.util.BatchSourceFile
 import scala.reflect.internal.util.{Position, NoPosition}
-import scala.reflect.internal.util.ScriptSourceFile
+import scala.reflect.internal.util.BatchSourceFile
+import scala.tools.nsc.io.AbstractFile
+
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IMarker
-import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.jface.text.IDocument
 import org.eclipse.ui.IEditorInput
 import org.eclipse.ui.part.FileEditorInput
-import org.eclipse.ui.texteditor.ITextEditor
-import org.scalaide.worksheet.editor.ScriptEditor
-import org.scalaide.core.resources.MarkerFactory
+import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.compiler.ISourceMap
+
+import org.scalaide.core.compiler.InteractiveCompilationUnit
+import org.scalaide.core.internal.builder.BuildProblemMarker
+import org.scalaide.core.resources.EclipseResource
+import org.scalaide.core.resources.MarkerFactory
+import org.scalaide.util.eclipse.FileUtils
+import org.scalaide.worksheet.editor.ScriptEditor
 
 /** A Script compilation unit connects the presentation compiler
  *  view of a script with the Eclipse IDE view of the underlying

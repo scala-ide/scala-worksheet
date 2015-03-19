@@ -2,13 +2,14 @@ package org.scalaide.worksheet.wizards
 
 import java.io.ByteArrayInputStream
 import java.io.InputStream
+
+import org.eclipse.core.resources.ResourcesPlugin
+import org.eclipse.core.runtime.IPath
 import org.eclipse.core.runtime.IStatus
 import org.eclipse.core.runtime.Status
 import org.eclipse.jface.viewers.IStructuredSelection
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage
-import org.eclipse.core.runtime.IPath
-import org.eclipse.core.resources.ResourcesPlugin
 import org.scalaide.core.IScalaPlugin
 
 /** Wizard page based of the new file creation page from the framework.

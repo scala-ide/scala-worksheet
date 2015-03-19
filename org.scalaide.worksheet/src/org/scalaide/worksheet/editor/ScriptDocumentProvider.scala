@@ -1,12 +1,12 @@
 package org.scalaide.worksheet.editor
 
+import org.eclipse.core.filebuffers.IDocumentSetupParticipant
+
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.IDocumentExtension3
-import org.eclipse.ui.editors.text.FileDocumentProvider
-import org.eclipse.ui.editors.text.TextFileDocumentProvider
 import org.eclipse.ui.editors.text.ForwardingDocumentProvider
+import org.eclipse.ui.editors.text.TextFileDocumentProvider
 import org.eclipse.ui.texteditor.IDocumentProvider
-import org.eclipse.core.filebuffers.IDocumentSetupParticipant
 import org.scalaide.core.lexical.ScalaCodePartitioner
 
 /** A Document provider for Scala scripts. It sets the Scala

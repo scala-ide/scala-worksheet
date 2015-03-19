@@ -1,60 +1,43 @@
 package org.scalaide.worksheet.runtime
 
-import scala.actors.{ Actor, DaemonActor }
 import scala.collection.immutable
-import org.scalaide.core.IScalaProject
-import org.scalaide.worksheet.ScriptCompilationUnit
-import scala.actors.Exit
-import org.scalaide.logging.HasLogger
-import scala.actors.AbstractActor
-import org.eclipse.core.runtime.IPath
-import scala.actors.UncaughtException
 import scala.util.Try
 
+import org.eclipse.core.runtime.IPath
+import org.scalaide.logging.HasLogger
+import org.scalaide.worksheet.ScriptCompilationUnit
+
+import akka.actor.Actor
+import akka.actor.ActorRef
+import akka.actor.Props
+import akka.actor.Terminated
+
 object WorksheetsManager {
-  lazy val Instance: Actor = {
-    val proxy = new WorksheetsManager
-    proxy.start()
-    proxy
-  }
+  final val ActorName = "worksheet-manager"
+  def props(): Props = Props(new WorksheetsManager)
 }
 
-private class WorksheetsManager private extends DaemonActor with HasLogger {
+private class WorksheetsManager private extends Actor with HasLogger {
   import WorksheetRunner.RunEvaluation
   import ProgramExecutor.StopRun
 
-  //FIXME: Need a way to dispose worksheet evaluator and remove it from the map when the project is disposed (listener!?)
-  private var worksheetEvaluator: immutable.Map[IPath, Actor] = new immutable.HashMap
+  //FIXME: Need to dispose worksheet evaluator and remove it from the map when the project is disposed
+  private var worksheets: immutable.Map[IPath, ActorRef] = immutable.HashMap.empty
 
-  override def act() = loop {
-    react {
+  override def receive = {
       case msg @ RunEvaluation(unit, _) =>
         obtainEvaluator(unit) forward msg
 
       case msg: StopRun =>
         forwardIfEvaluatorExists(msg)
 
-      case Exit(actor, UncaughtException(internalActor, msg, sender, thread, reason)) =>
-        eclipseLog.error("Evaluator actor crashed ", reason)
+      case Terminated(actor) =>
         evictEvaluator(actor)
-
-      case Exit(actor, reason) =>
-        eclipseLog.error("Evaluator actor crashed " + reason)
-        evictEvaluator(actor)
-
-      case any =>
-        // don't shutdown, this is a singleton instance and won't be restarted
-        logger.info("Unsupported message " + any)
     }
-  }
 
-  override def exceptionHandler = {
-    case e: Exception =>
-      logger.info("UncaughtException: ", e)
-  }
-
-  private def evictEvaluator(actor: AbstractActor) {
-    worksheetEvaluator = worksheetEvaluator filterNot { case (_, a) => a == actor }
+  private def evictEvaluator(actor: ActorRef) {
+    context.unwatch(actor)
+    worksheets = worksheets filterNot { case (_, a) => a == actor }
   }
 
   private def forwardIfEvaluatorExists(msg: StopRun): Unit = {
@@ -62,20 +45,19 @@ private class WorksheetsManager private extends DaemonActor with HasLogger {
     // TODO: ScalaPlugin.asScalaProject probably shouldn't filter out closed projects.
     for {
       scalaProject <- Try(msg.unit.scalaProject)
-      evaluator <- worksheetEvaluator.get(scalaProject.underlying.getFullPath)
+      evaluator <- worksheets.get(scalaProject.underlying.getFullPath)
     } evaluator forward msg
   }
 
-  private def obtainEvaluator(unit: ScriptCompilationUnit): Actor = {
+  private def obtainEvaluator(unit: ScriptCompilationUnit): ActorRef = {
     val scalaProject = unit.scalaProject
-    worksheetEvaluator.get(scalaProject.underlying.getFullPath) match {
+    worksheets.get(scalaProject.underlying.getFullPath) match {
       case Some(evaluator) => evaluator
       case None =>
-        val evaluator = WorksheetRunner(scalaProject)
-        trapExit = true
-        link(evaluator)
+        val evaluator = context.actorOf(WorksheetRunner.props(scalaProject), "worksheet-runner-for-project-"+scalaProject.underlying.getName)
+        context.watch(evaluator)
 
-        worksheetEvaluator = worksheetEvaluator + (scalaProject.underlying.getFullPath -> evaluator)
+        worksheets += (scalaProject.underlying.getFullPath -> evaluator)
         evaluator
     }
   }

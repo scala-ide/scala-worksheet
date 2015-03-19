@@ -2,8 +2,6 @@ package org.scalaide.worksheet.text
 
 import java.io.Writer
 
-//import reflect.internal.Chars._
-
 object SourceInserter {
   val LineBreak = System.getProperty("line.separator")
   def stripRight(cs: Array[Char]): Array[Char] = {

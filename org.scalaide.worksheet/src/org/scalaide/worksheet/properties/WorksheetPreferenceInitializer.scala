@@ -1,7 +1,8 @@
 package org.scalaide.worksheet.properties
 
-import org.scalaide.worksheet.WorksheetPlugin
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
+
+import org.scalaide.worksheet.WorksheetPlugin
 
 class WorksheetPreferenceInitializer extends AbstractPreferenceInitializer {
 

@@ -2,7 +2,9 @@
 <classpath>
 	<classpathentry kind="src" output="target/classes" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="target/lib/akka-actor_2.11-2.3.9.jar" sourcepath="target/lib/akka-actor_2.11-2.3.9-sources.jar"/>
+	<classpathentry kind="lib" path="target/lib/akka-osgi_2.11-2.3.9.jar" sourcepath="target/lib/akka-osgi_2.11-2.3.9-sources.jar"/>
+	<classpathentry kind="lib" path="target/lib/config-1.2.1.jar" sourcepath="target/lib/config-1.2.1-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

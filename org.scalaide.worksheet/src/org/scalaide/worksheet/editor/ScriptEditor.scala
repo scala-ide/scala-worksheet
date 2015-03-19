@@ -1,11 +1,10 @@
 package org.scalaide.worksheet.editor
 
-import org.scalaide.ui.editor.ISourceViewerEditor
-import org.scalaide.ui.editor.InteractiveCompilationUnitEditor
-import org.scalaide.core.compiler.InteractiveCompilationUnit
-import org.scalaide.logging.HasLogger
 import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.ProblemAnnotation
+import org.eclipse.jdt.ui.PreferenceConstants
+import org.eclipse.jdt.ui.actions.IJavaEditorActionDefinitionIds
+import org.eclipse.jface.action.Action
 import org.eclipse.jface.action.IMenuManager
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextSelection
@@ -22,17 +21,18 @@ import org.eclipse.swt.events.KeyEvent
 import org.eclipse.ui.editors.text.TextEditor
 import org.eclipse.ui.texteditor.ITextEditorActionConstants
 import org.eclipse.ui.texteditor.TextOperationAction
+import org.scalaide.core.compiler.InteractiveCompilationUnit
+import org.scalaide.logging.HasLogger
+
+import org.scalaide.ui.editor.ISourceViewerEditor
+import org.scalaide.ui.editor.InteractiveCompilationUnitEditor
+import org.scalaide.ui.editor.SourceConfiguration
+import org.scalaide.util.eclipse.EditorUtils
+import org.scalaide.util.ui.DisplayThread
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.WorksheetPlugin
-import org.scalaide.worksheet.editor.action.RunEvaluationAction
 import org.scalaide.worksheet.editor.action.ClearResultsAction
-import org.scalaide.util.ui.DisplayThread
-import org.eclipse.jdt.ui.PreferenceConstants
-import org.eclipse.jface.action.Action
-import org.scalaide.util.eclipse.EditorUtils
-import org.eclipse.jdt.ui.actions.IJavaEditorActionDefinitionIds
-import org.eclipse.ui.editors.text.TextFileDocumentProvider
-import org.scalaide.ui.editor.SourceConfiguration
+import org.scalaide.worksheet.editor.action.RunEvaluationAction
 
 object ScriptEditor {
 
@@ -50,6 +50,8 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private def prefStore = WorksheetPlugin.prefStore
 
   private lazy val sourceViewConfiguration = new ScriptConfiguration(prefStore, PreferenceConstants.getPreferenceStore, this)
+
+  // constructor
   setSourceViewerConfiguration(sourceViewConfiguration)
   //  setPreferenceStore(prefStore)
   setPartName("Scala Script Editor")
@@ -248,9 +250,8 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private[worksheet] def runEvaluation(): Unit = withScriptCompilationUnit {
     editorProxy.beginUpdate()
 
-    import org.scalaide.worksheet.runtime.WorksheetsManager
     import org.scalaide.worksheet.runtime.WorksheetRunner
-    WorksheetsManager.Instance ! WorksheetRunner.RunEvaluation(_, editorProxy)
+    WorksheetPlugin.plugin.runtime ! WorksheetRunner.RunEvaluation(_, editorProxy)
   }
 
   private[worksheet] def clearResults(): Unit = {
@@ -262,9 +263,8 @@ class ScriptEditor extends TextEditor with SelectionTracker with ISourceViewerEd
   private[worksheet] def stopEvaluation(): Unit = withScriptCompilationUnit {
     editorProxy.stopExternalEditorUpdate()
 
-    import org.scalaide.worksheet.runtime.WorksheetsManager
     import org.scalaide.worksheet.runtime.ProgramExecutor
-    WorksheetsManager.Instance ! ProgramExecutor.StopRun(_)
+    WorksheetPlugin.plugin.runtime ! ProgramExecutor.StopRun(_)
   }
 
   private def withScriptCompilationUnit(f: ScriptCompilationUnit => Unit): Unit = f(ScriptCompilationUnit.fromEditor(this))

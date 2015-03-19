@@ -3,13 +3,10 @@ package org.scalaide.worksheet.editor
 import scala.collection.mutable.StringBuilder
 
 import org.eclipse.jface.text.DocumentCommand
-
 import org.eclipse.jface.text.IAutoEditStrategy
 import org.eclipse.jface.text.IDocument
-import org.eclipse.jface.text.TextUtilities
 import org.eclipse.jface.text.IRegion
-import scala.collection.mutable.StringBuilder
-import scala.annotation.tailrec
+import org.eclipse.jface.text.TextUtilities
 
 object EvaluationResultsAutoEditStrategy {
 }
@@ -137,7 +134,6 @@ private[editor] object DocumentCommandUpdater {
         line.length()
     }
   }
-
 }
 
 private[editor] class DocumentCommandUpdater(

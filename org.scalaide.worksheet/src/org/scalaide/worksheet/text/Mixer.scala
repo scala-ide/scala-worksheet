@@ -1,10 +1,10 @@
 package org.scalaide.worksheet.text
 
 import java.io.{ FileInputStream, InputStreamReader, IOException }
-import scala.runtime.ScalaRunTime.stringOf
-import java.lang.reflect.InvocationTargetException
-import collection.mutable.ArrayBuffer
+
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ListBuffer
+
 import org.scalaide.logging.HasLogger
 
 class Mixer extends HasLogger {

@@ -1,15 +1,14 @@
 package org.scalaide.worksheet.lexical
 
-import org.scalaide.ui.syntax.ScalaSyntaxClass
-import org.scalaide.ui.syntax.ScalaSyntaxClasses
-
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.rules.IToken
 import org.eclipse.jface.text.rules.ITokenScanner
 import org.eclipse.jface.text.rules.Token
 import org.eclipse.jface.util.PropertyChangeEvent
-import org.scalaide.worksheet.lexical.SyntaxClasses
+
+import org.scalaide.ui.syntax.ScalaSyntaxClass
+import org.scalaide.ui.syntax.ScalaSyntaxClasses
 
 class SingleLineCommentScanner(val scalaPreferenceStore: IPreferenceStore, val worksheetPreferenceStore: IPreferenceStore) extends ITokenScanner {
   import SingleLineCommentScanner._

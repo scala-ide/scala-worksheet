@@ -1,11 +1,11 @@
 package org.scalaide.worksheet.properties
 
-import org.scalaide.ui.syntax.ScalaSyntaxClass
-
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.resource.StringConverter
 import org.eclipse.swt.graphics.RGB
+
+import org.scalaide.ui.syntax.ScalaSyntaxClass
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.lexical.SyntaxClasses
 

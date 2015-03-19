@@ -24,7 +24,6 @@ Require-Bundle:
  org.scala-lang.scala-library;bundle-version="[2.11,2.12)",
  org.scala-lang.scala-compiler;bundle-version="[2.11,2.12)",
  org.scala-lang.scala-reflect;bundle-version="[2.11,2.12)",
- org.scala-lang.scala-actors;bundle-version="[2.11,2.12)",
  org.scala-ide.sdt.core;bundle-version="[4.0.0,5.0.0)",
  scalariform,
  org.scala-ide.sbt.full.library,
@@ -37,7 +36,10 @@ Import-Package:
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor.formatter;apply-aspects:=false
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: org.scalaide.worksheet.WorksheetPlugin
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ target/lib/akka-actor_2.11-2.3.9.jar,
+ target/lib/akka-osgi_2.11-2.3.9.jar,
+ target/lib/config-1.2.1.jar
 Export-Package: org.scalaide.worksheet,org.scalaide.worksheet.editor,o
  rg.scalaide.worksheet.handlers,org.scalaide.worksheet.reconciler,org.
  scalaide.worksheet.runtime

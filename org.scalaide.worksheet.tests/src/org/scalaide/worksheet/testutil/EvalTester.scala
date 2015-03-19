@@ -2,6 +2,7 @@ package org.scalaide.worksheet.testutil
 
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.runtime._
+import org.scalaide.worksheet.WorksheetPlugin
 
 object EvalTester {
   import WorksheetUtils._
@@ -36,14 +37,14 @@ object EvalTester {
     val unit = getUnit(name, contents)
     val proxy = new EditorProxy(contents)
 
-    WorksheetsManager.Instance ! RunEvaluation(unit, proxy)
+    WorksheetPlugin.plugin.runtime ! RunEvaluation(unit, proxy)
 
     while (waited < timeout && !proxy.isDone) {
       Thread.sleep(timeslice)
       waited += timeslice
     }
     
-    WorksheetsManager.Instance ! ProgramExecutor.StopRun(unit)
+    WorksheetPlugin.plugin.runtime ! ProgramExecutor.StopRun(unit)
     
     // if it timed out, wait for the evaluation to be stopped
     if (!proxy.isDone) {

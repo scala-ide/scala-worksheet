@@ -5,11 +5,10 @@ import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.Charset
 
-import org.scalaide.core.IScalaProject
-
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.runtime.IPath
 import org.eclipse.core.runtime.Path
+import org.scalaide.core.IScalaProject
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.properties.WorksheetPreferences
 

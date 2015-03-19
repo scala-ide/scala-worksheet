@@ -6,10 +6,10 @@ import org.eclipse.jface.text.IDocumentListener
 import org.eclipse.jface.text.IRegion
 import org.eclipse.jface.text.reconciler.DirtyRegion
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy
+import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension
 import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.editor.ScriptEditor
-import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension
 
 class ScalaReconcilingStrategy(textEditor: ScriptEditor) extends IReconcilingStrategy with IReconcilingStrategyExtension with HasLogger {
   private var document: IDocument = _
