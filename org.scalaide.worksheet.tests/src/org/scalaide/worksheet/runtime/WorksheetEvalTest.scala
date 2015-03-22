@@ -338,7 +338,7 @@ object Snowman {
    *  The test blocks for at most `timeout` millis, but will finish as soon as the evaluator signals
    *  termination by calling 'endUpdate' on the `DocumentHolder` interface.
    */
-  def runTest(filename: String, contents: String, expected: String, timeout: Int = 30000) {
+  def runTest(filename: String, contents: String, expected: String, timeout: Int = 60000) {
     val res = runEvalSync(filename, contents, timeout)
 
     Assert.assertEquals("correct output", expected.trim, res.trim)
