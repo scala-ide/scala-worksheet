@@ -10,7 +10,6 @@ import org.scalaide.worksheet.ScriptCompilationUnit
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
-import akka.actor.Terminated
 
 object WorksheetsManager {
   final val ActorName = "worksheet-manager"
@@ -30,15 +29,7 @@ private class WorksheetsManager private extends Actor with HasLogger {
 
       case msg: StopRun =>
         forwardIfEvaluatorExists(msg)
-
-      case Terminated(actor) =>
-        evictEvaluator(actor)
     }
-
-  private def evictEvaluator(actor: ActorRef) {
-    context.unwatch(actor)
-    worksheets = worksheets filterNot { case (_, a) => a == actor }
-  }
 
   private def forwardIfEvaluatorExists(msg: StopRun): Unit = {
     // if the project is closed, `unit.scalaProject` throws NoSuchElementException
@@ -55,7 +46,6 @@ private class WorksheetsManager private extends Actor with HasLogger {
       case Some(evaluator) => evaluator
       case None =>
         val evaluator = context.actorOf(WorksheetRunner.props(scalaProject), "worksheet-runner-for-project-"+scalaProject.underlying.getName)
-        context.watch(evaluator)
 
         worksheets += (scalaProject.underlying.getFullPath -> evaluator)
         evaluator
