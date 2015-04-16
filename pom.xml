@@ -21,6 +21,8 @@
   <properties>
     <tycho.test.encoding>-Dfile.encoding=UTF-8</tycho.test.encoding>
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dsdtcore.headless ${tycho.test.encoding} ${tycho.test.weaving} ${tycho.test.OSspecific}</tycho.test.jvmArgs>
+    <akka.version>2.3.9</akka.version>
+    <config.version>1.2.1</config.version>
   </properties>
 
   <modules>
@@ -32,4 +34,87 @@
     <module>org.scalaide.worksheet.update-site</module>
   </modules>
 
+  <dependencies>
+    <dependency>
+      <groupId>com.typesafe</groupId>
+      <artifactId>config</artifactId>
+      <version>${config.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-actor_${scala.version.short}</artifactId>
+      <version>${akka.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-osgi_${scala.version.short}</artifactId>
+      <version>${akka.version}</version>
+    </dependency>
+    <!-- test support -->
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-testkit_${scala.version.short}</artifactId>
+      <version>${akka.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <!-- copy the jar dependencies -->
+          <execution>
+            <id>src-dependencies</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.typesafe</groupId>
+                  <artifactId>config</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.typesafe.akka</groupId>
+                  <artifactId>akka-actor_${scala.version.short}</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.typesafe.akka</groupId>
+                  <artifactId>akka-actor_${scala.version.short}</artifactId>
+                  <classifier>sources</classifier>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.typesafe.akka</groupId>
+                  <artifactId>akka-osgi_${scala.version.short}</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.typesafe</groupId>
+                  <artifactId>config</artifactId>
+                  <classifier>sources</classifier>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.typesafe.akka</groupId>
+                  <artifactId>akka-osgi_${scala.version.short}</artifactId>
+                  <classifier>sources</classifier>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.typesafe.akka</groupId>
+                  <artifactId>akka-testkit_${scala.version.short}</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.typesafe.akka</groupId>
+                  <artifactId>akka-testkit_${scala.version.short}</artifactId>
+                  <classifier>sources</classifier>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

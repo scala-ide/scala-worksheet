@@ -2,8 +2,8 @@ package scala.tools.nsc
 package interactive
 
 import scala.collection.mutable.ArrayBuffer
+import scala.reflect.internal.util.{SourceFile, RangePosition}
 import scala.tools.nsc.ast.parser.Tokens._
-import scala.reflect.internal.util.{SourceFile, BatchSourceFile, RangePosition}
 import scala.tools.nsc.util.Chars.{isLineBreakChar, isWhitespace}
 
 // Temporarily named `ScratchPadMaker2` to avoid collision with the existing `ScratchPadMaker` in the 

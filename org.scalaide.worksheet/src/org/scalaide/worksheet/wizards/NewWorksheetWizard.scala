@@ -1,6 +1,5 @@
 package org.scalaide.worksheet.wizards
 
-import org.scalaide.logging.HasLogger
 import org.eclipse.jface.viewers.IStructuredSelection
 import org.eclipse.jface.wizard.Wizard
 import org.eclipse.ui.INewWizard
@@ -8,8 +7,10 @@ import org.eclipse.ui.IWorkbench
 import org.eclipse.ui.PartInitException
 import org.eclipse.ui.PlatformUI
 import org.eclipse.ui.ide.IDE
-import org.scalaide.worksheet.editor.ScriptEditor
+
+import org.scalaide.logging.HasLogger
 import org.scalaide.util.ui.DisplayThread
+import org.scalaide.worksheet.editor.ScriptEditor
 
 /**
  * A wizard to create a new Scala worksheet file.

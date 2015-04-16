@@ -1,13 +1,14 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-import org.scalaide.core.IScalaPlugin
-import org.scalaide.core.IScalaProject
-import org.scalaide.logging.HasLogger
+
+import scala.reflect.internal.util.Position
 import scala.tools.nsc.CompilerCommand
 import scala.tools.nsc.Settings
 import scala.tools.nsc.reporters.StoreReporter
-import scala.reflect.internal.util.Position
+
+import org.scalaide.core.IScalaProject
+import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.WorksheetPlugin
 
 object ResidentCompiler extends HasLogger {

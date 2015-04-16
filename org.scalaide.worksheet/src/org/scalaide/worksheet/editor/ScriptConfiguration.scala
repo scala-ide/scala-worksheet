@@ -1,43 +1,36 @@
 package org.scalaide.worksheet.editor
 
-import org.scalaide.core.IScalaPlugin
-import org.scalaide.core.internal.formatter.ScalaFormattingStrategy
-import org.scalaide.ui.syntax.ScalaSyntaxClasses
-import org.scalaide.ui.internal.editor.autoedits.BracketAutoEditStrategy
-import org.eclipse.jdt.internal.ui.JavaPlugin
 import org.eclipse.jdt.ui.text.IJavaPartitions
 import org.eclipse.jface.preference.IPreferenceStore
 import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy
-import org.eclipse.jface.text.DefaultTextHover
 import org.eclipse.jface.text.IDocument
 import org.eclipse.jface.text.ITextHover
 import org.eclipse.jface.text.contentassist.ContentAssistant
 import org.eclipse.jface.text.contentassist.IContentAssistant
 import org.eclipse.jface.text.formatter.MultiPassContentFormatter
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector
+import org.eclipse.jface.text.information.InformationPresenter
 import org.eclipse.jface.text.presentation.PresentationReconciler
 import org.eclipse.jface.text.reconciler.IReconciler
 import org.eclipse.jface.text.reconciler.MonoReconciler
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer
-import org.eclipse.jface.text.rules.ITokenScanner
 import org.eclipse.jface.text.source.Annotation
 import org.eclipse.jface.text.source.DefaultAnnotationHover
 import org.eclipse.jface.text.source.IAnnotationHover
 import org.eclipse.jface.text.source.ISourceViewer
 import org.eclipse.jface.text.source.SourceViewerConfiguration
-import org.eclipse.jface.util.PropertyChangeEvent
-import org.eclipse.ui.texteditor.ITextEditor
-import org.scalaide.worksheet.completion.CompletionProposalComputer
-import org.scalaide.worksheet.lexical.SingleLineCommentScanner
-import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
-import scalariform.ScalaVersions
-import org.scalaide.worksheet.ScriptCompilationUnit
 import org.eclipse.jface.util.IPropertyChangeListener
+import org.eclipse.jface.util.PropertyChangeEvent
+
+import org.scalaide.core.IScalaPlugin
+import org.scalaide.core.internal.formatter.ScalaFormattingStrategy
 import org.scalaide.core.lexical.ScalaCodeScanners
 import org.scalaide.core.lexical.ScalaPartitions
-import org.scalaide.ui.editor.hover.IScalaHover
-import org.eclipse.jface.text.information.InformationPresenter
 import org.scalaide.ui.editor.SourceConfiguration
+import org.scalaide.ui.editor.hover.IScalaHover
+import org.scalaide.ui.internal.editor.autoedits.BracketAutoEditStrategy
+import org.scalaide.worksheet.completion.CompletionProposalComputer
+import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
 
 class ScriptConfiguration(val pluginPreferenceStore: IPreferenceStore, javaPreferenceStore: IPreferenceStore, textEditor: ScriptEditor) extends SourceViewerConfiguration with IPropertyChangeListener {
   @inline private def scalaPreferenceStore: IPreferenceStore = IScalaPlugin().getPreferenceStore()

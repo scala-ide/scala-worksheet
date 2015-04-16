@@ -1,17 +1,14 @@
 package org.scalaide.worksheet.completion
 
-import org.scalaide.core.compiler.IScalaPresentationCompiler
-import org.scalaide.util.ScalaWordFinder
-import org.scalaide.core.completion.ScalaCompletions
-import org.scalaide.ui.completion.ScalaCompletionProposal
-import org.scalaide.util.eclipse.EditorUtils
-import scala.reflect.internal.util.SourceFile
-
 import org.eclipse.jface.text.ITextViewer
 import org.eclipse.jface.text.contentassist.ICompletionProposal
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor
 import org.eclipse.jface.text.contentassist.IContextInformation
 import org.eclipse.ui.texteditor.ITextEditor
+import org.scalaide.core.completion.ScalaCompletions
+import org.scalaide.ui.completion.ScalaCompletionProposal
+import org.scalaide.util.ScalaWordFinder
+import org.scalaide.util.eclipse.EditorUtils
 import org.scalaide.worksheet.ScriptCompilationUnit
 
 class CompletionProposalComputer(textEditor: ITextEditor) extends ScalaCompletions with IContentAssistProcessor {

@@ -2,46 +2,54 @@ package org.scalaide.worksheet.runtime
 
 import java.io.Writer
 
-import scala.annotation.tailrec
-import scala.actors.{Actor, DaemonActor, TIMEOUT}
 import scala.collection.mutable.LinkedHashMap
 import scala.collection.mutable.ListBuffer
-import org.scalaide.logging.HasLogger
+import scala.concurrent.duration._
 
+import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.editor.DocumentHolder
 import org.scalaide.worksheet.text.{ Mixer, SourceInserter }
 
-object IncrementalDocumentMixer {
-  def apply(editor: DocumentHolder, source: Writer, maxOutput: Int): Actor = {
-    val incrementalMixer = new IncrementalDocumentMixer(editor, source, maxOutput)
-    incrementalMixer.start()
-    incrementalMixer
-  }
+import akka.actor.Actor
+import akka.actor.Props
 
-  private final val RefreshDocumentTimeout = 200
+object IncrementalDocumentMixer {
+  def props(editor: DocumentHolder, source: Writer, maxOutput: Int): Props =
+    Props(new IncrementalDocumentMixer(editor, source, maxOutput))
+
+  private final val RefreshDocumentTimeout: FiniteDuration = 200 millis
 
   /** How many ticks should pass with output not changing before adding a spinner? */
-  private final val InfiniteLoopTicks = 1000 / RefreshDocumentTimeout // 1 sec
+  private final val InfiniteLoopTicks: Int = (1000 / RefreshDocumentTimeout.length).toInt
+
+  private case object UpdateDocument
+  case object StartUpdatingDocument
+  case object StopUpdatingDocument
 }
 
-private class IncrementalDocumentMixer private (editor: DocumentHolder, source: Writer, val maximumOutputSize: Int) extends DaemonActor with HasLogger {
-  import IncrementalDocumentMixer.{ RefreshDocumentTimeout, InfiniteLoopTicks}
+private class IncrementalDocumentMixer private (editor: DocumentHolder, source: Writer, val maximumOutputSize: Int) extends Actor with HasLogger {
+  import IncrementalDocumentMixer.{ RefreshDocumentTimeout, InfiniteLoopTicks, UpdateDocument, StartUpdatingDocument, StopUpdatingDocument }
 
   private val stripped = SourceInserter.stripRight(editor.getContents.toCharArray)
   private val mixer = new Mixer
 
   private def currentContent: String = source.toString()
 
-  override def act(): Unit = loop {
-    reactWithin(RefreshDocumentTimeout) {
-      case TIMEOUT =>
-        updateDocument(currentContent)
-      case 'stop =>
-        updateDocument(currentContent)
-        editor.endUpdate()
-        exit()
-      case any => exit(this.toString + ": Unsupported message " + any)
-    }
+  override def receive = {
+    case StartUpdatingDocument =>
+      scheduleDocumentUpdate()
+    case UpdateDocument =>
+      updateDocument(currentContent)
+      scheduleDocumentUpdate()
+    case StopUpdatingDocument =>
+      updateDocument(currentContent)
+      editor.endUpdate()
+      context.stop(self)
+  }
+
+  private def scheduleDocumentUpdate(): Unit = {
+    import context.dispatcher
+    context.system.scheduler.scheduleOnce(RefreshDocumentTimeout, self, UpdateDocument)
   }
 
   private def updateDocument(newText: String): Unit = {
@@ -67,7 +75,8 @@ private class IncrementalDocumentMixer private (editor: DocumentHolder, source: 
 
       ticks += 1
       if (ticks >= 0) addSpinner else newText
-    } else {
+    }
+    else {
       // reset the counter and wait another second before adding a spinner
       ticks = -InfiniteLoopTicks
       newText
@@ -80,10 +89,10 @@ private class IncrementalDocumentMixer private (editor: DocumentHolder, source: 
       val offsetExtractor = """^(\d*)""".r
       val groupedEvaluations = LinkedHashMap.empty[String, ListBuffer[String]]
 
-      for(line <- lines) offsetExtractor.findFirstIn(line) match {
+      for (line <- lines) offsetExtractor.findFirstIn(line) match {
         case Some(offset) =>
           groupedEvaluations.get(offset) match {
-            case None => groupedEvaluations += (offset -> ListBuffer(line))
+            case None         => groupedEvaluations += (offset -> ListBuffer(line))
             case Some(result) => groupedEvaluations += ((offset, result += line))
           }
         case None =>
@@ -96,9 +105,9 @@ private class IncrementalDocumentMixer private (editor: DocumentHolder, source: 
     val lines = newText.split('\n')
     val linesByOffset = groupLinesByOffset(lines.toList)
 
-    val evaluationResults = for((offset, evaluationOutputs) <- linesByOffset) yield {
+    val evaluationResults = for ((offset, evaluationOutputs) <- linesByOffset) yield {
       val evaluationResult = evaluationOutputs.mkString("\n")
-      (if(evaluationResult.length <= maximumOutputSize) evaluationResult
+      (if (evaluationResult.length <= maximumOutputSize) evaluationResult
       else {
         logger.debug("Cutting off large output at position: " + offset)
         evaluationResult.take(maximumOutputSize) + '\n' + offset + " Output exceeds cutoff limit."

@@ -1,11 +1,11 @@
 package org.scalaide.worksheet
 
-import org.scalaide.core.compiler.InteractiveCompilationUnit
 import scala.util.control.Exception.handling
 
 import org.eclipse.core.resources.ResourcesPlugin
-
 import org.eclipse.core.runtime.IPath
+
+import org.scalaide.core.compiler.InteractiveCompilationUnit
 
 class SourceFileProvider extends org.scalaide.core.extensions.SourceFileProvider {
   override def createFrom(path: IPath): Option[InteractiveCompilationUnit] = {

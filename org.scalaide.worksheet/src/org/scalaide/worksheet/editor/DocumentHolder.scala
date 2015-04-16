@@ -1,6 +1,5 @@
 package org.scalaide.worksheet.editor
 
-import java.nio.charset.Charset
 import org.scalaide.worksheet.text.SourceInserter
 
 /** A document holder, such as the ScriptEditor.
