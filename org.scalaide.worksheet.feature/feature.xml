@@ -2,7 +2,7 @@
 <feature
       id="org.scalaide.worksheet.feature"
       label="Scala Worksheet"
-      version="0.2.7.qualifier"
+      version="0.3.0.qualifier"
       provider-name="Scala IDE"
       plugin="org.scalaide.worksheet">
 
