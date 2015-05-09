@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ECLIPSE=/Applications/dev/eclipse-helios/Eclipse.app/Contents/MacOS/eclipse
+: ${ECLIPSE:=$(which eclipse)} # ECLIPSE will take the declared value if not overridden
 
 THIS=$(pwd)
 TARGET_DIR=$THIS/target
@@ -30,7 +30,7 @@ signJars()
 {
   # $1 is the folder containing the JARs to be signed
   JAR_FOLDER=$1
-  
+
   for i in ${JAR_FOLDER}/*.jar
 
   do
@@ -57,7 +57,7 @@ signJars ${PLUGINS_DIR}
 $ECLIPSE -debug -consolelog -nosplash -verbose -application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher -metadataRepository file:${BUNDLE_DIR} -artifactRepository file:${BUNDLE_DIR} -source ${BUNDLE_DIR}  -compress -append -publishArtifacts
 
 # This will make sure that the above produced plug-in is visible on p2 repository
-$ECLIPSE -debug -consolelog -nosplash -verbose -application org.eclipse.equinox.p2.publisher.CategoryPublisher -metadataRepository file:${BUNDLE_DIR} -categoryDefinition file:${BUNDLE_DIR}/site.xml 
+$ECLIPSE -debug -consolelog -nosplash -verbose -application org.eclipse.equinox.p2.publisher.CategoryPublisher -metadataRepository file:${BUNDLE_DIR} -categoryDefinition file:${BUNDLE_DIR}/site.xml
 
 # Re-create the  site_assembly.zip
 pushd target/
