@@ -51,6 +51,8 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
   private var executor: ActorRef = _
   private var buildListener: BuildListener = _
 
+  private val projectName  = scalaProject.underlying.getName
+
   override def preStart(): Unit = {
     buildListener = new BuildListener(self)
     scalaProject.subscribe(buildListener)
@@ -59,6 +61,7 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
 
   override def postStop(): Unit = {
     scalaProject.removeSubscription(buildListener)
+    logger.debug(s"Shutted down worksheet runner for project `$projectName`.")
   }
 
   override def receive = {
@@ -104,5 +107,5 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
     errors map { error => unit.reportBuildError(error.msg, error.pos) }
   }
 
-  override def toString: String = "WorksheetEvaluator <actor>"
+  override def toString: String = "WorksheetRunner <actor>"
 }
