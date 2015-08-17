@@ -28,7 +28,6 @@ import org.scalaide.core.lexical.ScalaCodeScanners
 import org.scalaide.core.lexical.ScalaPartitions
 import org.scalaide.ui.editor.SourceConfiguration
 import org.scalaide.ui.editor.hover.IScalaHover
-import org.scalaide.ui.internal.editor.autoedits.BracketAutoEditStrategy
 import org.scalaide.worksheet.completion.CompletionProposalComputer
 import org.scalaide.worksheet.reconciler.ScalaReconcilingStrategy
 
