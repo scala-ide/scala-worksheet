@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mvn -Peclipse-kepler -Pscala-ide-nightly -Pscala-2.11.x clean install
+mvn -Peclipse-neon -Pscala-ide-nightly -Pscala-2.12.x clean install
