@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.scala-ide</groupId>
     <artifactId>plugin-profiles</artifactId>
-    <version>1.0.13</version>
+    <version>1.0.14</version>
   </parent>
 
   <groupId>org.scalaide</groupId>
@@ -23,6 +23,7 @@
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dsdtcore.headless ${tycho.test.encoding} ${tycho.test.weaving} ${tycho.test.OSspecific}</tycho.test.jvmArgs>
     <akka.version>2.4.17</akka.version>
     <config.version>1.3.1</config.version>
+    <weaving.hook.plugin.version>1.2.0.v20160929-1449</weaving.hook.plugin.version>
   </properties>
 
   <modules>
