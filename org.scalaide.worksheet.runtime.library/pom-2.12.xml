@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.scalaide</groupId>
+    <artifactId>org.scalaide.worksheet.build</artifactId>
+    <version>0.7.0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <scala.version>2.12.3</scala.version>
+    <version.suffix>2_12</version.suffix>
+    <scala.version.short>2.12</scala.version.short>
+    <ecosystem-scala-version>212</ecosystem-scala-version>
+    <scala-ide-branch>4.0.x</scala-ide-branch>
+  </properties>
+  <repositories>
+    <repository>
+      <id>typesafe-ide</id>
+      <name>Typesafe IDE repository</name>
+      <url>https://proxy-ch.typesafe.com:8082/artifactory/ide-2.12/</url>
+      <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+  </repositories>
+
+  <groupId>org.scalaide</groupId>
+  <artifactId>org.scalaide.worksheet.runtime.library_2.12</artifactId>
+  <packaging>jar</packaging>
+</project>

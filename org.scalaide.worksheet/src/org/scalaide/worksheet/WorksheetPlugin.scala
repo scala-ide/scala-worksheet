@@ -21,7 +21,7 @@ object WorksheetPlugin extends HasLogger {
 
   private final val worksheetBundle: Bundle = Platform.getBundle(WorksheetPlugin.PluginId)
   final val worksheetLibrary: Option[IPath] = {
-    val path2lib = OSGiUtils.pathInBundle(worksheetBundle, "target/lib/worksheet-runtime-library.jar")
+    val path2lib = OSGiUtils.pathInBundle(worksheetBundle, "target/lib/worksheet-runtime-library_2.12.jar")
     if(path2lib.isEmpty)
       eclipseLog.error("The Scala Worksheet cannot be started correctly because worksheet runtime library is missing. Please report the issue.")
 

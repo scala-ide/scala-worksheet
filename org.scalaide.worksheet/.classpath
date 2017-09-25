@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="target/lib/akka-actor_2.12-2.4.17.jar" sourcepath="target/lib/akka-actor_2.12-2.4.17-sources.jar"/>
-	<!-- classpathentry kind="lib" path="target/lib/akka-osgi_2.12-2.4.17.jar" sourcepath="target/lib/akka-osgi_2.12-2.4.17-sources.jar"/ -->
+	<classpathentry kind="lib" path="target/lib/akka-osgi_2.12-2.4.17.jar" sourcepath="target/lib/akka-osgi_2.12-2.4.17-sources.jar"/>
 	<classpathentry kind="lib" path="target/lib/config-1.3.1.jar" sourcepath="target/lib/config-1.3.1-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

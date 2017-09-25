@@ -43,11 +43,11 @@ object WorksheetRunner {
   */
 private class WorksheetRunner private (scalaProject: IScalaProject) extends Actor with HasLogger {
   import WorksheetRunner._
-  import ResidentCompiler._
+  import org.scalaide.core.internal.builder.zinc.ResidentCompiler._
 
   private val config = Configuration(scalaProject)
   private val instrumenter = new SourceInstrumenter(config)
-  private var compiler = ResidentCompiler(scalaProject, config)
+  private var compiler = org.scalaide.core.internal.builder.zinc.ResidentCompiler(scalaProject, config.binFolder, WorksheetPlugin.worksheetLibrary)
   private var executor: ActorRef = _
   private var buildListener: BuildListener = _
 
@@ -73,7 +73,7 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
       instrumenter.instrument(unit) match {
         case Left(ex) => eclipseLog.error("Error during instrumentation of " + unit, ex)
         case Right((decl, source)) =>
-          compiler.compile(source) match {
+          compiler.get.compile(source) match {
             case CompilationFailed(errors) =>
               logger.debug("compilation errors in " + (unit.file.name) + ": " + errors.mkString(","))
               editor.endUpdate()
@@ -92,7 +92,7 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
       executor forward msg
 
     case RefreshResidentCompiler =>
-      compiler = ResidentCompiler(scalaProject, config)
+      compiler = org.scalaide.core.internal.builder.zinc.ResidentCompiler(scalaProject, config.binFolder, WorksheetPlugin.worksheetLibrary)
   }
 
   /** The classpath, as a list of local filesystem path
