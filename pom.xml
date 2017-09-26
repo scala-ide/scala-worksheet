@@ -27,7 +27,7 @@
   </properties>
 
   <modules>
-    <module>org.scalaide.worksheet.runtime.library/pom-2.12.xml</module>
+    <module>org.scalaide.worksheet.runtime.library</module>
     <module>org.scalaide.worksheet</module>
     <module>org.scalaide.worksheet.tests</module>
     <module>org.scalaide.worksheet.feature</module>

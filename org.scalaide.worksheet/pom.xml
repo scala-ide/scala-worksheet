@@ -13,7 +13,12 @@
   <dependencies>
     <dependency>
         <groupId>org.scalaide</groupId>
-        <artifactId>org.scalaide.worksheet.runtime.library_2.12</artifactId>
+        <artifactId>org.scalaide.worksheet.runtime.library_2.12.3</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.scalaide</groupId>
+        <artifactId>org.scalaide.worksheet.runtime.library_2.11.11</artifactId>
         <version>${project.version}</version>
     </dependency>
   </dependencies>
@@ -34,9 +39,15 @@
                 <artifactItems>
                   <artifactItem>
                     <groupId>org.scalaide</groupId>
-                    <artifactId>org.scalaide.worksheet.runtime.library_2.12</artifactId>
+                    <artifactId>org.scalaide.worksheet.runtime.library_2.12.3</artifactId>
                     <type>jar</type>
-                    <destFileName>worksheet-runtime-library.jar</destFileName>
+                    <destFileName>worksheet-runtime-library_2.12.jar</destFileName>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.scalaide</groupId>
+                    <artifactId>org.scalaide.worksheet.runtime.library_2.11.11</artifactId>
+                    <type>jar</type>
+                    <destFileName>worksheet-runtime-library_2.11.jar</destFileName>
                   </artifactItem>
                 </artifactItems>
                 <stripVersion>true</stripVersion>
