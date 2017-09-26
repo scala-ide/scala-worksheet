@@ -15,6 +15,10 @@ import org.scalaide.worksheet.editor.DocumentHolder
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
+import org.scalaide.core.ScalaInstallationChange
+import scala.tools.nsc.settings.SpecificScalaVersion
+import org.scalaide.core.internal.ScalaPlugin
+import scala.tools.nsc.settings.ScalaVersion
 
 object WorksheetRunner {
 
@@ -27,31 +31,40 @@ object WorksheetRunner {
   class BuildListener(worksheetRunner: ActorRef) extends Subscriber[IScalaProjectEvent, Publisher[IScalaProjectEvent]] {
     override def notify(pub: Publisher[IScalaProjectEvent], event: IScalaProjectEvent) = {
       event match {
-        case e: BuildSuccess => worksheetRunner ! RefreshResidentCompiler
+        case BuildSuccess() | ScalaInstallationChange() => worksheetRunner ! RefreshResidentCompiler
       }
     }
   }
 }
 
-/** An evaluator for worksheet documents.
-  *
-  * It evaluates the contents of the given document and returns the output of the
-  * instrumented program.
-  *
-  * It instantiates the instrumented program in-process, using a different class-loader.
-  * A more advanced evaluator would spawn a new VM, to allow debugging in the future.
-  */
+/**
+ * An evaluator for worksheet documents.
+ *
+ * It evaluates the contents of the given document and returns the output of the
+ * instrumented program.
+ *
+ * It instantiates the instrumented program in-process, using a different class-loader.
+ * A more advanced evaluator would spawn a new VM, to allow debugging in the future.
+ */
 private class WorksheetRunner private (scalaProject: IScalaProject) extends Actor with HasLogger {
   import WorksheetRunner._
   import org.scalaide.core.internal.builder.zinc.ResidentCompiler._
 
   private val config = Configuration(scalaProject)
   private val instrumenter = new SourceInstrumenter(config)
-  private var compiler = org.scalaide.core.internal.builder.zinc.ResidentCompiler(scalaProject, config.binFolder, WorksheetPlugin.worksheetLibrary)
+  private def version: String =
+    scalaProject.effectiveScalaInstallation.version match {
+      case SpecificScalaVersion(major, minor, _, _) => s"$major.$minor"
+      case _ =>
+        val SpecificScalaVersion(major, minor, _, _) = ScalaVersion.current
+        s"$major.$minor"
+    }
+  private var compiler = org.scalaide.core.internal.builder.zinc.ResidentCompiler(scalaProject, config.binFolder,
+    WorksheetPlugin.worksheetLibraries.get(version))
   private var executor: ActorRef = _
   private var buildListener: BuildListener = _
 
-  private val projectName  = scalaProject.underlying.getName
+  private val projectName = scalaProject.underlying.getName
 
   override def preStart(): Unit = {
     buildListener = new BuildListener(self)
@@ -92,13 +105,15 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
       executor forward msg
 
     case RefreshResidentCompiler =>
-      compiler = org.scalaide.core.internal.builder.zinc.ResidentCompiler(scalaProject, config.binFolder, WorksheetPlugin.worksheetLibrary)
+      compiler = org.scalaide.core.internal.builder.zinc.ResidentCompiler(scalaProject, config.binFolder,
+          WorksheetPlugin.worksheetLibraries.get(version))
   }
 
-  /** The classpath, as a list of local filesystem path
-    */
+  /**
+   * The classpath, as a list of local filesystem path
+   */
   private def classpath: Seq[String] = {
-    WorksheetPlugin.worksheetLibrary.map(_.toOSString()).toSeq ++
+    WorksheetPlugin.worksheetLibraries.get(version).map(_.toOSString()).toSeq ++
       scalaProject.scalaClasspath.fullClasspath.map(_.getAbsolutePath()) ++
       scalaProject.outputFolderLocations.map(_.toOSString()) :+ config.binFolder.getAbsolutePath()
   }

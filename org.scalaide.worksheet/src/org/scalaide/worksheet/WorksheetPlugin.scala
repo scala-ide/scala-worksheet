@@ -20,12 +20,14 @@ object WorksheetPlugin extends HasLogger {
   private final val PluginId = "org.scalaide.worksheet"
 
   private final val worksheetBundle: Bundle = Platform.getBundle(WorksheetPlugin.PluginId)
-  final val worksheetLibrary: Option[IPath] = {
-    val path2lib = OSGiUtils.pathInBundle(worksheetBundle, "target/lib/worksheet-runtime-library_2.12.jar")
-    if(path2lib.isEmpty)
-      eclipseLog.error("The Scala Worksheet cannot be started correctly because worksheet runtime library is missing. Please report the issue.")
-
-    path2lib
+  final val worksheetLibraries: Map[String, IPath] = {
+    val worksheetRuntime212 = OSGiUtils.pathInBundle(worksheetBundle, "target/lib/worksheet-runtime-library_2.12.jar")
+    val worksheetRuntime211 = OSGiUtils.pathInBundle(worksheetBundle, "target/lib/worksheet-runtime-library_2.11.jar")
+    if(worksheetRuntime212.isEmpty)
+      eclipseLog.error("The Scala Worksheet cannot be started correctly because worksheet runtime library for scala 2.12 is missing. Please report the issue.")
+    if(worksheetRuntime211.isEmpty)
+      eclipseLog.error("The Scala Worksheet cannot be started correctly because worksheet runtime library for scala 2.11 is missing. Please report the issue.")
+    worksheetRuntime212.toSeq.map { "2.12" -> _ } ++ worksheetRuntime211.toSeq.map { "2.11" -> _ } toMap
   }
 
   def prefStore = plugin.getPreferenceStore
