@@ -13,6 +13,9 @@ import org.scalaide.worksheet.WorksheetPlugin
 import scala.tools.nsc.settings.SpecificScalaVersion
 import scala.tools.nsc.settings.ScalaVersion
 
+/**
+ * @deprecated replaced by [[org.scalaide.core.internal.builder.zinc.ResidentCompiler]]
+ */
 object ResidentCompiler extends HasLogger {
   def apply(scalaProject: IScalaProject, worksheetConfig: Configuration): ResidentCompiler = {
     val scalaClassPath = scalaProject.scalaClasspath
