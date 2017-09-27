@@ -2,10 +2,13 @@ package org.scalaide.worksheet.runtime
 
 import scala.collection.mutable.Publisher
 import scala.collection.mutable.Subscriber
+import scala.tools.nsc.settings.ScalaVersion
+import scala.tools.nsc.settings.SpecificScalaVersion
 
 import org.scalaide.core.BuildSuccess
 import org.scalaide.core.IScalaProject
 import org.scalaide.core.IScalaProjectEvent
+import org.scalaide.core.ScalaInstallationChange
 import org.scalaide.logging.HasLogger
 import org.scalaide.util.ui.DisplayThread
 import org.scalaide.worksheet.ScriptCompilationUnit
@@ -15,10 +18,6 @@ import org.scalaide.worksheet.editor.DocumentHolder
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
-import org.scalaide.core.ScalaInstallationChange
-import scala.tools.nsc.settings.SpecificScalaVersion
-import org.scalaide.core.internal.ScalaPlugin
-import scala.tools.nsc.settings.ScalaVersion
 
 object WorksheetRunner {
 
@@ -48,6 +47,7 @@ object WorksheetRunner {
  */
 private class WorksheetRunner private (scalaProject: IScalaProject) extends Actor with HasLogger {
   import WorksheetRunner._
+  import org.scalaide.core.internal.builder.zinc.{ ResidentCompiler => ZincCompiler }
   import org.scalaide.core.internal.builder.zinc.ResidentCompiler._
 
   private val config = Configuration(scalaProject)
@@ -59,8 +59,7 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
         val SpecificScalaVersion(major, minor, _, _) = ScalaVersion.current
         s"$major.$minor"
     }
-  private var compiler = org.scalaide.core.internal.builder.zinc.ResidentCompiler(scalaProject, config.binFolder,
-    WorksheetPlugin.worksheetLibraries.get(version))
+  private var compiler = ZincCompiler(scalaProject, config.binFolder, WorksheetPlugin.worksheetLibraries.get(version))
   private var executor: ActorRef = _
   private var buildListener: BuildListener = _
 
@@ -105,8 +104,7 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
       executor forward msg
 
     case RefreshResidentCompiler =>
-      compiler = org.scalaide.core.internal.builder.zinc.ResidentCompiler(scalaProject, config.binFolder,
-          WorksheetPlugin.worksheetLibraries.get(version))
+      compiler = ZincCompiler(scalaProject, config.binFolder, WorksheetPlugin.worksheetLibraries.get(version))
   }
 
   /**

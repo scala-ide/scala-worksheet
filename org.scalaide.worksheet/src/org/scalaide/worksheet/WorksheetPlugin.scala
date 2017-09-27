@@ -21,13 +21,14 @@ object WorksheetPlugin extends HasLogger {
 
   private final val worksheetBundle: Bundle = Platform.getBundle(WorksheetPlugin.PluginId)
   final val worksheetLibraries: Map[String, IPath] = {
-    val worksheetRuntime212 = OSGiUtils.pathInBundle(worksheetBundle, "target/lib/worksheet-runtime-library_2.12.jar")
-    val worksheetRuntime211 = OSGiUtils.pathInBundle(worksheetBundle, "target/lib/worksheet-runtime-library_2.11.jar")
-    if(worksheetRuntime212.isEmpty)
-      eclipseLog.error("The Scala Worksheet cannot be started correctly because worksheet runtime library for scala 2.12 is missing. Please report the issue.")
-    if(worksheetRuntime211.isEmpty)
-      eclipseLog.error("The Scala Worksheet cannot be started correctly because worksheet runtime library for scala 2.11 is missing. Please report the issue.")
-    worksheetRuntime212.toSeq.map { "2.12" -> _ } ++ worksheetRuntime211.toSeq.map { "2.11" -> _ } toMap
+    Seq("2.10", "2.11", "2.12").map { version =>
+      val lib = OSGiUtils.pathInBundle(worksheetBundle, s"target/lib/worksheet-runtime-library_$version.jar")
+      if (lib.isEmpty)
+        eclipseLog.error(s"The Scala Worksheet cannot be started correctly because worksheet runtime library for scala $version is missing. Please report the issue.")
+      version -> lib
+    }.collect {
+      case (version, Some(lib)) => version -> lib
+    }.toMap
   }
 
   def prefStore = plugin.getPreferenceStore
@@ -41,7 +42,7 @@ class WorksheetPlugin extends AbstractUIPlugin {
 
   @volatile private var bundleListener: BundleListener = _
   @volatile var runtime: ActorRef = _
-  
+
   class WorksheetActorSystemActivator extends ActorSystemActivator {
     override def configure(context: BundleContext, system: ActorSystem): Unit = {
       runtime = system.actorOf(WorksheetsRuntime.props, WorksheetsRuntime.ActorName)
