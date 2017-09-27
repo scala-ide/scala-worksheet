@@ -28,7 +28,7 @@
           <arguments>
             <argument>+publish</argument>
             <argument>-Dsbt.ivy.home=${IVY_HOME}</argument>
-            <argument>-Dmaven.repo.local=${LOCAL_M2_REPO}</argument>
+            <argument>-Dmaven.repo.local=${maven.repo.local}</argument>
           </arguments>
         </configuration>
       </plugin>
