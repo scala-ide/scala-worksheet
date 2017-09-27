@@ -26,7 +26,7 @@
           <executable>sbt</executable>
           <workingDirectory>${project.basedir}</workingDirectory>
           <arguments>
-            <argument>+publishM2</argument>
+            <argument>+publish</argument>
             <argument>-Dsbt.ivy.home=${IVY_HOME}</argument>
           </arguments>
         </configuration>
