@@ -39,3 +39,14 @@ scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
   )
   case _ => Seq()
 })
+
+publishMavenStyle := true
+
+publishTo := {
+  val repo = sys.props.get("maven.local.repo").orElse {
+    sys.props.get("user.home").flatMap { home =>
+      sys.props.get("file.separator").map(home + _ + ".m2")
+    }
+  }
+  repo.map("local" at _)
+}
