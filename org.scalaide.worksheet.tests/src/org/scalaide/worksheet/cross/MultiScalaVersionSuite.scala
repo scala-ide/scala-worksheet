@@ -5,8 +5,8 @@ import org.junit.runners.Suite
 
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array(
-  classOf[Scala210VersionTest],
   classOf[Scala211VersionTest],
-  classOf[Scala212VersionTest]
+  classOf[Scala212VersionTest],
+  classOf[Scala210VersionTest]
 ))
 class MultiScalaVersionSuite

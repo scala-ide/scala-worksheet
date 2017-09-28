@@ -10,25 +10,7 @@ import org.scalaide.worksheet.testutil.EvalTester
 
 package object cross {
   private object Monitor
-  private def setScalaVersion(project: ScalaProject, major: Int, minor: Int): Unit = {
-    project.effectiveScalaInstallation.version match {
-      case SpecificScalaVersion(2, `minor`, _, _) =>
-      case _ =>
-        val requiredInstallation = ScalaInstallation.availableInstallations.map { installation =>
-          installation -> installation.version
-        }.collectFirst {
-          case (installation, SpecificScalaVersion(2, `minor`, _, _)) => installation
-        }.get
-        project.setDesiredInstallation(ScalaInstallationChoice(requiredInstallation.version))
-    }
-    Assert.assertTrue(project.effectiveScalaInstallation.version match {
-      case SpecificScalaVersion(2, `minor`, _, _) => true
-      case _ => false
-    })
-  }
-
-  def evaluate(project: ScalaProject, major: Int, minor: Int): Unit = Monitor.synchronized {
-    setScalaVersion(project, major, minor)
+  def evaluate(project: ScalaProject, major: Int, minor: Int, rev: Int): Unit = Monitor.synchronized {
     val initial = """
 object o {
   val a = 3
