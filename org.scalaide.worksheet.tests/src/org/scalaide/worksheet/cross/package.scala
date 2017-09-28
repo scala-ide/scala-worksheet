@@ -11,6 +11,8 @@ import org.scalaide.worksheet.testutil.EvalTester
 package object cross {
   private object Monitor
   def evaluate(project: ScalaProject, major: Int, minor: Int, rev: Int): Unit = Monitor.synchronized {
+    val SpecificScalaVersion(actualMajor, actualMinor, actualRev, _) = project.effectiveScalaInstallation.version
+    Assert.assertTrue(actualMajor == major && actualMinor == minor && actualRev == rev)
     val initial = """
 object o {
   val a = 3
