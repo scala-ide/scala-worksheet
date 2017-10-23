@@ -10,15 +10,27 @@ import scala.tools.nsc.reporters.StoreReporter
 import org.scalaide.core.IScalaProject
 import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.WorksheetPlugin
+import scala.tools.nsc.settings.SpecificScalaVersion
+import scala.tools.nsc.settings.ScalaVersion
 
+/**
+ * @deprecated replaced by [[org.scalaide.core.internal.builder.zinc.ResidentCompiler]]
+ */
 object ResidentCompiler extends HasLogger {
   def apply(scalaProject: IScalaProject, worksheetConfig: Configuration): ResidentCompiler = {
     val scalaClassPath = scalaProject.scalaClasspath
+    def version: String =
+      scalaProject.effectiveScalaInstallation.version match {
+        case SpecificScalaVersion(major, minor, _, _) => s"$major.$minor"
+        case _ =>
+          val SpecificScalaVersion(major, minor, _, _) = ScalaVersion.current
+          s"$major.$minor"
+      }
 
     // scalacArguments returns all project settings (but not user classpath, nor output directory)
     val args = scalaProject.scalacArguments ++ Seq(
-        "-classpath", (WorksheetPlugin.worksheetLibrary.map(_.toOSString()).toSeq ++ scalaClassPath.userCp.map(_.toFile.getAbsolutePath)).mkString(File.pathSeparator),
-        "-d", worksheetConfig.binFolder.getAbsolutePath())
+      "-classpath", (WorksheetPlugin.worksheetLibraries.get(version).map(_.toOSString()).toSeq ++ scalaClassPath.userCp.map(_.toFile.getAbsolutePath)).mkString(File.pathSeparator),
+      "-d", worksheetConfig.binFolder.getAbsolutePath())
 
     logger.debug("Compilation arguments: " + args.mkString("\n"))
     new ResidentCompiler(args)

@@ -32,7 +32,7 @@ object EvalTester {
   
   /** Block until the given unit is evaluated. Wait `timeout` millis. */
   def runEvalSync(name: String, contents: String, timeout: Int = 10000): String = {
-    val timeslice = 200 // ms
+    val timeslice = 300 // ms
     var waited = 0
     val unit = getUnit(name, contents)
     val proxy = new EditorProxy(contents)
