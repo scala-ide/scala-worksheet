@@ -1,5 +1,5 @@
 name := "org.scalaide.worksheet.runtime.library"
-version := "0.7.0-SNAPSHOT"
+version := "0.8.0-SNAPSHOT"
 scalaVersion := "2.12.3"
 moduleName := name.value
 organization := "org.scalaide"
