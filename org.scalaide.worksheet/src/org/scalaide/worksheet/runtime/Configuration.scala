@@ -1,7 +1,6 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.Charset
 
@@ -38,46 +37,31 @@ final private[runtime] class Configuration private (project: IProject) {
 
   private def obtainFolder(relativePath: IPath): File = {
     val absolutePath = location.append(relativePath)
-    val folder = createFolder(absolutePath)
+    val folder = createFolder(absolutePath.toFile)
     folder
   }
 
-  private def createFolder(absolutePath: IPath): File = create(absolutePath) { folder =>
-    folder.mkdirs() // FIXME: This is not really safe
-    assert(folder.isDirectory())
+  private def createFolder(absolutePath: File): File = {
+    import java.nio.file.Files
+    Files.createDirectories(absolutePath.toPath).toFile
   }
 
-  private def createFile(absolutePath: IPath): File = create(absolutePath) { file =>
-    file.createNewFile() // FIXME: This is not really safe
-    assert(file.isFile())
-  }
-
-  private def create(absolutePath: IPath)(f: File => Unit): File = {
-    val file = new File(absolutePath.toOSString())
-    f(file)
-    file
-  }
-
-  def clearSrcFolder(): Unit = clear(srcFolder)
-  def clearBinFolder(): Unit = clear(binFolder)
-
-  private def clear(folder: File): Unit = {
-    if (folder.isDirectory()) {
-      for (resource <- folder.listFiles())
-        resource.delete() // FIXME: This is not really safe
-    }
+  private def autoClose[A <: AutoCloseable, B](resource: A)(code: A => B): B = {
+    try
+      code(resource)
+    finally
+      resource.close()
   }
 
   def touchSource(name: String, content: Array[Char], encoding: Charset): File = {
-    val absolutePath = new Path(srcFolder.getAbsolutePath()).append(name)
-    val source = createFile(absolutePath)
-    assert(source.isFile())
-
-    val writer = new OutputStreamWriter(new FileOutputStream(source), encoding.name)
-    try writer.write(content)
-    finally writer.close() // FIXME: This is not really safe
-
-    source
+    import java.nio.file.Files
+    val source = srcFolder.toPath.resolve(name)
+    autoClose {
+      new OutputStreamWriter(Files.newOutputStream(source))
+    } { out =>
+      out.write(content)
+      source.toFile
+    }
   }
 
   def vmArgs: VmArguments =
