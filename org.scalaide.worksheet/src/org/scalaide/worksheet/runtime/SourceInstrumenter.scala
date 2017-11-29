@@ -46,6 +46,7 @@ class SourceInstrumenter(config: Configuration) extends HasLogger {
   /** Write instrumented source file to disk. */
   private def writeInstrumented(decl: TopLevelObjectDecl, content: Array[Char]): File = {
     val sourceName = decl.fullName + ".scala"
+    logger.info(s"writing $sourceName with content ${content.take(20).mkString}")
     val sourceFile = config.touchSource(sourceName, content, config.vmArgs.fileEncoding)
     sourceFile
   }
