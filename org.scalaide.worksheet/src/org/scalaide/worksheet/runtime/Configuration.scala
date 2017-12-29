@@ -10,10 +10,16 @@ import org.eclipse.core.runtime.Path
 import org.scalaide.core.IScalaProject
 import org.scalaide.worksheet.WorksheetPlugin
 import org.scalaide.worksheet.properties.WorksheetPreferences
+import java.nio.file.StandardOpenOption
+import org.eclipse.ui.PlatformUI
+import org.scalaide.util.eclipse.EclipseUtils
+import org.eclipse.core.resources.ResourcesPlugin
+import org.eclipse.core.runtime.NullProgressMonitor
+import org.eclipse.core.resources.IResource
 
 private[runtime] object Configuration {
   private val RootFolder = new Path(".worksheet")
-  private val SrcFolder = RootFolder.append("src")
+  private[runtime] val SrcFolder = RootFolder.append("src")
   private val BinFolder = RootFolder.append("bin")
 
   def apply(project: IScalaProject): Configuration =
@@ -57,9 +63,18 @@ final private[runtime] class Configuration private (project: IProject) {
     import java.nio.file.Files
     val source = srcFolder.toPath.resolve(name)
     autoClose {
-      new OutputStreamWriter(Files.newOutputStream(source))
+      import StandardOpenOption._
+      Files.newBufferedWriter(source, DSYNC, TRUNCATE_EXISTING, CREATE)
     } { out =>
       out.write(content)
+      out.flush
+          try
+    ResourcesPlugin.getWorkspace.getRoot.getFileForLocation(location.append(SrcFolder)).refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor)
+    catch {
+      case e: Exception =>
+        println(e)
+    }
+
       source.toFile
     }
   }

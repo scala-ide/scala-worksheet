@@ -77,7 +77,7 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
   }
 
   override def receive = {
-    case RunEvaluation(unit, editor) =>
+    case RunEvaluation(unit, editor) => unit.workspaceFile.getParent.synchronized {
       unit.clearBuildErrors()
 
       editor.clearResults()
@@ -99,6 +99,7 @@ private class WorksheetRunner private (scalaProject: IScalaProject) extends Acto
               executor ! ProgramExecutor.RunProgram(unit, decl.fullName, classpath, editor)
           }
       }
+    }
 
     case msg: ProgramExecutor.StopRun =>
       executor forward msg

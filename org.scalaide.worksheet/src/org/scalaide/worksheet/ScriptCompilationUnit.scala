@@ -1,7 +1,8 @@
 package org.scalaide.worksheet
 
-import scala.reflect.internal.util.{Position, NoPosition}
 import scala.reflect.internal.util.BatchSourceFile
+import scala.reflect.internal.util.NoPosition
+import scala.reflect.internal.util.Position
 import scala.tools.nsc.io.AbstractFile
 
 import org.eclipse.core.resources.IFile
@@ -11,12 +12,10 @@ import org.eclipse.ui.IEditorInput
 import org.eclipse.ui.part.FileEditorInput
 import org.scalaide.core.IScalaPlugin
 import org.scalaide.core.compiler.ISourceMap
-
 import org.scalaide.core.compiler.InteractiveCompilationUnit
-import org.scalaide.core.internal.builder.BuildProblemMarker
 import org.scalaide.core.resources.EclipseResource
 import org.scalaide.core.resources.MarkerFactory
-import org.scalaide.util.eclipse.FileUtils
+import org.scalaide.worksheet.WorksheetMarkers.BuildProblemMarker
 import org.scalaide.worksheet.editor.ScriptEditor
 
 /** A Script compilation unit connects the presentation compiler
@@ -58,7 +57,7 @@ case class ScriptCompilationUnit(val workspaceFile: IFile) extends InteractiveCo
   }
 
   def clearBuildErrors(): Unit = {
-    FileUtils.clearBuildErrors(workspaceFile, null)
+    WorksheetMarkers.clearBuildErrors(workspaceFile, null)
   }
 
   /** Build errors need to be mapped back to the original source. Right now
