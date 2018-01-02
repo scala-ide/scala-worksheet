@@ -10,9 +10,6 @@ import org.scalaide.core.compiler.IScalaPresentationCompiler
 import org.scalaide.logging.HasLogger
 import org.scalaide.worksheet.ScriptCompilationUnit
 import org.scalaide.worksheet.text.SourceInserter
-import org.eclipse.core.resources.ResourcesPlugin
-import org.eclipse.core.resources.IResource
-import org.eclipse.core.runtime.NullProgressMonitor
 
 case class TopLevelObjectDecl(fullName: String)
 
