@@ -1,7 +1,6 @@
 package org.scalaide.worksheet.runtime
 
 import java.io.File
-import java.io.OutputStreamWriter
 import java.nio.charset.Charset
 
 import org.eclipse.core.resources.IProject
@@ -57,7 +56,8 @@ final private[runtime] class Configuration private (project: IProject) {
     import java.nio.file.Files
     val source = srcFolder.toPath.resolve(name)
     autoClose {
-      new OutputStreamWriter(Files.newOutputStream(source))
+      import java.nio.file.StandardOpenOption._
+      Files.newBufferedWriter(source, DSYNC, TRUNCATE_EXISTING, CREATE)
     } { out =>
       out.write(content)
       source.toFile
